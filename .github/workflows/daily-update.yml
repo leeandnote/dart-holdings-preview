@@ -2,14 +2,11 @@ name: Daily DART data update
 
 on:
   workflow_dispatch:
-   push:
-    branches: [main]
+  push:
+    branches:
+      - main
     paths:
       - ".github/workflows/daily-update.yml"
-      - "daily_update.ps1"
-      - "major_holdings.ps1"
-      - "enrich_obligation_dates.ps1"
-      - "update_prices.ps1"
   schedule:
     - cron: "30 7 * * 1-5"
     - cron: "30 14 * * 1-5"
@@ -39,8 +36,7 @@ jobs:
         env:
           DART_API_KEY: ${{ secrets.DART_API_KEY }}
         run: |
-         [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-  $PSDefaultParameterValues["Invoke-WebRequest:SslProtocol"] = "Tls12"
+          [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12
           if (-not $env:DART_API_KEY) {
             throw "Missing repository secret: DART_API_KEY"
           }
@@ -52,14 +48,9 @@ jobs:
       - name: Prepare SEO files
         shell: pwsh
         run: |
-          $siteUrl = "${{ vars.SITE_URL }}"
-          if (-not $siteUrl) {
-            $siteUrl = "https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/"
-          }
-          if (-not $siteUrl.EndsWith("/")) {
-            $siteUrl = "$siteUrl/"
-          }
+          $siteUrl = "https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/"
           $today = Get-Date -Format "yyyy-MM-dd"
+
           @(
             "User-agent: *",
             "Allow: /",
@@ -74,26 +65,6 @@ jobs:
             "    <loc>${siteUrl}</loc>",
             "    <lastmod>${today}</lastmod>",
             "    <priority>1.0</priority>",
-            "  </url>",
-            "  <url>",
-            "    <loc>${siteUrl}disclaimer.html</loc>",
-            "    <lastmod>${today}</lastmod>",
-            "    <priority>0.4</priority>",
-            "  </url>",
-            "  <url>",
-            "    <loc>${siteUrl}privacy.html</loc>",
-            "    <lastmod>${today}</lastmod>",
-            "    <priority>0.3</priority>",
-            "  </url>",
-            "  <url>",
-            "    <loc>${siteUrl}terms.html</loc>",
-            "    <lastmod>${today}</lastmod>",
-            "    <priority>0.3</priority>",
-            "  </url>",
-            "  <url>",
-            "    <loc>${siteUrl}contact.html</loc>",
-            "    <lastmod>${today}</lastmod>",
-            "    <priority>0.3</priority>",
             "  </url>",
             "</urlset>"
           ) | Set-Content -Path "site/sitemap.xml" -Encoding UTF8
