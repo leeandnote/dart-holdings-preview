@@ -35,16 +35,15 @@ jobs:
         shell: powershell
         env:
           DART_API_KEY: ${{ secrets.DART_API_KEY }}
-        run: |
-          [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12
-          if (-not $env:DART_API_KEY) {
-            throw "Missing repository secret: DART_API_KEY"
-          }
-          ./daily_update.ps1 -ApiKey $env:DART_API_KEY -PriceSleepMs 160
-          if (Test-Path "site/data/prices.json") {
-            Remove-Item "site/data/prices.json" -Force
-          }
-
+       run: |
+  [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+  if (-not $env:DART_API_KEY) {
+    throw "Missing repository secret: DART_API_KEY"
+  }
+  ./daily_update.ps1 -ApiKey $env:DART_API_KEY -PriceSleepMs 160
+  if (Test-Path "site/data/prices.json") {
+    Remove-Item "site/data/prices.json" -Force
+  }
       - name: Prepare SEO files
         shell: powershell
         run: |
@@ -71,17 +70,15 @@ jobs:
 
       - name: Commit updated cache
         shell: powershell
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add site/data site/robots.txt site/sitemap.xml
-          git diff --cached --quiet
-          if ($LASTEXITCODE -ne 0) {
-            git commit -m "Update DART holdings cache"
-            git push
-          } else {
-            Write-Host "No data changes to commit."
-          }
+       run: |
+  [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+  if (-not $env:DART_API_KEY) {
+    throw "Missing repository secret: DART_API_KEY"
+  }
+  ./daily_update.ps1 -ApiKey $env:DART_API_KEY -PriceSleepMs 160
+  if (Test-Path "site/data/prices.json") {
+    Remove-Item "site/data/prices.json" -Force
+  }
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
