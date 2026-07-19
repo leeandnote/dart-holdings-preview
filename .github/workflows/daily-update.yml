@@ -31,6 +31,8 @@ jobs:
         env:
           DART_API_KEY: ${{ secrets.DART_API_KEY }}
         run: |
+         [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+  $PSDefaultParameterValues["Invoke-WebRequest:SslProtocol"] = "Tls12"
           if (-not $env:DART_API_KEY) {
             throw "Missing repository secret: DART_API_KEY"
           }
