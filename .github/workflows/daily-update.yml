@@ -2,6 +2,14 @@ name: Daily DART data update
 
 on:
   workflow_dispatch:
+   push:
+    branches: [main]
+    paths:
+      - ".github/workflows/daily-update.yml"
+      - "daily_update.ps1"
+      - "major_holdings.ps1"
+      - "enrich_obligation_dates.ps1"
+      - "update_prices.ps1"
   schedule:
     - cron: "30 7 * * 1-5"
     - cron: "30 14 * * 1-5"
