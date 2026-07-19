@@ -1,4 +1,4 @@
-name: Daily DART data update
+name: Deploy site to GitHub Pages
 
 on:
   workflow_dispatch:
@@ -6,23 +6,21 @@ on:
     branches:
       - main
     paths:
+      - "site/**"
       - ".github/workflows/daily-update.yml"
-  schedule:
-    - cron: "30 7 * * 1-5"
-    - cron: "30 14 * * 1-5"
 
 permissions:
-  contents: write
+  contents: read
   pages: write
   id-token: write
 
 concurrency:
   group: pages
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
-  update-and-deploy:
-    runs-on: windows-latest
+  deploy:
+    runs-on: ubuntu-latest
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -30,55 +28,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Run DART and price update
-        shell: powershell
-        env:
-          DART_API_KEY: ${{ secrets.DART_API_KEY }}
-       run: |
-  [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-  if (-not $env:DART_API_KEY) {
-    throw "Missing repository secret: DART_API_KEY"
-  }
-  ./daily_update.ps1 -ApiKey $env:DART_API_KEY -PriceSleepMs 160
-  if (Test-Path "site/data/prices.json") {
-    Remove-Item "site/data/prices.json" -Force
-  }
-      - name: Prepare SEO files
-        shell: powershell
-        run: |
-          $siteUrl = "https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/"
-          $today = Get-Date -Format "yyyy-MM-dd"
-
-          @(
-            "User-agent: *",
-            "Allow: /",
-            "",
-            "Sitemap: ${siteUrl}sitemap.xml"
-          ) | Set-Content -Path "site/robots.txt" -Encoding UTF8
-
-          @(
-            "<?xml version=""1.0"" encoding=""UTF-8""?>",
-            "<urlset xmlns=""http://www.sitemaps.org/schemas/sitemap/0.9"">",
-            "  <url>",
-            "    <loc>${siteUrl}</loc>",
-            "    <lastmod>${today}</lastmod>",
-            "    <priority>1.0</priority>",
-            "  </url>",
-            "</urlset>"
-          ) | Set-Content -Path "site/sitemap.xml" -Encoding UTF8
-
-      - name: Commit updated cache
-        shell: powershell
-       run: |
-  [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-  if (-not $env:DART_API_KEY) {
-    throw "Missing repository secret: DART_API_KEY"
-  }
-  ./daily_update.ps1 -ApiKey $env:DART_API_KEY -PriceSleepMs 160
-  if (Test-Path "site/data/prices.json") {
-    Remove-Item "site/data/prices.json" -Force
-  }
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
