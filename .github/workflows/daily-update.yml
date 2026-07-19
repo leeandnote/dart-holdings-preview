@@ -1,0 +1,115 @@
+name: Daily DART data update
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "30 7 * * 1-5"
+    - cron: "30 14 * * 1-5"
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  update-and-deploy:
+    runs-on: windows-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run DART and price update
+        shell: pwsh
+        env:
+          DART_API_KEY: ${{ secrets.DART_API_KEY }}
+        run: |
+          if (-not $env:DART_API_KEY) {
+            throw "Missing repository secret: DART_API_KEY"
+          }
+          ./daily_update.ps1 -ApiKey $env:DART_API_KEY -PriceSleepMs 160
+          if (Test-Path "site/data/prices.json") {
+            Remove-Item "site/data/prices.json" -Force
+          }
+
+      - name: Prepare SEO files
+        shell: pwsh
+        run: |
+          $siteUrl = "${{ vars.SITE_URL }}"
+          if (-not $siteUrl) {
+            $siteUrl = "https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/"
+          }
+          if (-not $siteUrl.EndsWith("/")) {
+            $siteUrl = "$siteUrl/"
+          }
+          $today = Get-Date -Format "yyyy-MM-dd"
+          @(
+            "User-agent: *",
+            "Allow: /",
+            "",
+            "Sitemap: ${siteUrl}sitemap.xml"
+          ) | Set-Content -Path "site/robots.txt" -Encoding UTF8
+
+          @(
+            "<?xml version=""1.0"" encoding=""UTF-8""?>",
+            "<urlset xmlns=""http://www.sitemaps.org/schemas/sitemap/0.9"">",
+            "  <url>",
+            "    <loc>${siteUrl}</loc>",
+            "    <lastmod>${today}</lastmod>",
+            "    <priority>1.0</priority>",
+            "  </url>",
+            "  <url>",
+            "    <loc>${siteUrl}disclaimer.html</loc>",
+            "    <lastmod>${today}</lastmod>",
+            "    <priority>0.4</priority>",
+            "  </url>",
+            "  <url>",
+            "    <loc>${siteUrl}privacy.html</loc>",
+            "    <lastmod>${today}</lastmod>",
+            "    <priority>0.3</priority>",
+            "  </url>",
+            "  <url>",
+            "    <loc>${siteUrl}terms.html</loc>",
+            "    <lastmod>${today}</lastmod>",
+            "    <priority>0.3</priority>",
+            "  </url>",
+            "  <url>",
+            "    <loc>${siteUrl}contact.html</loc>",
+            "    <lastmod>${today}</lastmod>",
+            "    <priority>0.3</priority>",
+            "  </url>",
+            "</urlset>"
+          ) | Set-Content -Path "site/sitemap.xml" -Encoding UTF8
+
+      - name: Commit updated cache
+        shell: pwsh
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add site/data site/robots.txt site/sitemap.xml
+          git diff --cached --quiet
+          if ($LASTEXITCODE -ne 0) {
+            git commit -m "Update DART holdings cache"
+            git push
+          } else {
+            Write-Host "No data changes to commit."
+          }
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
