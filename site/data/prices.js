@@ -1,0 +1,1 @@
+﻿window.__PRICE_DATA__ = {"generatedAt":"2026-07-14 20:59:01","source":"Yahoo Finance chart API","range":"1y","interval":"1d","stockCount":1467,"errorCount":1,"errors":[{"code":"066410","name":"버킷스튜디오","symbol":"066410.KQ","error":"empty chart result"}],"prices":{}}; window.__PRICE_CHUNKS__ = window.__PRICE_CHUNKS__ || {};

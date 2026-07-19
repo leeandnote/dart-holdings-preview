@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DART 지분변동 이슈</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <p class="eyebrow">DART 대량보유 모니터</p>
+      <h1 id="title">지분변동 이슈</h1>
+      <p id="period" class="muted">데이터를 불러오는 중</p>
+    </div>
+    <button id="printBtn" class="iconButton" type="button" title="PDF 저장">PDF</button>
+  </header>
+
+  <main>
+    <section id="topRankings" class="topRankings" aria-label="오늘 Top5 요약"></section>
+
+    <div class="contentShell">
+      <section class="issueList" aria-label="지분변동 목록">
+        <div class="panelHead">
+          <h2 id="listTitle">대량보유 변동 테이블</h2>
+          <p id="listHint">종목명을 누르면 차트와 공시 마커를 봅니다.</p>
+        </div>
+        <section class="controls" aria-label="테이블 필터">
+          <select id="stockSelect" class="stockSelect" aria-label="종목 선택">
+            <option value="all">전체 종목</option>
+          </select>
+          <select id="marketFilter" class="filterSelect" aria-label="시장 필터">
+            <option value="all">전체 시장</option>
+            <option value="KOSPI">KOSPI</option>
+            <option value="KOSDAQ">KOSDAQ</option>
+          </select>
+          <select id="directionFilter" class="filterSelect" aria-label="증감 필터">
+            <option value="all">전체 증감</option>
+            <option value="up">지분 증가</option>
+            <option value="cross">5% 상향돌파</option>
+            <option value="down">지분 감소</option>
+          </select>
+          <input id="fromDate" class="dateInput" type="date" aria-label="시작일">
+          <input id="toDate" class="dateInput" type="date" aria-label="종료일">
+          <input id="searchInput" class="searchInput" type="search" placeholder="종목, 제출인, 사유 검색" aria-label="검색">
+          <div class="segmented">
+            <button class="active" type="button" data-mode="day">일별</button>
+            <button type="button" data-mode="week">주별</button>
+            <button type="button" data-mode="month">월별</button>
+          </div>
+          <select id="pageSize" class="filterSelect pageSizeSelect" aria-label="페이지당 표시 개수">
+            <option value="10">10개씩 보기</option>
+            <option value="20">20개씩 보기</option>
+            <option value="50">50개씩 보기</option>
+          </select>
+          <button id="columnsBtn" class="ghostButton" type="button">열설정</button>
+          <button id="csvBtn" class="ghostButton" type="button">Excel</button>
+        </section>
+        <section id="columnsPanel" class="columnsPanel hidden" aria-label="열 설정"></section>
+        <div id="list"></div>
+      </section>
+
+    </div>
+
+    <section id="chartPanel" class="chartPanel hidden">
+      <div class="panelHead">
+        <h2 id="chartTitle">가격·지분변동 차트</h2>
+        <p id="chartHint">캐싱된 일봉 가격 위에 DART 지분변동 이벤트를 표시합니다.</p>
+      </div>
+      <div id="chart" class="chart" role="img" aria-label="지분율 증감 추이"></div>
+      <div id="eventRail" class="eventRail" aria-label="지분변동 이벤트 마커"></div>
+    </section>
+
+    <section id="insight" class="insightPanel" aria-label="자동 해석">
+      <h2>자동 해석</h2>
+      <p class="muted">데이터를 불러오는 중입니다.</p>
+    </section>
+
+    <footer class="siteFooter">
+      <p>본 서비스는 DART 공시와 공개 가격 데이터를 기반으로 한 정보 제공 서비스이며, 특정 종목의 매수·매도 추천이 아닙니다.</p>
+      <nav aria-label="사이트 정책">
+        <a href="disclaimer.html">투자유의사항</a>
+        <a href="privacy.html">개인정보처리방침</a>
+        <a href="terms.html">이용약관</a>
+        <a href="contact.html">문의</a>
+      </nav>
+    </footer>
+  </main>
+
+  <script src="data/latest.js"></script>
+  <script src="data/logos.js"></script>
+  <script src="data/prices.js"></script>
+  <script src="data/event_prices.js"></script>
+  <script src="data/current_prices.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
