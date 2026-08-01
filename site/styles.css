@@ -3891,15 +3891,22 @@ button {
 
   .topbar {
     position: static;
-    align-items: center;
-    flex-direction: row;
-    gap: 10px;
-    padding: 14px 12px;
-    overflow-x: auto;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+    gap: 9px;
+    padding: 12px 12px 10px;
+    overflow: visible;
+  }
+
+  .brandHome {
+    min-width: 0;
+    min-height: 32px;
   }
 
   .brandLogo {
-    width: 110px;
+    width: 118px;
+    max-width: calc(100vw - 72px);
   }
 
   .brandMark {
@@ -3908,17 +3915,24 @@ button {
   }
 
   .siteNav {
-    width: auto;
+    width: 100%;
     overflow-x: auto;
     flex-wrap: nowrap;
-    padding-bottom: 2px;
+    gap: 6px;
+    padding-bottom: 3px;
+    scrollbar-width: none;
+  }
+
+  .siteNav::-webkit-scrollbar {
+    display: none;
   }
 
   .navLink {
     flex: 0 0 auto;
-    min-height: 34px;
-    padding: 0 10px;
-    font-size: 13px;
+    min-height: 32px;
+    padding: 0 9px;
+    font-size: 12px;
+    white-space: nowrap;
   }
 
   .navIcon {
@@ -3958,7 +3972,7 @@ button {
   .holdingFilterPanel,
   .holdingMainLine,
   .holdingDetailLine {
-    display: grid;
+    display: block;
     grid-template-columns: 1fr;
   }
 
@@ -3967,6 +3981,8 @@ button {
   }
 
   .holdingMainLine {
+    width: 100%;
+    min-width: 0;
     padding: 11px;
   }
 
@@ -4001,18 +4017,28 @@ button {
 
   .scanField {
     display: grid;
-    grid-template-columns: minmax(96px, 0.8fr) minmax(0, 1fr);
+    grid-template-columns: minmax(104px, 0.74fr) minmax(0, 1fr);
     gap: 8px;
     align-items: baseline;
     padding: 7px 2px;
     border-bottom: 1px solid #f1f4f8;
   }
 
+  .holdingCardStack,
+  .holdingCardStack .holdingMainLine,
+  .holdingCardStack .scanField {
+    max-width: 100%;
+    overflow: hidden;
+  }
+
   .scanField strong,
   .scanField em,
   .scanField.num strong,
   .scanField.num em {
+    min-width: 0;
+    overflow: hidden;
     text-align: right;
+    text-overflow: ellipsis;
     white-space: normal;
   }
 
@@ -4022,6 +4048,36 @@ button {
 
   .scanField em {
     grid-column: 2;
+  }
+
+  .trendField strong {
+    overflow: visible;
+  }
+
+  .miniTrend {
+    width: min(156px, 100%);
+    margin-left: auto;
+  }
+
+  .toolbar,
+  .tableToolbar,
+  .institutionTableToolbar {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    padding-bottom: 4px;
+    scrollbar-width: thin;
+  }
+
+  .toolbar .searchInput,
+  .tableToolbar .searchInput,
+  .institutionTableToolbar .searchInput {
+    flex: 0 0 min(70vw, 320px);
+    min-width: 0;
+  }
+
+  .toolIconButton,
+  .pageSizeSelect {
+    flex: 0 0 auto;
   }
 
   .fieldLabel {
