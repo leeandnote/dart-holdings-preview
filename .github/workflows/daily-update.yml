@@ -46,6 +46,20 @@ jobs:
             Remove-Item "site/data/prices.json" -Force
           }
 
+      - name: Sync cache to Supabase
+        shell: pwsh
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          if (-not $env:SUPABASE_URL) {
+            throw "Missing repository secret: SUPABASE_URL"
+          }
+          if (-not $env:SUPABASE_SERVICE_ROLE_KEY) {
+            throw "Missing repository secret: SUPABASE_SERVICE_ROLE_KEY"
+          }
+          node scripts/sync-supabase-cache.mjs
+
       - name: Prepare SEO files
         shell: pwsh
         run: |

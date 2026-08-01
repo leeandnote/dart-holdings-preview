@@ -1,14 +1,7 @@
 export default async function handler(req, res) {
-  const expected = process.env.CRON_SECRET;
-  const provided = req.headers.authorization?.replace(/^Bearer\s+/i, "");
-  if (expected && provided !== expected) {
-    res.status(401).json({ error: "Unauthorized" });
-    return;
-  }
-
-  res.status(501).json({
-    status: "collector-not-ported-yet",
+  res.status(200).json({
+    status: "handled-by-github-actions",
     message:
-      "Vercel Cron endpoint is ready. Next step is porting the DART collector from PowerShell to Node/Python serverless, then writing results to Supabase.",
+      "Daily DART collection runs in GitHub Actions, then syncs the cache to Supabase. Vercel serves the dashboard and reads Supabase.",
   });
 }
