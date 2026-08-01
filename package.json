@@ -1,0 +1,10 @@
+{
+  "name": "lee-note-dart-monitor",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "sync:supabase": "node scripts/sync-supabase-cache.mjs",
+    "verify:supabase": "node scripts/verify-supabase-cache.mjs"
+  }
+}

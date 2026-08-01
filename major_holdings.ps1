@@ -2,7 +2,7 @@
     [Parameter(Position = 0)]
     [string[]]$Query = @(),
 
-    [string]$BgnDe = (Get-Date).AddMonths(-3).ToString('yyyyMMdd'),
+    [string]$BgnDe = (Get-Date).AddYears(-1).ToString('yyyyMMdd'),
     [string]$EndDe = (Get-Date).ToString('yyyyMMdd'),
     [string]$ApiKey = $env:DART_API_KEY,
     [string]$CacheDir = '.cache',

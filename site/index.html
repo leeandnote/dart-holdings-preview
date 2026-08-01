@@ -1,22 +1,43 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="ko">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>DART 지분변동 이슈</title>
+  <title>리앤노트 | 대량보유 변동 스캐너</title>
+  <link rel="icon" href="assets/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" href="assets/favicon-32.png" sizes="32x32">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <header class="topbar">
-    <div>
-      <p class="eyebrow">DART 대량보유 모니터</p>
-      <h1 id="title">지분변동 이슈</h1>
-      <p id="period" class="muted">데이터를 불러오는 중</p>
-    </div>
-    <button id="printBtn" class="iconButton" type="button" title="PDF 저장">PDF</button>
+    <a class="brandHome" href="index.html" aria-label="리앤노트 홈">
+      <img class="brandMark" src="assets/leeandnote-mark.png" alt="">
+      <img class="brandLogo" src="assets/leeandnote-logo.png" alt="LEE&NOTE">
+    </a>
+    <nav class="siteNav" aria-label="주요 카테고리">
+      <div class="navGroup active">
+        <a class="navLink" href="index.html"><span class="navIcon disclosureIcon"></span>공시데이터<span class="navArrow">▾</span></a>
+        <div class="navMenu" aria-label="공시데이터 하위 메뉴">
+          <a href="index.html">대량보유 스캐너</a>
+          <a href="institutions.html">금융사 수급</a>
+          <a href="disclosure-signals.html">실적·계약 공시</a>
+        </div>
+      </div>
+      <a class="navLink" href="blog.html"><span class="navIcon blogIcon"></span>블로그</a>
+      <a class="navLink" href="prices.html"><span class="navIcon priceIcon"></span>가격</a>
+    </nav>
   </header>
 
   <main>
+    <section class="pageHero">
+      <div>
+        <p class="eyebrow">DART 대량보유 모니터</p>
+        <h1 id="title" class="homeTitle" role="button" tabindex="0" title="전체 테이블로 이동">대량보유 변동 스캐너</h1>
+        <p id="period" class="muted">데이터를 불러오는 중</p>
+      </div>
+    </section>
+
     <section id="topRankings" class="topRankings" aria-label="오늘 Top5 요약"></section>
 
     <div class="contentShell">
@@ -26,37 +47,82 @@
           <p id="listHint">종목명을 누르면 차트와 공시 마커를 봅니다.</p>
         </div>
         <section class="controls" aria-label="테이블 필터">
-          <select id="stockSelect" class="stockSelect" aria-label="종목 선택">
-            <option value="all">전체 종목</option>
-          </select>
-          <select id="marketFilter" class="filterSelect" aria-label="시장 필터">
-            <option value="all">전체 시장</option>
-            <option value="KOSPI">KOSPI</option>
-            <option value="KOSDAQ">KOSDAQ</option>
-          </select>
-          <select id="directionFilter" class="filterSelect" aria-label="증감 필터">
-            <option value="all">전체 증감</option>
-            <option value="up">지분 증가</option>
-            <option value="cross">5% 상향돌파</option>
-            <option value="down">지분 감소</option>
-          </select>
-          <input id="fromDate" class="dateInput" type="date" aria-label="시작일">
-          <input id="toDate" class="dateInput" type="date" aria-label="종료일">
           <input id="searchInput" class="searchInput" type="search" placeholder="종목, 제출인, 사유 검색" aria-label="검색">
-          <div class="segmented">
-            <button class="active" type="button" data-mode="day">일별</button>
-            <button type="button" data-mode="week">주별</button>
-            <button type="button" data-mode="month">월별</button>
-          </div>
+          <button id="csvBtn" class="toolIconButton" type="button" title="Excel 저장" aria-label="Excel 저장">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8"/><path d="M8 17h8"/><path d="M8 9h2"/></svg>
+            <span>XLS</span>
+          </button>
+          <button id="imageBtn" class="toolIconButton" type="button" title="이미지 저장" aria-label="이미지 저장">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="10.5" r="1.5"/><path d="M21 15l-5-5L5 19"/></svg>
+            <span>IMG</span>
+          </button>
+          <button id="filterBtn" class="toolIconButton" type="button" title="필터" aria-label="필터">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h18"/><path d="M7 12h10"/><path d="M10 19h4"/></svg>
+            <span>필터</span>
+          </button>
+          <button id="columnsBtn" class="toolIconButton" type="button" title="열 설정" aria-label="열 설정">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/><path d="M8 4v16"/><path d="M16 4v16"/></svg>
+            <span>열</span>
+          </button>
           <select id="pageSize" class="filterSelect pageSizeSelect" aria-label="페이지당 표시 개수">
             <option value="10">10개씩 보기</option>
             <option value="20">20개씩 보기</option>
             <option value="50">50개씩 보기</option>
           </select>
-          <button id="columnsBtn" class="ghostButton" type="button">열설정</button>
-          <button id="csvBtn" class="ghostButton" type="button">Excel</button>
+          <span id="imageStatus" class="imageStatus" aria-live="polite"></span>
         </section>
-        <section id="columnsPanel" class="columnsPanel hidden" aria-label="열 설정"></section>
+        <div id="filterModal" class="modalOverlay hidden" role="dialog" aria-modal="true" aria-labelledby="filterModalTitle">
+          <div class="tableModal">
+            <div class="modalHead">
+              <div>
+                <h3 id="filterModalTitle">필터 변경하기</h3>
+                <p>기간, 종목, 제출인, 금액/괴리 정렬을 조정합니다.</p>
+              </div>
+              <button class="modalClose" type="button" data-close-modal="filterModal" aria-label="닫기">×</button>
+            </div>
+            <div class="modalBody">
+              <div class="filterModalBasics">
+                <select id="stockSelect" class="stockSelect" aria-label="종목 선택">
+                  <option value="all">전체 종목</option>
+                </select>
+                <select id="marketFilter" class="filterSelect" aria-label="시장 필터">
+                  <option value="all">전체 시장</option>
+                  <option value="KOSPI">KOSPI</option>
+                  <option value="KOSDAQ">KOSDAQ</option>
+                </select>
+                <select id="directionFilter" class="filterSelect" aria-label="지분변동 필터">
+                  <option value="all">전체 지분변동</option>
+                  <option value="up">지분 증가</option>
+                  <option value="cross">5% 상향돌파</option>
+                  <option value="down">지분 감소</option>
+                </select>
+                <input id="fromDate" class="dateInput" type="date" aria-label="시작일">
+                <input id="toDate" class="dateInput" type="date" aria-label="종료일">
+              </div>
+              <div id="advancedFilterPanel" class="holdingFilterPanel modalFilterPanel" aria-label="컬럼별 필터와 정렬"></div>
+            </div>
+            <div class="modalActions">
+              <button class="ghostButton" type="button" data-close-modal="filterModal">닫기</button>
+              <button class="iconButton" type="button" data-close-modal="filterModal">적용</button>
+            </div>
+          </div>
+        </div>
+        <div id="columnsModal" class="modalOverlay hidden" role="dialog" aria-modal="true" aria-labelledby="columnsModalTitle">
+          <div class="tableModal small">
+            <div class="modalHead">
+              <div>
+                <h3 id="columnsModalTitle">열 설정</h3>
+                <p>화면에서 확인할 열을 선택합니다.</p>
+              </div>
+              <button class="modalClose" type="button" data-close-modal="columnsModal" aria-label="닫기">×</button>
+            </div>
+            <div id="columnsPanel" class="columnsPanel modalColumns"></div>
+            <div class="modalActions">
+              <button class="ghostButton" type="button" data-close-modal="columnsModal">취소</button>
+              <button class="iconButton" type="button" data-close-modal="columnsModal">적용</button>
+            </div>
+          </div>
+        </div>
         <div id="list"></div>
       </section>
 
@@ -69,11 +135,6 @@
       </div>
       <div id="chart" class="chart" role="img" aria-label="지분율 증감 추이"></div>
       <div id="eventRail" class="eventRail" aria-label="지분변동 이벤트 마커"></div>
-    </section>
-
-    <section id="insight" class="insightPanel" aria-label="자동 해석">
-      <h2>자동 해석</h2>
-      <p class="muted">데이터를 불러오는 중입니다.</p>
     </section>
 
     <footer class="siteFooter">
@@ -92,6 +153,9 @@
   <script src="data/prices.js"></script>
   <script src="data/event_prices.js"></script>
   <script src="data/current_prices.js"></script>
+  <script src="data/shareholders.js"></script>
+  <script src="data/disclosure_signals.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
+

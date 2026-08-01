@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>리앤노트 | 일별 공시 리포트</title>
+  <link rel="icon" href="assets/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" href="assets/favicon-32.png" sizes="32x32">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brandHome" href="index.html" aria-label="리앤노트 홈">
+      <img class="brandMark" src="assets/leeandnote-mark.png" alt="">
+      <img class="brandLogo" src="assets/leeandnote-logo.png" alt="LEE&NOTE">
+    </a>
+    <nav class="siteNav" aria-label="주요 카테고리">
+      <div class="navGroup">
+        <a class="navLink" href="index.html"><span class="navIcon disclosureIcon"></span>공시데이터<span class="navArrow">▾</span></a>
+        <div class="navMenu" aria-label="공시데이터 하위 메뉴">
+          <a href="index.html">대량보유 스캐너</a>
+          <a href="institutions.html">금융사 수급</a>
+          <a href="disclosure-signals.html">실적·계약 공시</a>
+        </div>
+      </div>
+      <a class="navLink active" href="blog.html"><span class="navIcon blogIcon"></span>블로그</a>
+      <a class="navLink" href="prices.html"><span class="navIcon priceIcon"></span>가격</a>
+    </nav>
+  </header>
+
+  <main class="reportMain">
+    <section class="reportToolbar" aria-label="리포트 조건">
+      <div>
+        <p class="eyebrow">LEE&NOTE DAILY DISCLOSURE REPORT</p>
+        <h1>일별 공시 리포트</h1>
+        <p id="reportRange" class="muted">DART 대량보유 공시 캐시를 불러오는 중입니다.</p>
+      </div>
+      <div class="reportActions">
+        <label>
+          <span>접수일 선택</span>
+          <select id="reportDateSelect" class="filterSelect"></select>
+        </label>
+        <button id="reportPdfButton" class="toolIconButton" type="button" title="브라우저에서 PDF로 저장">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5"/><path d="M9 17h6"/><path d="M9 14h6"/></svg>
+          PDF 저장
+        </button>
+      </div>
+    </section>
+
+    <section class="reportLayout">
+      <article id="dailyReportArticle" class="reportArticle" aria-live="polite"></article>
+      <aside class="reportAside">
+        <div class="reportAsideCard">
+          <strong>리포트 보기</strong>
+          <p>선택한 접수일의 대량보유 공시를 기준으로 지분 변동금액, 신규 5% 진입, 제출인 흐름을 자동 요약합니다.</p>
+          <button id="asidePdfButton" class="primarySmallButton" type="button">리포트 전문 PDF 저장</button>
+        </div>
+        <div class="reportAsideCard subtle">
+          <strong>작성 기준</strong>
+          <p>DART 공시와 캐시된 가격 데이터 기반입니다. 투자 판단은 차트, 거래량, 섹터 수급과 함께 확인해야 합니다.</p>
+        </div>
+      </aside>
+    </section>
+
+    <footer class="siteFooter">
+      <p>본 서비스는 DART 공시와 공개 가격 데이터를 기반으로 한 정보 제공 서비스이며, 특정 종목의 매수·매도 추천이 아닙니다.</p>
+      <nav aria-label="사이트 정책">
+        <a href="disclaimer.html">투자유의사항</a>
+        <a href="privacy.html">개인정보처리방침</a>
+        <a href="terms.html">이용약관</a>
+        <a href="contact.html">문의</a>
+      </nav>
+    </footer>
+  </main>
+
+  <script src="data/latest.js"></script>
+  <script src="data/event_prices.js"></script>
+  <script src="data/current_prices.js"></script>
+  <script src="blog.js"></script>
+</body>
+</html>

@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>금융사 수급 큐레이션 | DART 지분변동 이슈</title>
+  <link rel="icon" href="assets/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" href="assets/favicon-32.png" sizes="32x32">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brandHome" href="index.html" aria-label="리앤노트 홈">
+      <img class="brandMark" src="assets/leeandnote-mark.png" alt="">
+      <img class="brandLogo" src="assets/leeandnote-logo.png" alt="LEE&NOTE">
+    </a>
+    <nav class="siteNav" aria-label="주요 카테고리">
+      <div class="navGroup active">
+        <a class="navLink" href="index.html"><span class="navIcon disclosureIcon"></span>공시데이터<span class="navArrow">▾</span></a>
+        <div class="navMenu" aria-label="공시데이터 하위 메뉴">
+          <a href="index.html">대량보유 스캐너</a>
+          <a href="institutions.html">금융사 수급</a>
+          <a href="disclosure-signals.html">실적·계약 공시</a>
+        </div>
+      </div>
+      <a class="navLink" href="blog.html"><span class="navIcon blogIcon"></span>블로그</a>
+      <a class="navLink" href="prices.html"><span class="navIcon priceIcon"></span>가격</a>
+    </nav>
+  </header>
+
+  <main class="curationPage institutionPage">
+    <section class="pageHero">
+      <div>
+        <p class="eyebrow">&#44592;&#44288;&middot;&#44544;&#47196;&#48268; &#44552;&#50997;&#49324; &#49688;&#44553;</p>
+        <h1>&#44552;&#50997;&#49324; &#49688;&#44553; &#53328;&#47112;&#51060;&#49496;</h1>
+        <p id="institutionPeriod" class="muted">&#45936;&#51060;&#53552;&#47484; &#48520;&#47084;&#50724;&#45716; &#51473;</p>
+      </div>
+    </section>
+
+    <section class="curationControls hidden" aria-label="금융사 수급 필터">
+      <select id="institutionPreset" class="filterSelect" aria-label="제출인 그룹">
+        <option value="all">전체 금융사 그룹</option>
+        <option value="global">외국계 금융사</option>
+        <option value="domestic">국내 기관/운용사</option>
+        <option value="pension">연기금/국부펀드</option>
+      </select>
+      <select id="institutionReporter" class="filterSelect" aria-label="관심 금융사 선택">
+        <option value="all">관심 금융사 전체</option>
+      </select>
+      <select id="institutionDirection" class="filterSelect" aria-label="수급 방향">
+        <option value="all">전체 수급</option>
+        <option value="up">지분 증가만</option>
+        <option value="down">지분 감소만</option>
+        <option value="cross">신규 5% 진입</option>
+      </select>
+      <input id="institutionFrom" class="dateInput" type="date" aria-label="시작일">
+      <input id="institutionTo" class="dateInput" type="date" aria-label="종료일">
+      <input id="institutionSearch" class="searchInput" type="search" placeholder="금융사, 종목명 검색" aria-label="금융사 검색">
+    </section>
+
+    <section id="institutionSummary" class="insightPanel"></section>
+
+    <section class="themeBlock institutionMainBlock">
+      <div class="themeHead">
+        <div>
+          <p class="eyebrow">Institution Flow Table</p>
+          <h2>금융사 수급 변동 테이블</h2>
+        </div>
+        <p id="institutionMainHint" class="muted"></p>
+      </div>
+      <div id="institutionMainTable"></div>
+    </section>
+
+    <section class="themeBlock institutionGroupBlock" data-institution-group="global">
+      <div class="themeHead">
+        <div>
+          <p class="eyebrow">Foreign Institutions</p>
+          <h2>외국계 금융사</h2>
+        </div>
+        <p id="globalInstitutionHint" class="muted"></p>
+      </div>
+      <div id="globalInstitutionTable"></div>
+    </section>
+
+    <section class="themeBlock institutionGroupBlock" data-institution-group="domestic">
+      <div class="themeHead">
+        <div>
+          <p class="eyebrow">Domestic Institutions</p>
+          <h2>국내 기관/운용사</h2>
+        </div>
+        <p id="domesticInstitutionHint" class="muted"></p>
+      </div>
+      <div id="domesticInstitutionTable"></div>
+    </section>
+
+    <section class="themeBlock institutionGroupBlock" data-institution-group="pension">
+      <div class="themeHead">
+        <div>
+          <p class="eyebrow">Pension & Sovereign Funds</p>
+          <h2>연기금/국부펀드</h2>
+        </div>
+        <p id="pensionInstitutionHint" class="muted"></p>
+      </div>
+      <div id="pensionInstitutionTable"></div>
+    </section>
+
+    <footer class="siteFooter">
+      <p>본 페이지는 DART 대량보유 공시에서 주요 제출인을 분류한 참고용 큐레이션입니다. 특정 종목의 매수·매도 추천이 아닙니다.</p>
+      <nav aria-label="사이트 정책">
+        <a href="disclaimer.html">투자유의사항</a>
+        <a href="privacy.html">개인정보처리방침</a>
+        <a href="terms.html">이용약관</a>
+        <a href="contact.html">문의</a>
+      </nav>
+    </footer>
+  </main>
+
+  <script src="data/latest.js"></script>
+  <script src="data/event_prices.js"></script>
+  <script src="data/current_prices.js"></script>
+  <script src="institutions.js"></script>
+</body>
+</html>

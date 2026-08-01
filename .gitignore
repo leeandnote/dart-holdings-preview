@@ -1,0 +1,5 @@
+.cache/
+site/data/prices.json
+*.zip
+.env.local
+telegram_config.local.ps1

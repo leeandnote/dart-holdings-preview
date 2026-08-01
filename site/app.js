@@ -13,35 +13,59 @@ const state = {
   columnFilters: {},
   sortKey: "",
   sortDir: "",
-  visibleColumns: new Set(["obligationDate", "rcept", "market", "reporter", "eventClose", "currentClose", "priceGap", "tradeValue", "previous", "current", "delta"]),
+  visibleColumns: new Set(["obligationDate", "rcept", "reporter", "holderType", "shareChange", "trend3m", "reason", "eventClose", "currentClose", "priceGap", "tradeValue", "previous", "current", "delta"]),
   meta: null,
   priceData: {},
   eventPrices: {},
+  disclosureRows: [],
+  regularShareholders: {},
   logos: {},
   priceLoadStatus: {},
 };
 
 const number = new Intl.NumberFormat("ko-KR", { maximumFractionDigits: 2, minimumFractionDigits: 2 });
+const fallbackStockLogo = "assets/company-placeholder.svg";
+const blockedLogoStocks = new Set(["107640"]);
+const canUseApi = window.location.protocol !== "file:";
 let columnFilterTimer = null;
 let composingColumnFilter = false;
 const columns = [
   { key: "obligationDate", label: "보고의무발생일" },
-  { key: "rcept", label: "접수일자" },
+  { key: "rcept", label: "접수일" },
   { key: "market", label: "시장구분" },
   { key: "reporter", label: "주주/제출인" },
-  { key: "eventClose", label: "지분변동일 종가" },
-  { key: "currentClose", label: "현재 종가" },
-  { key: "priceGap", label: "현재가 괴리" },
-  { key: "tradeValue", label: "추정 변동금액" },
+  { key: "holderType", label: "제출인 성격" },
+  { key: "shareChange", label: "직전 → 이번" },
+  { key: "trend3m", label: "1년 추이" },
+  { key: "reason", label: "보고사유" },
+  { key: "eventClose", label: "보고의무발생일 종가" },
+  { key: "currentClose", label: "최근일 종가" },
+  { key: "priceGap", label: "종목 가격 괴리" },
+  { key: "tradeValue", label: "지분변동금액" },
   { key: "previous", label: "직전보유" },
   { key: "current", label: "이번보유" },
-  { key: "delta", label: "증감" },
+  { key: "delta", label: "지분변동주식수" },
 ];
 
-document.getElementById("printBtn").addEventListener("click", () => window.print());
 document.getElementById("csvBtn").addEventListener("click", downloadExcel);
-document.getElementById("columnsBtn").addEventListener("click", () => {
-  document.getElementById("columnsPanel").classList.toggle("hidden");
+document.getElementById("imageBtn").addEventListener("click", () => downloadTableImage("png"));
+document.getElementById("jpgBtn")?.addEventListener("click", () => downloadTableImage("jpg"));
+document.getElementById("filterBtn")?.addEventListener("click", () => openModal("filterModal"));
+document.getElementById("columnsBtn")?.addEventListener("click", () => openModal("columnsModal"));
+document.querySelectorAll("[data-close-modal]").forEach((button) => {
+  button.addEventListener("click", () => closeModal(button.dataset.closeModal));
+});
+document.querySelectorAll(".modalOverlay").forEach((overlay) => {
+  overlay.addEventListener("click", (event) => {
+    if (event.target === overlay) closeModal(overlay.id);
+  });
+});
+document.getElementById("title")?.addEventListener("click", goHome);
+document.getElementById("title")?.addEventListener("keydown", (event) => {
+  if (event.key === "Enter" || event.key === " ") {
+    event.preventDefault();
+    goHome();
+  }
 });
 document.getElementById("searchInput").addEventListener("input", (event) => {
   state.search = event.target.value.trim();
@@ -95,7 +119,17 @@ load();
 
 async function load() {
   try {
-    let payload = window.__DART_DATA__;
+    let payload = null;
+    const bootstrap = await loadBootstrapFromApi();
+    if (bootstrap?.latest) {
+      payload = bootstrap.latest;
+      window.__STOCK_LOGOS__ = bootstrap.logos || {};
+      window.__EVENT_PRICES__ = bootstrap.eventPrices || {};
+      window.__CURRENT_PRICES__ = bootstrap.currentPrices || {};
+      window.__REGULAR_SHAREHOLDERS__ = bootstrap.shareholders || {};
+      window.__DISCLOSURE_SIGNALS__ = bootstrap.disclosureSignals || { rows: [] };
+    }
+    if (!payload) payload = window.__DART_DATA__;
     if (!payload) {
       const response = await fetch("data/latest.json", { cache: "no-store" });
       if (!response.ok) throw new Error("latest.json not found");
@@ -105,6 +139,8 @@ async function load() {
     state.rows = (payload.rows || []).map(normalizeRow);
     state.priceData = window.__PRICE_DATA__?.prices || {};
     state.eventPrices = window.__EVENT_PRICES__ || {};
+    state.disclosureRows = (window.__DISCLOSURE_SIGNALS__?.rows || []).map(normalizeDisclosureRow);
+    state.regularShareholders = window.__REGULAR_SHAREHOLDERS__ || {};
     state.logos = window.__STOCK_LOGOS__ || {};
     state.from = defaultFromDate(payload);
     state.to = toDateInput(payload.endDe);
@@ -116,6 +152,17 @@ async function load() {
   } catch (error) {
     document.getElementById("title").textContent = "데이터가 없습니다";
     document.getElementById("period").textContent = "먼저 major_holdings.ps1을 실행해 data/latest.json을 생성하세요.";
+  }
+}
+
+async function loadBootstrapFromApi() {
+  if (!canUseApi) return null;
+  try {
+    const response = await fetch("/api/bootstrap", { cache: "no-store" });
+    if (!response.ok) return null;
+    return response.json();
+  } catch {
+    return null;
   }
 }
 
@@ -169,6 +216,29 @@ function normalizeRow(row) {
     shareDeltaText,
     crossed: row["5퍼센트상향돌파"] === "Y",
     reason: row["보고사유"] || "",
+    holderType: classifyHolder(row["보고자"] || "", row["보고사유"] || ""),
+    reasonType: classifyReason(row["보고사유"] || ""),
+    url: row.DART_URL || "#",
+  };
+}
+
+function normalizeDisclosureRow(row) {
+  const typeLabel = row["공시유형"] || "";
+  return {
+    date: String(row["접수일"] || ""),
+    market: row["시장"] || "",
+    type: typeLabel === "단일판매·공급계약" ? "contract" : "earnings",
+    typeLabel,
+    corpName: row["종목명"] || "",
+    stockCode: row["종목코드"] || "",
+    reportName: String(row["보고서명"] || "").trim(),
+    contractAmount: toNumber(row["계약금액"]),
+    recentSales: toNumber(row["최근매출액"]),
+    salesRatio: toNumber(row["매출대비비율"]),
+    sales: toNumber(row["매출액"]),
+    operatingProfit: toNumber(row["영업이익"]),
+    netProfit: toNumber(row["당기순이익"]),
+    turnaround: row["턴어라운드"] || "",
     url: row.DART_URL || "#",
   };
 }
@@ -177,6 +247,31 @@ function toNumber(value) {
   if (value === null || value === undefined || value === "") return null;
   const parsed = Number(String(value).replaceAll(",", ""));
   return Number.isFinite(parsed) ? parsed : null;
+}
+
+function classifyHolder(reporter, reason = "") {
+  const text = `${reporter} ${reason}`.toLowerCase();
+  const foreign = ["blackrock", "morgan", "jpmorgan", "jp morgan", "goldman", "dalton", "fidelity", "nomura", "ubs", "citigroup", "vanguard", "capital", "asset management", "investment", "inc.", "ltd.", "llc", "p.", "s.a.", "norges", "allianz", "macquarie"];
+  if (foreign.some((word) => text.includes(word))) return "외국계/글로벌 금융";
+  if (/국민연금|연기금|공무원연금|사학연금|교직원공제|군인공제/.test(reporter)) return "연기금·공제회";
+  if (/자산운용|투자신탁|투자자문|증권|캐피탈|벤처|사모|펀드|조합|신기술|인베스트|파트너스|운용/.test(reporter)) return "국내 금융·투자";
+  if (/홀딩스|지주|컨소시엄|컴퍼니|코퍼레이션|산업|상사|전자|화학|건설|테크|솔루션|시스템|바이오|엔터/.test(reporter)) return "전략적/관계사";
+  if (/대표|회장|임원|최대주주|특별관계자|친인척|증여|상속/.test(`${reporter} ${reason}`)) return "오너·특수관계";
+  if (/^[가-힣]{2,5}$/.test(reporter.trim())) return "개인";
+  return "기타/확인필요";
+}
+
+function classifyReason(reason = "") {
+  const text = String(reason);
+  if (/장내매수|매수|취득|증가/.test(text) && !/매도|처분/.test(text)) return "매수·취득";
+  if (/장내매도|매도|처분|감소/.test(text)) return "매도·처분";
+  if (/신규보고|신규 보고|5%/.test(text)) return "신규보고";
+  if (/담보|질권|근질권|대출|공탁/.test(text)) return "담보·계약변경";
+  if (/양수도|매매계약|경영권|최대주주 변경/.test(text)) return "양수도·경영권";
+  if (/전환사채|CB|신주인수권|BW|교환사채|EB/.test(text)) return "CB/BW/EB";
+  if (/특별관계|공동보유|특수관계/.test(text)) return "특별관계 변경";
+  if (/증여|상속/.test(text)) return "증여·상속";
+  return text ? "기타 사유" : "사유 미기재";
 }
 
 function readRoute() {
@@ -218,6 +313,7 @@ function syncControls() {
 
 function setupColumns() {
   const panel = document.getElementById("columnsPanel");
+  if (!panel) return;
   panel.innerHTML = columns.map((column) => `<label>
     <input type="checkbox" value="${column.key}" ${state.visibleColumns.has(column.key) ? "checked" : ""}>
     ${column.label}
@@ -256,21 +352,35 @@ function render() {
     document.getElementById("chart").innerHTML = "";
     drawEventRail([]);
     drawTopRankings(state.rows);
-    drawInsight(visibleRows, null);
   } else {
     document.getElementById("chartPanel").classList.remove("hidden");
     document.getElementById("chartTitle").textContent = `${selectedName} 가격·지분변동 차트`;
     document.getElementById("chartHint").textContent = "캐싱된 일봉 가격 위에 DART 대량보유 변동일을 마커로 표시합니다.";
-    drawPriceChart(selectedRows[0] || visibleRows[0], visibleRows);
-    drawEventRail(visibleRows);
+    drawPriceChart(selectedRows[0] || visibleRows[0], visibleRows, selectedRows);
+    drawEventRail([]);
     drawTopRankings([]);
-    drawInsight(visibleRows, selectedName);
   }
 
   const label = state.mode === "day" ? "일별" : state.mode === "week" ? "주별" : "월별";
   document.getElementById("listTitle").textContent = `${label} 대량보유 변동 테이블`;
   document.getElementById("listHint").textContent = `${visibleRows.length.toLocaleString("ko-KR")}건 · ${state.pageSize}개씩 표시 · 종목명을 누르면 상세 차트로 이동`;
+  renderAdvancedFilters();
   drawTable(groupRows(visibleRows, state.mode));
+}
+
+function openModal(id) {
+  document.getElementById(id)?.classList.remove("hidden");
+}
+
+function closeModal(id) {
+  document.getElementById(id)?.classList.add("hidden");
+}
+
+function goHome() {
+  if (state.selectedStock === "all") return;
+  state.selectedStock = "all";
+  resetPage();
+  commitRoute();
 }
 
 function drawTopRankings(rows) {
@@ -293,14 +403,14 @@ function drawTopRankings(rows) {
   const panels = [
     {
       title: "#자금유입 규모",
-      caption: "추정 변동금액 증가",
+      caption: "지분변동금액 증가",
       tone: "up",
       metric: "money",
       rows: rankRowsBy(dateRows.filter((row) => row.tradeValue > 0), "tradeValue", "desc").slice(0, 5),
     },
     {
       title: "#자금이탈 규모",
-      caption: "추정 변동금액 감소",
+      caption: "지분변동금액 감소",
       tone: "down",
       metric: "money",
       rows: rankRowsBy(dateRows.filter((row) => row.tradeValue < 0), "tradeValue", "asc").slice(0, 5),
@@ -320,8 +430,8 @@ function drawTopRankings(rows) {
       rows: rankRowsBy(dateRows.filter((row) => row.delta >= 3), "delta", "desc").slice(0, 5),
     },
     {
-      title: "#현재가 하락 괴리",
-      caption: "지분변동일 종가 대비 현재가 낮은 순",
+      title: "#최근일 하락 괴리",
+      caption: "보고의무발생일 종가 대비 최근일 종가가 낮은 순",
       tone: "gap",
       metric: "gap",
       rows: rankRowsBy(dateRows.filter((row) => row.priceGapPct < 0), "priceGapPct", "asc").slice(0, 5),
@@ -410,8 +520,9 @@ function renderRankPanel(panel) {
   const more = panel.rows.length > previewRows.length
     ? `<p class="rankMore">외 ${panel.rows.length - previewRows.length}건은 테이블에서 확인</p>`
     : "";
+  const tag = panel.tone === "down" ? "유출" : panel.tone === "gap" ? "괴리" : panel.tone === "cross" ? "신규" : "유입";
   return `<article class="rankPanel ${panel.tone}">
-    <h3>${escapeHtml(panel.title)}</h3>
+    <div class="rankPanelHead"><span>${escapeHtml(tag)}</span><h3>${escapeHtml(panel.title)}</h3></div>
     <p class="rankCaption">${escapeHtml(panel.caption || "")}</p>
     <div class="rankList">${items}</div>
     ${more}
@@ -451,7 +562,7 @@ function filteredRows() {
     if (state.direction === "down" && !(row.delta < 0)) return false;
     if (state.direction === "cross" && !row.crossed) return false;
     if (state.search) {
-      const haystack = `${row.corpName} ${row.stockCode} ${row.reporter} ${row.reason} ${row.reportType} ${row.market}`.toLowerCase();
+      const haystack = `${row.corpName} ${row.stockCode} ${row.reporter} ${row.holderType} ${row.reasonType} ${row.reason} ${row.reportType} ${row.market}`.toLowerCase();
       if (!haystack.includes(state.search.toLowerCase())) return false;
     }
     if (!matchesColumnFilters(row)) return false;
@@ -474,8 +585,10 @@ function sortRows(rows) {
 }
 
 function sortValue(row, key) {
+  if (key === "source") return row.date;
   if (key === "previous") return row.previousShares;
   if (key === "current") return row.currentShares;
+  if (key === "shareChange") return row.delta;
   if (key === "delta") return row.shareDelta;
   if (key === "eventClose") return row.eventClose;
   if (key === "tradeValue") return row.tradeValue;
@@ -483,6 +596,8 @@ function sortValue(row, key) {
   if (key === "priceGap") return row.priceGapPct;
   if (key === "obligationDate") return row.obligationDate;
   if (key === "rcept") return row.date;
+  if (key === "holderType") return row.holderType;
+  if (key === "reason") return row.reasonType;
   return row[key];
 }
 
@@ -511,6 +626,9 @@ function filterValue(row, key) {
   if (key === "obligationDate") return formatDate(row.obligationDate);
   if (key === "rcept") return formatDate(row.date);
   if (key === "reporter") return row.reporter || "";
+  if (key === "holderType") return row.holderType || "";
+  if (key === "reason") return `${row.reasonType || ""} ${row.reason || ""}`;
+  if (key === "source") return row.url || "";
   if (key === "eventClose") return formatPrice(row.eventClose);
   if (key === "tradeValue") return formatSignedMoney(row.tradeValue);
   if (key === "currentClose") return formatPrice(row.currentClose);
@@ -544,13 +662,13 @@ function stockSummaries(rows) {
   return Array.from(map.values()).sort((a, b) => b.latest.localeCompare(a.latest) || a.corpName.localeCompare(b.corpName, "ko"));
 }
 
-function drawPriceChart(row, visibleRows) {
+function drawPriceChart(row, visibleRows, shareholderRows = visibleRows) {
   const chart = document.getElementById("chart");
   if (!row) {
     chart.textContent = "선택한 조건에 해당하는 공시가 없습니다.";
     return;
   }
-  const candles = (state.priceData[row.stockCode] || []).filter((item) => item.open && item.high && item.low && item.close);
+  const candles = getCachedPriceCandles(row.stockCode).filter((item) => item.open && item.high && item.low && item.close);
   if (!candles.length) {
     if (!state.priceLoadStatus[row.stockCode]) {
       state.priceLoadStatus[row.stockCode] = "loading";
@@ -569,14 +687,15 @@ function drawPriceChart(row, visibleRows) {
       });
       return;
     }
+    const fallbackChart = renderFallbackPriceChart(row, shareholderRows);
     chart.innerHTML = `<div class="chartActions">
       <button class="backButton" type="button" id="backToAll">전체 테이블</button>
-      <span class="priceSource">가격 캐시 없음 · update_prices.ps1 실행 필요</span>
+      <span class="priceSource">${fallbackChart ? "공시 가격 기반 간이 차트" : "가격 캐시 없음 · update_prices.ps1 실행 필요"}</span>
     </div>
-    <div class="emptyChart">
+    ${fallbackChart || `<div class="emptyChart">
       <strong>${escapeHtml(row.corpName)} ${row.stockCode}</strong>
-      <p>아직 이 종목의 Yahoo 일봉 가격 데이터가 캐싱되지 않았습니다. DART 이벤트 표시는 정상이며, 가격 캐시를 생성하면 이 영역에 캔들차트와 마커가 함께 표시됩니다.</p>
-    </div>`;
+      <p>아직 이 종목의 Yahoo 일봉 가격 데이터가 캐싱되지 않았습니다. 가격 캐시를 생성하면 이 영역에 캔들차트와 마커가 함께 표시됩니다.</p>
+    </div>`}`;
     document.getElementById("backToAll").addEventListener("click", () => {
       state.selectedStock = "all";
       commitRoute();
@@ -595,13 +714,10 @@ function drawPriceChart(row, visibleRows) {
     .sort((a, b) => a.date.localeCompare(b.date));
   const svg = renderCandleSvg(chartCandles, eventRows);
   const latest = chartCandles.at(-1);
-  const first = chartCandles[0];
-  const perf = first ? ((latest.close - first.close) / first.close) * 100 : 0;
-  const eventList = eventRows.slice(0, 8).map((event) => `<a class="detailEvent ${event.delta < 0 ? "down" : "up"}" href="${event.url}" target="_blank" rel="noreferrer">
-    <span>${formatDate(event.date)}</span>
-    <strong>${escapeHtml(event.reporter)}</strong>
-    <em>${formatSignedPct(event.delta)} · ${formatSignedShares(event.shareDelta)}</em>
-  </a>`).join("");
+  const shareholderPanel = renderShareholderSummary(shareholderRows);
+  const regularShareholderPanel = renderRegularShareholderPanel(row.stockCode);
+  const disclosurePanel = renderStockDisclosurePanel(row.stockCode);
+  const earningsPanel = renderOperatingProfitPanel(row.stockCode);
   chart.innerHTML = `<div class="chartActions">
     <button class="backButton" type="button" id="backToAll">전체 테이블</button>
     <div class="chartRangeGroup" aria-label="차트 기간 선택">
@@ -609,14 +725,12 @@ function drawPriceChart(row, visibleRows) {
     </div>
     <span class="priceSource">Yahoo Finance 캐시 · ${chartCandles[0].date} ~ ${latest.date}</span>
   </div>
-  <div class="priceSummary">
-    <span>종가 <strong>${formatPrice(latest.close)}</strong></span>
-    <span>기간수익률 <strong class="${perf >= 0 ? "positive" : "negative"}">${perf >= 0 ? "+" : ""}${number.format(perf)}%</strong></span>
-    <span>이벤트 <strong>${eventRows.length.toLocaleString("ko-KR")}건</strong></span>
-  </div>
   <div class="priceChartWrap">${svg}</div>
   <div id="chartTooltip" class="chartTooltip hidden"></div>
-  <div class="detailEvents">${eventList || `<p class="muted">선택 기간의 지분변동 이벤트가 없습니다.</p>`}</div>`;
+  ${regularShareholderPanel}
+  ${shareholderPanel}
+  ${earningsPanel}
+  ${disclosurePanel}`;
   document.getElementById("backToAll").addEventListener("click", () => {
     state.selectedStock = "all";
     commitRoute();
@@ -628,6 +742,305 @@ function drawPriceChart(row, visibleRows) {
     });
   });
   bindChartTooltips(chart);
+}
+
+function renderFallbackPriceChart(row, rows) {
+  const points = rows
+    .map((item) => ({
+      date: formatDate(item.obligationDate || item.date),
+      close: Number.isFinite(item.eventClose) ? item.eventClose : null,
+      delta: item.delta,
+      reporter: item.reporter,
+    }))
+    .filter((item) => item.close !== null)
+    .sort((a, b) => a.date.localeCompare(b.date));
+  if (Number.isFinite(row.currentClose)) {
+    points.push({ date: row.currentCloseDate || "최근일", close: row.currentClose, delta: 0, reporter: "최근일 종가" });
+  }
+  if (points.length < 2) return "";
+  const width = 1180;
+  const height = 310;
+  const pad = { top: 28, right: 54, bottom: 42, left: 58 };
+  const prices = points.map((item) => item.close);
+  const minPrice = Math.min(...prices);
+  const maxPrice = Math.max(...prices);
+  const span = Math.max(1, maxPrice - minPrice);
+  const x = (index) => pad.left + (index / Math.max(1, points.length - 1)) * (width - pad.left - pad.right);
+  const y = (price) => height - pad.bottom - ((price - minPrice) / span) * (height - pad.top - pad.bottom);
+  const line = points.map((item, index) => `${x(index).toFixed(1)},${y(item.close).toFixed(1)}`).join(" ");
+  const markers = points.map((item, index) => {
+    const cls = item.delta < 0 ? "down" : "up";
+    return `<g class="chartMarker ${cls}"><circle cx="${x(index).toFixed(1)}" cy="${y(item.close).toFixed(1)}" r="5"></circle></g>`;
+  }).join("");
+  const grid = [0, 0.5, 1].map((ratio) => {
+    const gy = pad.top + ratio * (height - pad.top - pad.bottom);
+    const price = maxPrice - ratio * span;
+    return `<line class="chartGrid" x1="${pad.left}" y1="${gy.toFixed(1)}" x2="${width - pad.right}" y2="${gy.toFixed(1)}"></line>
+      <text class="priceAxis" x="${width - pad.right + 8}" y="${(gy + 4).toFixed(1)}">${formatPrice(price)}</text>`;
+  }).join("");
+  const labels = [0, points.length - 1].map((index) => `<text class="dateAxis" x="${x(index).toFixed(1)}" y="${height - 16}">${escapeHtml(points[index].date)}</text>`).join("");
+  return `<div class="priceChartWrap fallbackChartWrap">
+    <svg class="priceChart fallbackPriceChart" viewBox="0 0 ${width} ${height}" role="img" aria-label="공시 가격 기반 간이 차트">
+      ${grid}
+      <polyline class="fallbackPriceLine" points="${line}"></polyline>
+      ${markers}
+      ${labels}
+    </svg>
+  </div>`;
+}
+
+function renderShareholderSummary(rows) {
+  const byReporter = new Map();
+  rows.forEach((row) => {
+    if (!row.reporter) return;
+    const item = byReporter.get(row.reporter) || { reporter: row.reporter, reports: [] };
+    item.reports.push(row);
+    byReporter.set(row.reporter, item);
+  });
+  const holders = Array.from(byReporter.values()).map((item) => {
+    item.reports.sort((a, b) => {
+      const aKey = `${a.obligationDate || ""}${a.date || ""}${a.current ?? ""}`;
+      const bKey = `${b.obligationDate || ""}${b.date || ""}${b.current ?? ""}`;
+      return bKey.localeCompare(aKey);
+    });
+    item.latest = item.reports[0];
+    item.reportCount = item.reports.length;
+    item.totalShareDelta = item.reports.reduce((sum, row) => sum + (Number.isFinite(row.shareDelta) ? row.shareDelta : 0), 0);
+    item.totalPctDelta = item.reports.reduce((sum, row) => sum + (Number.isFinite(row.delta) ? row.delta : 0), 0);
+    return item;
+  }).filter((item) => Number.isFinite(item.latest?.current))
+    .sort((a, b) => (b.latest.current || 0) - (a.latest.current || 0));
+
+  if (!holders.length) {
+    return `<section class="shareholderPanel">
+      <div class="shareholderHead">
+        <div>
+          <h3>최근공시기준 지분율 변동현황</h3>
+          <p>최근 대량보유 보고 제출인 기준</p>
+        </div>
+        <span class="shareholderNotice">표시할 최신 보유비율 데이터가 없습니다.</span>
+      </div>
+    </section>`;
+  }
+  const totalKnown = holders.reduce((sum, item) => sum + (item.latest.current || 0), 0);
+  return `<section class="shareholderPanel">
+    <div class="shareholderHead">
+      <div>
+        <h3>최근공시기준 지분율 변동현황</h3>
+        <p>최근 대량보유 보고 제출인 기준 · ${holders.length}명 · 최신 보유비율 단순합 ${formatPct(totalKnown)}</p>
+      </div>
+      <span class="shareholderNotice">전체 주주명부가 아니라, DART 대량보유 보고서를 낸 제출인 기준입니다.</span>
+    </div>
+    <div class="shareholderTableWrap">
+      <div class="shareholderTable" role="table" aria-label="최근 대량보유 보고 제출인별 지분율">
+        <div class="shareholderRow shareholderRowHead" role="row">
+          <span>제출인</span>
+          <span>최신 지분율</span>
+          <span>직전 → 이번</span>
+          <span>지분율 변동</span>
+          <span>지분변동주식수</span>
+          <span>지분변동금액</span>
+          <span>종목 가격 괴리</span>
+          <span>공시/이력</span>
+        </div>
+        ${holders.map((item) => {
+          const row = item.latest;
+          const tone = row.delta < 0 ? "down" : row.delta > 0 ? "up" : "";
+          const priceGapClass = row.priceGap < 0 ? "negative" : row.priceGap > 0 ? "positive" : "";
+          const tradeClass = row.tradeValue < 0 ? "negative" : row.tradeValue > 0 ? "positive" : "";
+          const history = item.reports.slice(0, 3).map((report) =>
+            `<span class="historyChip">${formatDate(report.obligationDate || report.date)} ${formatPct(report.current)} ${formatSignedPct(report.delta)}</span>`
+          ).join("");
+          return `<div class="shareholderRow ${tone}" role="row">
+            <span class="shareholderReporter">
+              <strong>${escapeHtml(item.reporter)}</strong>
+              <em>${formatDate(row.obligationDate || row.date)} 변동 · ${formatDate(row.date)} 접수</em>
+            </span>
+            <span class="shareholderCurrent">${formatPct(row.current)}</span>
+            <span class="shareholderStack">${formatPct(row.previous)} <i aria-hidden="true">→</i> ${formatPct(row.current)}</span>
+            <span class="shareholderDelta ${tone}">${formatSignedPct(row.delta)}</span>
+            <span class="shareholderDelta ${tone}">${formatSignedShareUnits(row.shareDelta)}</span>
+            <span class="shareholderMoney ${tradeClass}">${formatSignedMoney(row.tradeValue)}</span>
+            <span class="shareholderGap ${priceGapClass}">${formatSignedPrice(row.priceGap)} ${formatSignedPctPlain(row.priceGapPct)}</span>
+            <span class="shareholderHistory">
+              <a href="${escapeHtml(row.url)}" target="_blank" rel="noreferrer">공시</a>
+              <em>${item.reportCount}건</em>
+              ${history}
+            </span>
+          </div>`;
+        }).join("")}
+      </div>
+    </div>
+  </section>`;
+}
+
+function renderStockDisclosurePanel(stockCode) {
+  const rows = state.disclosureRows
+    .filter((row) => row.stockCode === stockCode)
+    .sort((a, b) => b.date.localeCompare(a.date))
+    .slice(0, 10);
+  const contracts = rows.filter((row) => row.type === "contract").slice(0, 5);
+  const earnings = rows.filter((row) => row.type === "earnings").slice(0, 5);
+  if (!contracts.length && !earnings.length) {
+    return "";
+  }
+  return `<section class="stockDisclosurePanel">
+    <div class="shareholderHead">
+      <div>
+        <h3>실적·계약 공시</h3>
+        <p>선택 종목 관련 최신 공시 · 계약 ${contracts.length}건 · 실적 ${earnings.length}건</p>
+      </div>
+      <a class="stockDisclosureMore" href="disclosure-signals.html?search=${encodeURIComponent(stockCode)}">전체 보기</a>
+    </div>
+    <div class="stockDisclosureGrid">
+      ${renderStockDisclosureList("단일판매·공급계약", contracts, "contract")}
+      ${renderStockDisclosureList("영업실적·손익", earnings, "earnings")}
+    </div>
+  </section>`;
+}
+
+function renderStockDisclosureList(title, rows, type) {
+  if (!rows.length) {
+    return `<div class="stockDisclosureList">
+      <h4>${title}</h4>
+      <p class="muted">해당 공시 없음</p>
+    </div>`;
+  }
+  return `<div class="stockDisclosureList">
+    <h4>${title}</h4>
+    ${rows.map((row) => {
+      const metrics = type === "contract"
+        ? [
+            `계약금액 ${formatMoney(row.contractAmount)}`,
+            Number.isFinite(row.salesRatio) ? `매출대비 ${number.format(row.salesRatio)}%` : "",
+          ].filter(Boolean)
+        : [
+            `매출 ${formatMoney(row.sales)}`,
+            `영업이익 ${formatMoney(row.operatingProfit)}`,
+            row.turnaround ? `전환 ${escapeHtml(row.turnaround)}` : "",
+          ].filter(Boolean);
+      return `<a class="stockDisclosureItem" href="${escapeHtml(row.url)}" target="_blank" rel="noreferrer">
+        <span>${formatDate(row.date)} · ${escapeHtml(row.typeLabel || title)}</span>
+        <strong>${escapeHtml(row.reportName || row.corpName)}</strong>
+        <em>${metrics.join(" · ") || "-"}</em>
+      </a>`;
+    }).join("")}
+  </div>`;
+}
+
+function renderRegularShareholderPanel(stockCode) {
+  const payload = state.regularShareholders?.[stockCode];
+  const rows = (payload?.rows || [])
+    .filter((row) => Number.isFinite(toNumber(row.ratio)) || Number.isFinite(toNumber(row.shares)))
+    .slice(0, 8);
+  if (!rows.length) return "";
+  const total = rows.reduce((sum, row) => sum + (toNumber(row.ratio) || 0), 0);
+  return `<section class="regularShareholderPanel">
+    <div class="shareholderHead">
+      <div>
+        <h3>정기보고서 기준 주요 주주현황</h3>
+        <p>${escapeHtml(payload.reportName || "정기보고서")} · ${escapeHtml(payload.settlementDate || "-")} 기준 · 상위 ${rows.length}명 단순합 ${formatPct(total)}</p>
+      </div>
+      <span class="shareholderNotice">분기·반기·사업보고서 기준이라 실제 현재 지분과 시차가 있을 수 있습니다.</span>
+    </div>
+    <div class="regularShareholderTable">
+      <div class="regularShareholderRow head">
+        <span>주주명</span>
+        <span>관계</span>
+        <span>주식수</span>
+        <span>지분율</span>
+      </div>
+      ${rows.map((row) => `<div class="regularShareholderRow">
+        <strong>${escapeHtml(row.name || "-")}</strong>
+        <span>${escapeHtml(row.relation || "-")}</span>
+        <span class="num">${formatShares(toNumber(row.shares))}</span>
+        <span class="num">${formatPct(toNumber(row.ratio))}</span>
+      </div>`).join("")}
+    </div>
+  </section>`;
+}
+
+function renderOperatingProfitPanel(stockCode) {
+  const rows = state.disclosureRows
+    .filter((row) => row.stockCode === stockCode && row.type === "earnings")
+    .filter((row) => Number.isFinite(row.operatingProfit) || Number.isFinite(row.sales) || Number.isFinite(row.netProfit))
+    .sort((a, b) => a.date.localeCompare(b.date))
+    .slice(-12);
+  if (!rows.length) {
+    return "";
+  }
+  const latest = rows.at(-1);
+  const previous = rows.length > 1 ? rows.at(-2) : null;
+  const growth = previous && Number.isFinite(previous.operatingProfit) && previous.operatingProfit !== 0 && Number.isFinite(latest.operatingProfit)
+    ? ((latest.operatingProfit - previous.operatingProfit) / Math.abs(previous.operatingProfit)) * 100
+    : null;
+  return `<section class="earningsTrendPanel">
+    <div class="shareholderHead">
+      <div>
+        <h3>영업이익 추이</h3>
+        <p>${formatDate(latest.date)} 기준 영업이익 ${formatMoney(latest.operatingProfit)}${Number.isFinite(growth) ? ` · 직전 대비 ${formatSignedPctPlain(growth)}` : ""}</p>
+      </div>
+      <span class="shareholderNotice">DART 영업실적 공시 캐시 기준</span>
+    </div>
+    <div class="earningsChartBox">${renderOperatingProfitSvg(rows)}</div>
+    <div class="earningsRawWrap">
+      <table class="earningsRawTable">
+        <thead><tr>${["접수일", "보고서", "매출액", "영업이익", "당기순이익", "전환/특이사항"].map((item) => `<th>${item}</th>`).join("")}</tr></thead>
+        <tbody>${rows.slice().reverse().map((row) => `<tr>
+          <td>${formatDate(row.date)}</td>
+          <td><a href="${escapeHtml(row.url)}" target="_blank" rel="noreferrer">${escapeHtml(row.reportName || row.typeLabel || "영업실적")}</a></td>
+          <td class="num">${formatMoney(row.sales)}</td>
+          <td class="num ${row.operatingProfit < 0 ? "negative" : row.operatingProfit > 0 ? "positive" : ""}">${formatMoney(row.operatingProfit)}</td>
+          <td class="num">${formatMoney(row.netProfit)}</td>
+          <td>${escapeHtml(row.turnaround || "-")}</td>
+        </tr>`).join("")}</tbody>
+      </table>
+    </div>
+  </section>`;
+}
+
+function renderOperatingProfitSvg(rows) {
+  const width = 980;
+  const height = 260;
+  const pad = { left: 44, right: 28, top: 24, bottom: 42 };
+  const values = rows.map((row) => Number.isFinite(row.operatingProfit) ? row.operatingProfit : 0);
+  const min = Math.min(0, ...values);
+  const max = Math.max(0, ...values);
+  const span = max === min ? 1 : max - min;
+  const x = (index) => pad.left + (rows.length <= 1 ? 0 : (index / (rows.length - 1)) * (width - pad.left - pad.right));
+  const y = (value) => pad.top + ((max - value) / span) * (height - pad.top - pad.bottom);
+  const zeroY = y(0);
+  const bars = rows.map((row, index) => {
+    const value = Number.isFinite(row.operatingProfit) ? row.operatingProfit : 0;
+    const barWidth = Math.max(18, Math.min(44, (width - pad.left - pad.right) / Math.max(rows.length, 1) * 0.46));
+    const barX = x(index) - barWidth / 2;
+    const barY = value >= 0 ? y(value) : zeroY;
+    const barH = Math.max(2, Math.abs(zeroY - y(value)));
+    const cls = value >= 0 ? "earningsBar positive" : "earningsBar negative";
+    return `<rect class="${cls}" x="${barX.toFixed(1)}" y="${barY.toFixed(1)}" width="${barWidth.toFixed(1)}" height="${barH.toFixed(1)}" rx="5"><title>${formatDate(row.date)} 영업이익 ${formatMoney(value)}</title></rect>`;
+  }).join("");
+  const linePoints = rows.map((row, index) => {
+    const value = Number.isFinite(row.operatingProfit) ? row.operatingProfit : 0;
+    return `${x(index).toFixed(1)},${y(value).toFixed(1)}`;
+  }).join(" ");
+  const labels = rows.map((row, index) => `<text x="${x(index).toFixed(1)}" y="${height - 14}" text-anchor="middle">${formatShortDate(row.date)}</text>`).join("");
+  const grid = [0.25, 0.5, 0.75].map((ratio) => {
+    const gy = pad.top + ratio * (height - pad.top - pad.bottom);
+    return `<line class="earningsGrid" x1="${pad.left}" x2="${width - pad.right}" y1="${gy.toFixed(1)}" y2="${gy.toFixed(1)}"/>`;
+  }).join("");
+  return `<svg class="earningsTrendSvg" viewBox="0 0 ${width} ${height}" role="img" aria-label="영업이익 추이 그래프">
+    ${grid}
+    <line class="earningsZero" x1="${pad.left}" x2="${width - pad.right}" y1="${zeroY.toFixed(1)}" y2="${zeroY.toFixed(1)}"/>
+    ${bars}
+    <polyline class="earningsLine" points="${linePoints}"/>
+    ${labels}
+  </svg>`;
+}
+
+function formatShortDate(value) {
+  const text = String(value || "");
+  if (text.length !== 8) return text || "-";
+  return `${Number(text.slice(4, 6))}/${Number(text.slice(6, 8))}`;
 }
 
 function renderChartRangeButtons() {
@@ -704,7 +1117,7 @@ function renderCandleSvg(candles, events) {
       event.reporter,
       `지분 ${formatPct(event.previous)} → ${formatPct(event.current)} (${formatSignedPct(event.delta)})`,
       `주식 ${formatSignedShares(event.shareDelta)}`,
-      event.tradeValue ? `추정 변동금액 ${formatSignedMoney(event.tradeValue)}` : "",
+      event.tradeValue ? `지분변동금액 ${formatSignedMoney(event.tradeValue)}` : "",
       event.close ? `종가 ${formatPrice(event.close)}` : "",
     ].filter(Boolean).join("\n");
     return `<a href="${event.url}" target="_blank" rel="noreferrer">
@@ -721,7 +1134,7 @@ function renderCandleSvg(candles, events) {
   }).join("");
   const labels = [0, Math.floor(candles.length / 2), candles.length - 1].map((index) => {
     const item = candles[index];
-    return item ? `<text class="dateAxis" x="${x(index).toFixed(1)}" y="${height - 18}">${item.date.slice(5)}</text>` : "";
+    return item ? `<text class="dateAxis" x="${x(index).toFixed(1)}" y="${height - 18}">${item.date}</text>` : "";
   }).join("");
   return `<svg class="priceChart" viewBox="0 0 ${width} ${height}" role="img" aria-label="가격 캔들차트와 지분변동 마커">
     ${grid}
@@ -769,6 +1182,36 @@ function nearestCandleIndex(candles, dartDate) {
 
 function loadPriceChunk(stockCode) {
   const existing = document.getElementById(`price_${stockCode}`);
+  if (existing) {
+    const cached = window.__PRICE_CHUNKS__?.[stockCode];
+    if (cached?.length && !state.priceData[stockCode]?.length) {
+      state.priceData[stockCode] = cached;
+      state.priceLoadStatus[stockCode] = "loaded";
+      render();
+    }
+    return;
+  }
+  if (canUseApi) {
+    fetch(`/api/prices?stockCode=${encodeURIComponent(stockCode)}`, { cache: "force-cache" })
+      .then((response) => (response.ok ? response.json() : null))
+      .then((payload) => {
+        const candles = payload?.candles || [];
+        if (candles.length) {
+          state.priceData[stockCode] = candles;
+          state.priceLoadStatus[stockCode] = "loaded";
+          render();
+          return;
+        }
+        loadPriceChunkScript(stockCode);
+      })
+      .catch(() => loadPriceChunkScript(stockCode));
+    return;
+  }
+  loadPriceChunkScript(stockCode);
+}
+
+function loadPriceChunkScript(stockCode) {
+  const existing = document.getElementById(`price_${stockCode}`);
   if (existing) return;
   const script = document.createElement("script");
   script.id = `price_${stockCode}`;
@@ -783,6 +1226,17 @@ function loadPriceChunk(stockCode) {
     render();
   };
   document.body.appendChild(script);
+}
+
+function getCachedPriceCandles(stockCode) {
+  if (state.priceData[stockCode]?.length) return state.priceData[stockCode];
+  const cached = window.__PRICE_CHUNKS__?.[stockCode];
+  if (cached?.length) {
+    state.priceData[stockCode] = cached;
+    state.priceLoadStatus[stockCode] = "loaded";
+    return cached;
+  }
+  return [];
 }
 
 function drawEventRail(rows) {
@@ -860,10 +1314,11 @@ function drawTable(groups) {
   state.page = Math.min(Math.max(1, state.page), totalPages);
   const start = (state.page - 1) * state.pageSize;
   const pageRows = rows.slice(start, start + state.pageSize);
-  list.innerHTML = `${renderPagination(rows.length, totalPages)}
-    <div class="holdingsCards">${renderTableHeader()}${pageRows.map(renderTableRow).join("")}</div>
+  ensureTablePriceChunks(pageRows);
+  list.innerHTML = `<div class="holdingsCards">${renderTableHeader()}${pageRows.map(renderTableRow).join("")}</div>
     ${renderPagination(rows.length, totalPages)}`;
   bindColumnFilters(list);
+  bindHeaderFilters(list);
   bindPagination(list);
   list.querySelectorAll("[data-stock]").forEach((button) => {
     button.addEventListener("click", () => {
@@ -874,14 +1329,23 @@ function drawTable(groups) {
   });
 }
 
-function renderPagination(totalRows, totalPages) {
+function ensureTablePriceChunks(rows) {
+  if (!state.visibleColumns.has("trend3m")) return;
+  Array.from(new Set(rows.map((row) => row.stockCode).filter(Boolean))).forEach((stockCode) => {
+    if (state.priceData[stockCode]?.length || state.priceLoadStatus[stockCode] === "loading" || state.priceLoadStatus[stockCode] === "missing") return;
+    loadPriceChunk(stockCode);
+  });
+}
+
+function renderPagination(totalRows, totalPages, options = {}) {
+  const showSummary = options.showSummary !== false;
   const start = totalRows ? (state.page - 1) * state.pageSize + 1 : 0;
   const end = Math.min(totalRows, state.page * state.pageSize);
   const pages = pageWindow(state.page, totalPages).map((page) =>
     `<button class="pageButton ${page === state.page ? "active" : ""}" type="button" data-page="${page}">${page}</button>`
   ).join("");
   return `<nav class="pagination" aria-label="테이블 페이지 이동">
-    <span class="pageSummary">${start.toLocaleString("ko-KR")}-${end.toLocaleString("ko-KR")} / ${totalRows.toLocaleString("ko-KR")}건</span>
+    ${showSummary ? `<span class="pageSummary">${start.toLocaleString("ko-KR")}-${end.toLocaleString("ko-KR")} / ${totalRows.toLocaleString("ko-KR")}건</span>` : ""}
     <div class="pageControls">
       <button class="pageButton" type="button" data-page="${state.page - 1}" ${state.page <= 1 ? "disabled" : ""}>이전</button>
       ${pages}
@@ -913,17 +1377,42 @@ function bindPagination(root) {
 }
 
 function renderTableHeader() {
-  const cells = [`<div class="tableHeadCell stockHead">종목${columnFilterControl("stock")}</div>`];
-  columns.forEach((column) => {
-    if (state.visibleColumns.has(column.key)) {
-      cells.push(`<div class="tableHeadCell" data-col="${column.key}">${column.label}${columnFilterControl(column.key)}</div>`);
-    }
-  });
-  return `<div class="holdingHeader">${cells.join("")}</div>`;
+  const headerLabels = [
+    { key: "stock", label: "종목" },
+    { key: "obligationDate", label: "보고의무발생일" },
+    { key: "rcept", label: "접수일" },
+    { key: "reporter", label: "주주/제출인" },
+    { key: "shareChange", label: "직전 → 이번" },
+    { key: "trend3m", label: "1년 추이", filterKey: "priceGap" },
+    { key: "reason", label: "보고사유" },
+    { key: "eventClose", label: "보고의무발생일 종가" },
+    { key: "currentClose", label: "최근일 종가" },
+    { key: "priceGap", label: "종목 가격 괴리" },
+    { key: "tradeValue", label: "지분변동금액|단위: 억원" },
+    { key: "delta", label: "지분변동주식수|단위: 만주" },
+  ];
+  return `<div class="holdingHeader">
+    ${headerLabels.map(({ key, label, filterKey }) => {
+      const [main, unit] = label.split("|");
+      return `<button class="tableHeadCell tableHeadButton" type="button" data-header-filter="${filterKey || key}" title="${escapeHtml(main)} 필터/정렬 변경"><span>${main}<i aria-hidden="true">↕</i></span>${unit ? `<small>${unit}</small>` : ""}</button>`;
+    }).join("")}
+  </div>`;
+}
+
+function renderAdvancedFilters() {
+  const panel = document.getElementById("advancedFilterPanel");
+  if (!panel) return;
+  const filterKeys = ["stock", "obligationDate", "rcept", "reporter", "holderType", "shareChange", "reason", "eventClose", "currentClose", "priceGap", "tradeValue", "delta"];
+  panel.innerHTML = filterKeys.map((key) => {
+    const label = key === "stock" ? "종목" : columns.find((column) => column.key === key)?.label || key;
+    return `<label class="holdingFilterCell"><span>${escapeHtml(label)}</span>${columnFilterControl(key)}</label>`;
+  }).join("");
+  bindColumnFilters(panel);
 }
 
 function columnFilterControl(key) {
   const value = state.columnFilters[key] || "";
+  if (key === "source") return "";
   if (key === "obligationDate" || key === "rcept") {
     const options = uniqueDateOptions(key).map((date) =>
       `<option value="${date}" ${value === date ? "selected" : ""}>${date}</option>`
@@ -940,11 +1429,25 @@ function columnFilterControl(key) {
       <option value="KOSDAQ" ${value === "KOSDAQ" ? "selected" : ""}>KOSDAQ</option>
     </select>`;
   }
-  if (["eventClose", "tradeValue", "currentClose", "priceGap", "previous", "current", "delta"].includes(key)) {
+  if (key === "holderType") {
+    const values = ["외국계/글로벌 금융", "연기금·공제회", "국내 금융·투자", "전략적/관계사", "오너·특수관계", "개인", "기타/확인필요"];
+    return `<select class="columnFilter" data-column-filter="${key}" aria-label="제출인 성격 필터">
+      <option value="">전체</option>
+      ${values.map((item) => `<option value="${escapeHtml(item)}" ${value === item ? "selected" : ""}>${escapeHtml(item)}</option>`).join("")}
+    </select>`;
+  }
+  if (key === "reason") {
+    const values = ["매수·취득", "매도·처분", "신규보고", "담보·계약변경", "양수도·경영권", "CB/BW/EB", "특별관계 변경", "증여·상속", "기타 사유", "사유 미기재"];
+    return `<select class="columnFilter" data-column-filter="${key}" aria-label="보고사유 필터">
+      <option value="">전체</option>
+      ${values.map((item) => `<option value="${escapeHtml(item)}" ${value === item ? "selected" : ""}>${escapeHtml(item)}</option>`).join("")}
+    </select>`;
+  }
+  if (["eventClose", "tradeValue", "currentClose", "priceGap", "previous", "current", "shareChange", "delta"].includes(key)) {
     const active = state.sortKey === key ? state.sortDir : "";
-  const label = key === "eventClose" ? "지분변동일 종가" : key === "currentClose" ? "현재 종가" : key === "priceGap" ? "현재가 괴리" : key === "tradeValue" ? "추정 변동금액" : key === "previous" ? "직전보유" : key === "current" ? "이번보유" : "증감";
-    const descLabel = key === "tradeValue" ? "자금유입 큰 순" : key === "priceGap" ? "현재가 높은 순" : "큰 순서";
-    const ascLabel = key === "tradeValue" ? "자금이탈 큰 순" : key === "priceGap" ? "현재가 낮은 순" : "작은 순서";
+    const label = key === "eventClose" ? "보고의무발생일 종가" : key === "currentClose" ? "최근일 종가" : key === "priceGap" ? "종목 가격 괴리" : key === "tradeValue" ? "지분변동금액" : key === "previous" ? "직전보유" : key === "current" ? "이번보유" : key === "shareChange" ? "직전 → 이번" : "지분변동주식수";
+    const descLabel = key === "tradeValue" ? "자금유입 큰 순" : key === "priceGap" ? "최근일 종가 높은 순" : "큰 순서";
+    const ascLabel = key === "tradeValue" ? "자금이탈 큰 순" : key === "priceGap" ? "최근일 종가 낮은 순" : "작은 순서";
     return `<select class="columnFilter" data-sort-filter="${key}" aria-label="${label} 정렬">
       <option value="">정렬 없음</option>
       <option value="desc" ${active === "desc" ? "selected" : ""}>${descLabel}</option>
@@ -954,6 +1457,8 @@ function columnFilterControl(key) {
   const placeholder = {
     stock: "종목명/코드",
     reporter: "제출인",
+    holderType: "성격",
+    reason: "사유",
   }[key] || "필터";
   return `<input class="columnFilter" data-column-filter="${key}" type="search" value="${escapeHtml(value)}" placeholder="${placeholder}" aria-label="${placeholder} 필터">`;
 }
@@ -995,6 +1500,25 @@ function bindColumnFilters(root) {
   });
 }
 
+function bindHeaderFilters(root) {
+  root.querySelectorAll("[data-header-filter]").forEach((button) => {
+    button.addEventListener("click", () => openHeaderFilter(button.dataset.headerFilter));
+  });
+}
+
+function openHeaderFilter(key) {
+  openModal("filterModal");
+  requestAnimationFrame(() => {
+    const target = key === "stock"
+      ? document.getElementById("stockSelect")
+      : document.querySelector(`[data-column-filter="${key}"], [data-sort-filter="${key}"]`);
+    target?.scrollIntoView({ block: "center", inline: "nearest" });
+    target?.focus();
+    target?.closest(".holdingFilterCell")?.classList.add("isFocused");
+    setTimeout(() => target?.closest(".holdingFilterCell")?.classList.remove("isFocused"), 900);
+  });
+}
+
 function resetPage() {
   state.page = 1;
 }
@@ -1025,37 +1549,127 @@ function uniqueDateOptions(key) {
   return Array.from(new Set(values)).sort((a, b) => b.localeCompare(a));
 }
 
+function renderMiniTrend(row) {
+  const candles = getCachedPriceCandles(row.stockCode)
+    .filter((item) => item?.date && Number.isFinite(item.close))
+    .sort((a, b) => String(a.date).localeCompare(String(b.date)));
+  if (candles.length < 2) return `<span class="miniTrend empty">-</span>`;
+
+  const endText = row.currentCloseDate || candles[candles.length - 1].date;
+  const endDate = parseDashedDate(endText) || parseDashedDate(candles[candles.length - 1].date);
+  const startDate = endDate ? new Date(endDate) : null;
+  if (startDate) startDate.setFullYear(startDate.getFullYear() - 1);
+  const rangeCandles = startDate && endDate
+    ? candles.filter((item) => {
+      const date = parseDashedDate(item.date);
+      return date && date >= startDate && date <= endDate;
+    })
+    : candles.slice(-64);
+  const points = rangeCandles.length >= 2 ? rangeCandles : candles.slice(-64);
+  const firstPointDate = parseDashedDate(points[0]?.date);
+  const hasShortHistory = startDate && firstPointDate && firstPointDate > startDate;
+  const closes = points.map((item) => item.close);
+  const min = Math.min(...closes);
+  const max = Math.max(...closes);
+  const span = Math.max(1, max - min);
+  const width = 220;
+  const height = 34;
+  const pad = 3;
+  const xFor = (index) => pad + (index / Math.max(1, points.length - 1)) * (width - pad * 2);
+  const yFor = (close) => height - pad - ((close - min) / span) * (height - pad * 2);
+  const line = points.map((item, index) => `${xFor(index).toFixed(1)},${yFor(item.close).toFixed(1)}`).join(" ");
+  const eventDate = parseDashedDate(formatDate(row.obligationDate || row.date));
+  const eventIndex = nearestTrendCandleIndex(points, eventDate);
+  const eventPoint = points[eventIndex] || points[points.length - 1];
+  const trendClass = closes[closes.length - 1] >= closes[0] ? "up" : "down";
+  const latestY = yFor(closes[closes.length - 1]).toFixed(1);
+  const dotX = xFor(eventIndex).toFixed(1);
+  const dotY = yFor(eventPoint.close).toFixed(1);
+  const title = hasShortHistory
+    ? `가격 이력이 ${points[0].date}부터 있어 해당 구간만 표시합니다. 점은 보고의무발생일 기준입니다.`
+    : "최근 1년 가격 추이입니다. 점은 보고의무발생일 기준입니다.";
+  return `<span class="miniTrendWrap ${hasShortHistory ? "shortHistory" : ""}" title="${escapeHtml(title)}"><svg class="miniTrendSvg ${trendClass}" viewBox="0 0 ${width} ${height}" role="img" aria-label="${escapeHtml(title)}"><line class="latestCloseGuide" x1="${pad}" y1="${latestY}" x2="${width - pad}" y2="${latestY}"></line><polyline points="${line}"></polyline><circle class="eventDot" cx="${dotX}" cy="${dotY}" r="3.9"></circle></svg></span>`;
+}
+
+function parseDashedDate(value) {
+  const text = String(value || "");
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(text)) return null;
+  const date = new Date(`${text}T00:00:00`);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
+function nearestTrendCandleIndex(points, targetDate) {
+  if (!targetDate) return points.length - 1;
+  let bestIndex = 0;
+  let bestDistance = Infinity;
+  points.forEach((item, index) => {
+    const date = parseDashedDate(item.date);
+    if (!date) return;
+    const distance = Math.abs(date.getTime() - targetDate.getTime());
+    if (distance < bestDistance) {
+      bestDistance = distance;
+      bestIndex = index;
+    }
+  });
+  return bestIndex;
+}
+
 function renderTableRow(row) {
   const deltaValue = Number.isFinite(row.delta) ? row.delta : row.shareDelta;
   const deltaClass = deltaValue < 0 ? "negative" : deltaValue > 0 ? "positive" : "";
   const moneyClass = row.tradeValue < 0 ? "negative" : row.tradeValue > 0 ? "positive" : "";
   const priceGapClass = row.priceGap < 0 ? "negative" : row.priceGap > 0 ? "positive" : "";
-  const logo = state.logos[row.stockCode]
-    ? `<img class="stockLogo" src="${escapeHtml(state.logos[row.stockCode])}" alt="" loading="lazy">`
+  const logoSrc = blockedLogoStocks.has(row.stockCode) ? fallbackStockLogo : (state.logos[row.stockCode] || fallbackStockLogo);
+  const logo = `<img class="stockLogo" src="${escapeHtml(logoSrc)}" alt="" loading="lazy" onerror="this.onerror=null;this.src='${fallbackStockLogo}'">`;
+  const field = (key, value, sub = "", extraClass = "", title = "") => state.visibleColumns.has(key)
+    ? `<div class="scanField ${extraClass}" data-col="${key}"${title ? ` title="${escapeHtml(title)}"` : ""}><span class="fieldLabel">${columns.find((column) => column.key === key)?.label || key}</span><strong>${value}</strong>${sub ? `<em>${sub}</em>` : ""}</div>`
     : "";
-  const field = (key, value, sub = "", extraClass = "") => state.visibleColumns.has(key)
-    ? `<div class="scanField ${extraClass}" data-col="${key}"><span class="fieldLabel">${columns.find((column) => column.key === key)?.label || key}</span><strong>${value}</strong>${sub ? `<em>${sub}</em>` : ""}</div>`
-    : "";
-  return `<article class="holdingCard">
-    <div class="scanStock">
-      ${logo}
-      <button class="stockButton" type="button" data-stock="${row.stockCode}">
-        ${escapeHtml(row.corpName)}
-        <span class="subText">${row.stockCode}</span>
-      </button>
+  const detailTitle = [
+    `보고의무발생일 종가: ${formatPrice(row.eventClose)}${row.eventCloseDate ? ` (${row.eventCloseDate} 기준)` : ""}`,
+    `최근일 종가: ${formatPrice(row.currentClose)}${row.currentCloseDate ? ` (${row.currentCloseDate} 기준)` : ""}`,
+    `종목 가격 괴리: ${formatSignedPrice(row.priceGap)} ${formatSignedPctPlain(row.priceGapPct)}`,
+    `직전보유: ${formatShares(row.previousShares)} / ${formatPct(row.previous)}`,
+    `이번보유: ${formatShares(row.currentShares)} / ${formatPct(row.current)}`,
+    `보고사유: ${row.reason || row.reasonType || "-"}`,
+  ].join("\n");
+  return `<article class="holdingCard holdingCardStack" title="${escapeHtml(detailTitle)}">
+    <div class="holdingMainLine">
+      <div class="scanStock">
+        ${logo}
+        <button class="stockButton" type="button" data-stock="${row.stockCode}">
+          ${escapeHtml(row.corpName)}
+          <span class="subText">${row.stockCode}${row.market ? ` · ${escapeHtml(row.market)}` : ""}</span>
+        </button>
+      </div>
+      ${field("obligationDate", escapeHtml(formatDate(row.obligationDate)))}
+      ${field("rcept", escapeHtml(formatDate(row.date)), `<a class="receiptSourceLink" href="${escapeHtml(row.url)}" target="_blank" rel="noreferrer">원문보기</a>`)}
+      ${field("reporter", `<span class="reporterBadge" title="${escapeHtml(row.reporter)}">${escapeHtml(row.reporter)}</span>`, `<span class="miniMeta">${escapeHtml(row.holderType || "-")}</span>`)}
+      ${field("shareChange", `${formatPct(row.previous)} → ${formatPct(row.current)}`, "", "shareChangeField")}
+      ${field("trend3m", renderMiniTrend(row), "", "trendField")}
+      ${field("reason", escapeHtml(row.reasonType || row.reason || "-"), row.reason ? escapeHtml(compactReasonText(row.reason)) : "", "clippedReason", row.reason || row.reasonType)}
+      ${field("eventClose", formatPrice(row.eventClose), row.eventCloseDate ? `${escapeHtml(row.eventCloseDate)} 기준` : "", "num")}
+      ${field("currentClose", formatPrice(row.currentClose), row.currentCloseDate ? `${escapeHtml(row.currentCloseDate)} 기준` : "", "num")}
+      ${field("priceGap", formatSignedPrice(row.priceGap), formatSignedPctPlain(row.priceGapPct), `num ${priceGapClass}`)}
+      ${field("tradeValue", moneyBadge(row.tradeValue), "", `num moneyField ${moneyClass}`)}
+      ${field("delta", formatSignedShareUnits(row.shareDelta), formatSignedPct(row.delta), `num ${deltaClass}`)}
     </div>
-    ${field("obligationDate", escapeHtml(formatDate(row.obligationDate)))}
-    ${field("rcept", `<a class="receiptLink" href="${row.url}" target="_blank" rel="noreferrer">${formatDate(row.date)}</a>`)}
-    ${field("market", escapeHtml(row.market))}
-    ${field("reporter", escapeHtml(row.reporter))}
-    ${field("eventClose", formatPrice(row.eventClose), row.eventCloseDate ? `${escapeHtml(row.eventCloseDate)} 기준` : "", "num")}
-    ${field("currentClose", formatPrice(row.currentClose), row.currentCloseDate ? `${escapeHtml(row.currentCloseDate)} 기준` : "", "num")}
-    ${field("priceGap", formatSignedPrice(row.priceGap), formatSignedPctPlain(row.priceGapPct), `num ${priceGapClass}`)}
-    ${field("tradeValue", moneyBadge(row.tradeValue), "", `num moneyField ${moneyClass}`)}
-    ${field("previous", formatShares(row.previousShares), formatPct(row.previous), "num")}
-    ${field("current", formatShares(row.currentShares), formatPct(row.current), "num")}
-    ${field("delta", formatSignedShares(row.shareDelta), formatSignedPct(row.delta), `num ${deltaClass}`)}
+    <div class="holdingDetailLine">
+      ${field("eventClose", formatPrice(row.eventClose), row.eventCloseDate ? `${escapeHtml(row.eventCloseDate)} 기준` : "", "num")}
+      ${field("currentClose", formatPrice(row.currentClose), row.currentCloseDate ? `${escapeHtml(row.currentCloseDate)} 기준` : "", "num")}
+      ${field("priceGap", formatSignedPrice(row.priceGap), formatSignedPctPlain(row.priceGapPct), `num ${priceGapClass}`)}
+      ${field("previous", formatShares(row.previousShares), formatPct(row.previous), "num")}
+      ${field("current", formatShares(row.currentShares), formatPct(row.current), "num")}
+      ${field("reason", `<span class="reasonType">${escapeHtml(row.reasonType)}</span>`, escapeHtml(row.reason || ""), "reasonField compactReason", row.reason || row.reasonType)}
+    </div>
   </article>`;
+}
+
+function compactReasonText(value) {
+  return String(value || "")
+    .replace(/[\r\n]+/g, " · ")
+    .replace(/\s*-\s*/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 function drawInsight(rows, corpName) {
@@ -1086,13 +1700,17 @@ function drawInsight(rows, corpName) {
 }
 
 function downloadExcel() {
-  const header = ["종목", "보고의무발생일", "접수일자", "시장구분", "주주/제출인", "지분변동일종가", "지분변동일종가기준일", "현재종가", "현재종가기준일", "현재가괴리금액", "현재가괴리율", "추정변동금액", "직전보유주식등의수", "직전보유비율", "이번보유주식등의수", "이번보유비율", "증감주식수", "증감비율", "DART_URL"];
-  const body = filteredRows().map((row) => [
+  const header = ["종목", "보고의무발생일", "접수일", "시장구분", "주주/제출인", "제출인성격", "보고사유구분", "보고사유", "보고의무발생일종가", "보고의무발생일종가기준일", "최근일종가", "최근일종가기준일", "종목가격괴리금액", "종목가격괴리율", "지분변동금액(원)", "직전보유주식등의수", "직전보유비율", "이번보유주식등의수", "이번보유비율", "지분변동주식수(주)", "지분변동비율(%p)", "DART_URL"];
+  const rows = filteredRows();
+  const body = rows.map((row) => [
     row.corpName,
     row.obligationDate,
     row.date,
     row.market,
     row.reporter,
+    row.holderType,
+    row.reasonType,
+    row.reason,
     row.eventClose ?? "",
     row.eventCloseDate,
     row.currentClose ?? "",
@@ -1113,9 +1731,295 @@ function downloadExcel() {
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = "major_holdings_table.xls";
+  a.download = `${downloadBaseName()}_${rows.length}건.xls`;
   a.click();
   URL.revokeObjectURL(url);
+}
+
+async function downloadTableImage(format = "png") {
+  const rows = filteredRows();
+  if (!rows.length) return;
+  const type = format === "jpg" ? "image/jpeg" : "image/png";
+  const extension = format === "jpg" ? "jpg" : "png";
+  setImageStatus(`${extension.toUpperCase()} 생성 중...`);
+  try {
+    const start = (state.page - 1) * state.pageSize;
+    const pageRows = rows.slice(start, start + state.pageSize);
+    const canvas = renderTableCanvas(pageRows, rows.length);
+    const blob = await canvasToBlob(canvas, type);
+    downloadBlob(blob, `${downloadBaseName()}_현재페이지.${extension}`);
+    setImageStatus(`${extension.toUpperCase()} 저장 완료`);
+  } catch (error) {
+    console.error(error);
+    setImageStatus("이미지 저장 실패. PDF 저장을 사용해 주세요.");
+  }
+}
+
+function renderTableCanvas(rows, totalRows) {
+  const cols = imageColumns();
+  const margin = 32;
+  const titleHeight = 86;
+  const headerHeight = 46;
+  const rowHeight = 74;
+  const footerHeight = 34;
+  const width = Math.max(1180, cols.reduce((sum, col) => sum + col.width, margin * 2));
+  const height = titleHeight + headerHeight + rows.length * rowHeight + footerHeight + margin;
+  const scale = Math.min(2, Math.max(1, window.devicePixelRatio || 1));
+  const canvas = document.createElement("canvas");
+  canvas.width = Math.ceil(width * scale);
+  canvas.height = Math.ceil(height * scale);
+  canvas.style.width = `${width}px`;
+  canvas.style.height = `${height}px`;
+  const ctx = canvas.getContext("2d");
+  ctx.scale(scale, scale);
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(0, 0, width, height);
+
+  const from = state.from ? state.from : "전체";
+  const to = state.to ? state.to : "전체";
+  const filterText = [
+    `기간 ${from} ~ ${to}`,
+    state.market !== "all" ? state.market : "전체 시장",
+    state.direction !== "all" ? directionLabel(state.direction) : "전체 지분변동",
+    state.search ? `검색 ${state.search}` : "",
+    `${state.page}페이지 · ${rows.length}/${totalRows.toLocaleString("ko-KR")}건`,
+  ].filter(Boolean).join("  |  ");
+
+  ctx.fillStyle = "#0f172a";
+  ctx.font = "800 25px Pretendard, Arial, sans-serif";
+  ctx.fillText("대량보유 변동 테이블", margin, 42);
+  ctx.fillStyle = "#64748b";
+  ctx.font = "700 13px Pretendard, Arial, sans-serif";
+  ctx.fillText(filterText, margin, 68);
+
+  let x = margin;
+  const headerY = titleHeight;
+  ctx.fillStyle = "#fff5f0";
+  roundRect(ctx, margin, headerY, width - margin * 2, headerHeight, 8);
+  ctx.fill();
+  ctx.fillStyle = "#fa4905";
+  ctx.fillRect(margin, headerY + headerHeight - 3, width - margin * 2, 3);
+  cols.forEach((col) => {
+    ctx.fillStyle = "#334155";
+    ctx.font = "800 12px Pretendard, Arial, sans-serif";
+    drawClippedText(ctx, col.label, x + 10, headerY + 28, col.width - 20);
+    x += col.width;
+  });
+
+  rows.forEach((row, rowIndex) => {
+    const y = titleHeight + headerHeight + rowIndex * rowHeight;
+    ctx.fillStyle = rowIndex % 2 ? "#ffffff" : "#fbfcfe";
+    ctx.fillRect(margin, y, width - margin * 2, rowHeight);
+    ctx.strokeStyle = "#e6ebf1";
+    ctx.beginPath();
+    ctx.moveTo(margin, y + rowHeight);
+    ctx.lineTo(width - margin, y + rowHeight);
+    ctx.stroke();
+
+    let cellX = margin;
+    cols.forEach((col) => {
+      drawImageCell(ctx, row, col, cellX, y, col.width, rowHeight);
+      cellX += col.width;
+    });
+  });
+
+  ctx.fillStyle = "#94a3b8";
+  ctx.font = "700 11px Pretendard, Arial, sans-serif";
+  ctx.fillText("DART 공시와 공개 가격 데이터 기반 정보 제공용 이미지입니다. 투자 판단은 가격·거래량·시장 상황을 함께 확인하세요.", margin, height - 18);
+  return canvas;
+}
+
+function imageColumns() {
+  const base = [{ key: "stock", label: "종목", width: 170 }];
+  const widths = {
+    source: 92,
+    obligationDate: 112,
+    rcept: 112,
+    market: 82,
+    reporter: 160,
+    holderType: 132,
+    shareChange: 124,
+    trend3m: 256,
+    reason: 190,
+    eventClose: 124,
+    currentClose: 124,
+    priceGap: 126,
+    tradeValue: 142,
+    previous: 144,
+    current: 144,
+    delta: 160,
+  };
+  return base.concat(columns
+    .filter((column) => state.visibleColumns.has(column.key))
+    .map((column) => ({ ...column, width: widths[column.key] || 120 })));
+}
+
+function drawImageCell(ctx, row, col, x, y, width, height) {
+  const pad = 10;
+  const lines = imageCellLines(row, col.key);
+  const tone = imageCellTone(row, col.key);
+  const mainColor = tone === "positive" ? "#dc2626" : tone === "negative" ? "#2563eb" : "#111827";
+  ctx.fillStyle = mainColor;
+  ctx.font = col.key === "stock" ? "800 13px Pretendard, Arial, sans-serif" : "700 12px Pretendard, Arial, sans-serif";
+  drawWrappedLine(ctx, lines[0] || "-", x + pad, y + 25, width - pad * 2, col.key === "reporter" ? 2 : 1);
+  if (lines[1]) {
+    ctx.fillStyle = "#64748b";
+    ctx.font = "600 11px Pretendard, Arial, sans-serif";
+    drawWrappedLine(ctx, lines[1], x + pad, y + 48, width - pad * 2, 1);
+  }
+  if (lines[2]) {
+    ctx.fillStyle = "#94a3b8";
+    ctx.font = "600 10px Pretendard, Arial, sans-serif";
+    drawClippedText(ctx, lines[2], x + pad, y + 64, width - pad * 2);
+  }
+  ctx.strokeStyle = "#eef2f6";
+  ctx.beginPath();
+  ctx.moveTo(x + width, y + 12);
+  ctx.lineTo(x + width, y + height - 12);
+  ctx.stroke();
+}
+
+function imageCellLines(row, key) {
+  if (key === "stock") return [row.corpName, row.stockCode];
+  if (key === "source") return ["DART 원문"];
+  if (key === "obligationDate") return [formatDate(row.obligationDate)];
+  if (key === "rcept") return [formatDate(row.date)];
+  if (key === "market") return [row.market];
+  if (key === "reporter") return [row.reporter || "-"];
+  if (key === "holderType") return [row.holderType || "-"];
+  if (key === "shareChange") return [`${formatPct(row.previous)} → ${formatPct(row.current)}`];
+  if (key === "trend3m") return ["1년 추이", "화면에서 확인"];
+  if (key === "reason") return [row.reasonType || "-", row.reason || ""];
+  if (key === "eventClose") return [formatPrice(row.eventClose), row.eventCloseDate ? `${row.eventCloseDate} 기준` : ""];
+  if (key === "currentClose") return [formatPrice(row.currentClose), row.currentCloseDate ? `${row.currentCloseDate} 기준` : ""];
+  if (key === "priceGap") return [formatSignedPrice(row.priceGap), formatSignedPctPlain(row.priceGapPct)];
+  if (key === "tradeValue") return [formatSignedMoney(row.tradeValue)];
+  if (key === "previous") return [formatShares(row.previousShares), formatPct(row.previous)];
+  if (key === "current") return [formatShares(row.currentShares), formatPct(row.current)];
+  if (key === "delta") return [formatSignedShares(row.shareDelta), formatSignedPct(row.delta)];
+  return [String(row[key] || "-")];
+}
+
+function imageCellTone(row, key) {
+  if (key === "tradeValue") return row.tradeValue > 0 ? "positive" : row.tradeValue < 0 ? "negative" : "";
+  if (key === "delta") return row.shareDelta > 0 || row.delta > 0 ? "positive" : row.shareDelta < 0 || row.delta < 0 ? "negative" : "";
+  if (key === "priceGap") return row.priceGap > 0 ? "positive" : row.priceGap < 0 ? "negative" : "";
+  return "";
+}
+
+function directionLabel(value) {
+  if (value === "up") return "지분 증가";
+  if (value === "down") return "지분 감소";
+  if (value === "cross") return "5% 상향돌파";
+  return "전체 지분변동";
+}
+
+function drawWrappedLine(ctx, text, x, y, maxWidth, maxLines) {
+  const words = String(text || "").split(/\s+/).filter(Boolean);
+  if (!words.length) return;
+  const lines = [];
+  let line = "";
+  words.forEach((word) => {
+    const test = line ? `${line} ${word}` : word;
+    if (ctx.measureText(test).width <= maxWidth || !line) {
+      line = test;
+    } else {
+      lines.push(line);
+      line = word;
+    }
+  });
+  if (line) lines.push(line);
+  lines.slice(0, maxLines).forEach((item, index) => {
+    const suffix = index === maxLines - 1 && lines.length > maxLines ? "..." : "";
+    drawClippedText(ctx, item + suffix, x, y + index * 16, maxWidth);
+  });
+}
+
+function drawClippedText(ctx, text, x, y, maxWidth) {
+  let output = String(text || "");
+  if (ctx.measureText(output).width <= maxWidth) {
+    ctx.fillText(output, x, y);
+    return;
+  }
+  while (output.length > 1 && ctx.measureText(`${output}...`).width > maxWidth) {
+    output = output.slice(0, -1);
+  }
+  ctx.fillText(`${output}...`, x, y);
+}
+
+function roundRect(ctx, x, y, width, height, radius) {
+  const r = Math.min(radius, width / 2, height / 2);
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + width, y, x + width, y + height, r);
+  ctx.arcTo(x + width, y + height, x, y + height, r);
+  ctx.arcTo(x, y + height, x, y, r);
+  ctx.arcTo(x, y, x + width, y, r);
+  ctx.closePath();
+}
+
+function canvasToBlob(canvas, type) {
+  return new Promise((resolve, reject) => {
+    canvas.toBlob((blob) => {
+      if (blob) resolve(blob);
+      else reject(new Error("이미지 파일 생성에 실패했습니다."));
+    }, type, 0.95);
+  });
+}
+
+function downloadBlob(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  downloadUrl(url, filename);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+function downloadUrl(url, filename) {
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+}
+
+function setImageStatus(message) {
+  const target = document.getElementById("imageStatus");
+  if (!target) return;
+  target.textContent = message;
+  if (message.includes("완료")) {
+    setTimeout(() => {
+      if (target.textContent === message) target.textContent = "";
+    }, 2500);
+  }
+}
+
+function collectSameOriginCss() {
+  return Array.from(document.styleSheets).map((sheet) => {
+    try {
+      return Array.from(sheet.cssRules || [])
+        .map((rule) => rule.cssText)
+        .filter((text) => !text.trim().startsWith("@import"))
+        .join("\n");
+    } catch (error) {
+      return "";
+    }
+  }).join("\n");
+}
+
+function downloadBaseName() {
+  const parts = [
+    "대량보유스캐너",
+    compactDateInput(state.from) || "전체",
+    compactDateInput(state.to) || "전체",
+    state.market !== "all" ? state.market : "",
+    state.direction !== "all" ? state.direction : "",
+    state.selectedStock !== "all" ? state.selectedStock : "",
+  ].filter(Boolean);
+  return parts.join("_");
+}
+
+function compactDateInput(value) {
+  return String(value || "").replaceAll("-", "");
 }
 
 function formatShares(value) {
@@ -1127,6 +2031,18 @@ function formatSignedShares(value) {
   if (value === null || value === undefined || !Number.isFinite(value)) return "-";
   const rounded = Math.round(value);
   return `${directionSymbol(rounded)}${Math.abs(rounded).toLocaleString("ko-KR")}주`;
+}
+
+function formatSignedShareUnits(value) {
+  if (value === null || value === undefined || !Number.isFinite(value)) return "-";
+  const sign = directionSymbol(value);
+  const abs = Math.abs(value);
+  const units = abs / 10000;
+  if (abs > 0 && units < 0.01) {
+    return `${sign}<0.01만주`;
+  }
+  const digits = units >= 100 ? 0 : units >= 10 ? 1 : 2;
+  return `${sign}${units.toLocaleString("ko-KR", { maximumFractionDigits: digits })}만주`;
 }
 
 function formatPct(value) {
@@ -1158,6 +2074,19 @@ function formatSignedMoney(value) {
   return `${sign}${Math.round(abs).toLocaleString("ko-KR")}원`;
 }
 
+function formatMoney(value) {
+  if (value === null || value === undefined || !Number.isFinite(value)) return "-";
+  const abs = Math.abs(value);
+  const sign = value < 0 ? "-" : "";
+  if (abs >= 100000000) {
+    return `${sign}${Math.round(abs / 100000000).toLocaleString("ko-KR")}억원`;
+  }
+  if (abs >= 10000) {
+    return `${sign}${Math.round(abs / 10000).toLocaleString("ko-KR")}만원`;
+  }
+  return `${sign}${Math.round(abs).toLocaleString("ko-KR")}원`;
+}
+
 function formatSignedPct(value) {
   if (value === null || value === undefined || !Number.isFinite(value)) return "-";
   return `${directionSymbol(value)}${number.format(Math.abs(value))}%p`;
@@ -1177,7 +2106,15 @@ function directionSymbol(value) {
 function moneyBadge(value) {
   if (value === null || value === undefined || !Number.isFinite(value)) return "-";
   const cls = value < 0 ? "negative" : value > 0 ? "positive" : "neutral";
-  return `<span class="moneyBadge ${cls}">${formatSignedMoney(value)}</span>`;
+  return `<span class="moneyBadge ${cls}">${formatSignedMoneyEok(value)}</span>`;
+}
+
+function formatSignedMoneyEok(value) {
+  if (value === null || value === undefined || !Number.isFinite(value)) return "-";
+  const sign = directionSymbol(value);
+  const eok = Math.abs(value) / 100000000;
+  if (eok > 0 && eok < 1) return `${sign}<1억원`;
+  return `${sign}${Math.round(eok).toLocaleString("ko-KR")}억원`;
 }
 
 function toDateInput(value) {
