@@ -4149,6 +4149,225 @@ button {
   }
 }
 
+@media (max-width: 640px) {
+  .issueList {
+    margin-top: 12px;
+    padding: 14px 10px;
+    overflow: hidden;
+  }
+
+  .issueList h2 {
+    font-size: 18px;
+    line-height: 1.25;
+  }
+
+  .holdingsCards {
+    width: 100%;
+    overflow: visible;
+    padding-right: 0;
+    gap: 10px;
+  }
+
+  .holdingCardStack {
+    width: 100%;
+    min-width: 0;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .holdingCardStack .holdingMainLine {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-areas:
+      "stock stock"
+      "reporter reporter"
+      "share trend"
+      "reason reason"
+      "event current"
+      "trade delta"
+      "obligation rcept";
+    gap: 0;
+    width: 100%;
+    min-width: 0;
+    padding: 10px 12px 8px;
+  }
+
+  .holdingCardStack .holdingDetailLine {
+    display: none;
+  }
+
+  .holdingCardStack .scanStock {
+    grid-area: stock;
+    min-width: 0;
+    padding: 0 0 10px;
+    border-bottom: 1px solid #eef2f6;
+  }
+
+  .holdingCardStack [data-col="reporter"] {
+    grid-area: reporter;
+  }
+
+  .holdingCardStack [data-col="shareChange"] {
+    grid-area: share;
+  }
+
+  .holdingCardStack [data-col="trend3m"] {
+    grid-area: trend;
+  }
+
+  .holdingCardStack [data-col="reason"] {
+    grid-area: reason;
+  }
+
+  .holdingCardStack [data-col="eventClose"] {
+    grid-area: event;
+  }
+
+  .holdingCardStack [data-col="currentClose"] {
+    grid-area: current;
+  }
+
+  .holdingCardStack [data-col="tradeValue"] {
+    grid-area: trade;
+  }
+
+  .holdingCardStack [data-col="delta"] {
+    grid-area: delta;
+  }
+
+  .holdingCardStack [data-col="obligationDate"] {
+    grid-area: obligation;
+  }
+
+  .holdingCardStack [data-col="rcept"] {
+    grid-area: rcept;
+  }
+
+  .holdingCardStack .scanField {
+    display: block;
+    min-width: 0;
+    padding: 8px 4px;
+    border: 0;
+    border-bottom: 1px solid #f1f4f8;
+  }
+
+  .holdingCardStack [data-col="priceGap"] {
+    display: none !important;
+  }
+
+  .holdingCardStack [data-col="shareChange"],
+  .holdingCardStack [data-col="eventClose"],
+  .holdingCardStack [data-col="tradeValue"],
+  .holdingCardStack [data-col="obligationDate"] {
+    padding-right: 8px;
+  }
+
+  .holdingCardStack [data-col="trend3m"],
+  .holdingCardStack [data-col="currentClose"],
+  .holdingCardStack [data-col="delta"],
+  .holdingCardStack [data-col="rcept"] {
+    padding-left: 8px;
+    border-left: 1px solid #f1f4f8;
+  }
+
+  .holdingCardStack [data-col="reason"] {
+    border-left: 0;
+  }
+
+  .holdingCardStack [data-col="obligationDate"],
+  .holdingCardStack [data-col="rcept"] {
+    border-bottom: 0;
+  }
+
+  .holdingCardStack .fieldLabel {
+    display: block;
+    margin-bottom: 4px;
+    color: #7a8594;
+    font-size: 11px;
+    font-weight: 850;
+    line-height: 1.15;
+  }
+
+  .holdingCardStack .scanField strong,
+  .holdingCardStack .scanField em,
+  .holdingCardStack .scanField.num strong,
+  .holdingCardStack .scanField.num em {
+    display: block;
+    max-width: 100%;
+    overflow: hidden;
+    color: #101827;
+    font-size: 13px;
+    line-height: 1.25;
+    text-align: left;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .holdingCardStack .scanField em,
+  .holdingCardStack .miniMeta {
+    margin-top: 2px;
+    color: #667085;
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+  .holdingCardStack .stockButton {
+    min-width: 0;
+    font-size: 16px;
+  }
+
+  .holdingCardStack .stockButton .subText {
+    font-size: 12px;
+  }
+
+  .holdingCardStack .stockLogo {
+    flex-basis: 32px;
+    width: 32px;
+    height: 32px;
+  }
+
+  .holdingCardStack .reporterBadge {
+    max-width: 100%;
+    font-size: 13px;
+  }
+
+  .holdingCardStack .shareChangeField strong {
+    font-size: 14px;
+    text-align: left;
+  }
+
+  .holdingCardStack .trendField strong {
+    overflow: visible;
+  }
+
+  .holdingCardStack .miniTrendWrap,
+  .holdingCardStack .miniTrendSvg {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .holdingCardStack .miniTrendSvg {
+    height: 38px;
+  }
+
+  .holdingCardStack .moneyField strong {
+    justify-content: flex-start;
+  }
+
+  .holdingCardStack .moneyBadge {
+    min-width: 0;
+    max-width: 100%;
+    justify-content: center;
+    padding: 3px 8px;
+  }
+
+  .holdingCardStack [data-col="delta"] strong,
+  .holdingCardStack [data-col="tradeValue"] strong {
+    font-size: 14px;
+    font-weight: 900;
+  }
+}
+
 @media print {
   .topbar {
     position: static;
