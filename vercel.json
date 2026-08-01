@@ -1,6 +1,6 @@
 {
   "outputDirectory": "site",
-  "cleanUrls": true,
+  "cleanUrls": false,
   "trailingSlash": false,
   "crons": [
     {
