@@ -46,20 +46,6 @@ jobs:
           $maxReceipt = $latest.rows | ForEach-Object { $_.접수일 } | Where-Object { $_ } | Sort-Object -Descending | Select-Object -First 1
           Write-Host "Latest cache generatedAt: $($latest.generatedAt); max receipt: $maxReceipt; rows: $($latest.rows.Count)"
 
-      - name: Sync cache to Supabase
-        shell: pwsh
-        env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-        run: |
-          if (-not $env:SUPABASE_URL) {
-            throw "Missing repository secret: SUPABASE_URL"
-          }
-          if (-not $env:SUPABASE_SERVICE_ROLE_KEY) {
-            throw "Missing repository secret: SUPABASE_SERVICE_ROLE_KEY"
-          }
-          node scripts/sync-supabase-cache.mjs
-
       - name: Prepare SEO files
         shell: pwsh
         run: |
@@ -142,3 +128,21 @@ jobs:
           } else {
             Write-Host "No data changes to commit."
           }
+
+      - name: Sync cache to Supabase
+        shell: pwsh
+        timeout-minutes: 5
+        continue-on-error: true
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          if (-not $env:SUPABASE_URL) {
+            Write-Host "Missing repository secret: SUPABASE_URL. Skipping Supabase sync."
+            exit 0
+          }
+          if (-not $env:SUPABASE_SERVICE_ROLE_KEY) {
+            Write-Host "Missing repository secret: SUPABASE_SERVICE_ROLE_KEY. Skipping Supabase sync."
+            exit 0
+          }
+          node scripts/sync-supabase-cache.mjs

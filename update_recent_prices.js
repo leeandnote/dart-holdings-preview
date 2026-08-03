@@ -12,6 +12,7 @@ const range = process.argv.includes("--range") ? process.argv[process.argv.index
 const concurrency = Number(process.argv.includes("--concurrency") ? process.argv[process.argv.indexOf("--concurrency") + 1] : 24);
 const maxStocks = Number(process.argv.includes("--max") ? process.argv[process.argv.indexOf("--max") + 1] : 0);
 const recentDays = Number(process.argv.includes("--recent-days") ? process.argv[process.argv.indexOf("--recent-days") + 1] : 0);
+const timeoutMs = Number(process.argv.includes("--timeout-ms") ? process.argv[process.argv.indexOf("--timeout-ms") + 1] : 10000);
 const cutoff = getKoreaTodayDate();
 const cutoffKey = cutoff.toISOString().slice(0, 10);
 
@@ -102,9 +103,21 @@ function mergeCandles(oldItems, newItems) {
 
 async function fetchCandles(stock) {
   const url = `https://query1.finance.yahoo.com/v8/finance/chart/${stock.symbol}?range=${range}&interval=1d&events=history&includeAdjustedClose=true`;
-  const res = await fetch(url, { headers: { "user-agent": "Mozilla/5.0" } });
-  if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
-  const data = await res.json();
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  let data;
+  try {
+    const res = await fetch(url, { headers: { "user-agent": "Mozilla/5.0" }, signal: controller.signal });
+    if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+    data = await res.json();
+  } catch (error) {
+    if (error?.name === "AbortError") {
+      throw new Error(`Yahoo timeout after ${timeoutMs}ms`);
+    }
+    throw error;
+  } finally {
+    clearTimeout(timer);
+  }
   const result = data?.chart?.result?.[0];
   const timestamps = result?.timestamp || [];
   const quote = result?.indicators?.quote?.[0];
