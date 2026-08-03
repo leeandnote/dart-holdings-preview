@@ -30,6 +30,17 @@ function Format-DateText([string]$Value) {
   return $Value
 }
 
+function Format-ShortDate([string]$Value) {
+  if ($Value -match '^\d{8}$') {
+    return $Value.Substring(2,6)
+  }
+  $digits = ($Value -replace '\D', '')
+  if ($digits.Length -ge 8) {
+    return $digits.Substring(2,6)
+  }
+  return $Value
+}
+
 function Format-Eok([object]$Value) {
   if ($null -eq $Value) { return "확인불가" }
   $eok = [math]::Round(([double]$Value) / 100000000)
@@ -52,12 +63,12 @@ function Escape-TelegramHtml([string]$Text) {
   return ([string]$Text).Replace("&", "&amp;").Replace("<", "&lt;").Replace(">", "&gt;")
 }
 
-if (-not $BotToken -or -not $ChatId) {
+if ((-not $BotToken -or -not $ChatId) -and -not $DryRun) {
   Write-Host "Telegram credentials not configured. Skipping notification."
   exit 0
 }
 
-if (-not $BotToken.StartsWith("bot")) {
+if ($BotToken -and -not $BotToken.StartsWith("bot")) {
   $BotToken = "bot$BotToken"
 }
 
@@ -132,7 +143,7 @@ $buyTotal = ($enriched | Where-Object { $null -ne $_.TradeValue -and $_.TradeVal
 $sellTotal = ($enriched | Where-Object { $null -ne $_.TradeValue -and $_.TradeValue -lt 0 } | Measure-Object -Property TradeValue -Sum).Sum
 
 $lines = New-Object System.Collections.Generic.List[string]
-$lines.Add("<b>리앤노트 일일 공시 업데이트</b>")
+$lines.Add("<b>[$(Escape-TelegramHtml (Format-ShortDate $ReportDate)) 리앤노트 일일 공시 업데이트]</b>")
 $lines.Add("접수일: $(Escape-TelegramHtml (Format-DateText $ReportDate))")
 $lines.Add("대량보유 공시: <b>$($daily.Count)건</b>")
 $lines.Add("추정 매수: $(Escape-TelegramHtml (Format-Eok $buyTotal)) / 추정 매도: $(Escape-TelegramHtml (Format-Eok $sellTotal))")
