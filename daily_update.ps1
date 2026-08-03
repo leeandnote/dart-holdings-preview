@@ -6,7 +6,9 @@
   [string]$DisclosureBgnDe = (Get-Date).AddMonths(-6).ToString('yyyyMMdd'),
   [string]$PriceRange = "1y",
   [int]$PriceSleepMs = 120,
-  [int]$RefreshLookbackDays = 10,
+  [int]$RefreshLookbackDays = 0,
+  [int]$ObligationMaxRows = 80,
+  [int]$PriceRecentDays = 30,
   [switch]$FullRefresh,
   [switch]$RefreshDisclosureSignals,
   [switch]$RefreshShareholders,
@@ -125,10 +127,15 @@ if (-not $BgnDe) {
   } else {
     $latestReceipt = Get-LatestReceiptDate -LatestJsonPath $latestJson
     if ($latestReceipt -match '^\d{8}$') {
-      $startDate = [datetime]::ParseExact($latestReceipt, "yyyyMMdd", $null).AddDays(-1 * [Math]::Max(1, $RefreshLookbackDays))
+      if ($RefreshLookbackDays -le 0) {
+        $BgnDe = Normalize-UpdateDate $EndDe
+        Write-Host "Fast daily mode: checking only today's receipt date ($BgnDe)."
+      } else {
+        $startDate = [datetime]::ParseExact($latestReceipt, "yyyyMMdd", $null).AddDays(-1 * $RefreshLookbackDays)
       $historyStart = [datetime]::ParseExact($historyBgn, "yyyyMMdd", $null)
       if ($startDate -lt $historyStart) { $startDate = $historyStart }
       $BgnDe = $startDate.ToString("yyyyMMdd")
+      }
     } else {
       $BgnDe = $historyBgn
     }
@@ -155,7 +162,13 @@ foreach ($range in $holdingRanges) {
 Write-MergedLatestData -ChunkFiles $chunkFiles -Bgn $historyBgn -End $EndDe
 
 Write-Host "DART obligation-date enrichment"
-& (Join-Path $root "enrich_obligation_dates.ps1") -ApiKey $ApiKey
+$obligationArgs = @{
+  ApiKey = $ApiKey
+}
+if (-not $FullRefresh -and $ObligationMaxRows -gt 0) {
+  $obligationArgs.MaxRows = $ObligationMaxRows
+}
+& (Join-Path $root "enrich_obligation_dates.ps1") @obligationArgs
 
 if ($RefreshDisclosureSignals -or $FullRefresh) {
   Write-Host "DART earnings and contract disclosure signals: $DisclosureBgnDe ~ $EndDe"
@@ -189,7 +202,7 @@ if (Test-Path -LiteralPath $bundledNode) {
   if ($nodeCommand) { $nodePath = $nodeCommand.Source }
 }
 if ($nodePath -and (Test-Path -LiteralPath $recentPriceJs)) {
-  & $nodePath $recentPriceJs --concurrency 32
+  & $nodePath $recentPriceJs --concurrency 32 --recent-days $PriceRecentDays
 } else {
   Write-Host "Node not found. Falling back to slower PowerShell price updater."
   & (Join-Path $root "update_prices.ps1") -Range $PriceRange -Interval "1d" -SleepMs $PriceSleepMs

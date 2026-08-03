@@ -138,8 +138,8 @@ function oneYearPrices(code, reportDate) {
 
 function makeSparkline(points, obligationDate, amount) {
   if (points.length < 2) return `<span class="muted">-</span>`;
-  const width = 150;
-  const height = 34;
+  const width = 118;
+  const height = 32;
   const pad = 3;
   const closes = points.map((point) => point.close);
   const min = Math.min(...closes);
@@ -209,13 +209,13 @@ function sectionHtml({ title, eyebrow, rows, accent }) {
       <table>
         <thead>
           <tr>
-            <th style="width:40px">#</th>
-            <th style="width:150px">종목명</th>
-            <th style="width:245px">주주/제출인</th>
-            <th style="width:140px">보고의무발생일</th>
-            <th style="width:135px;text-align:right">추정변동금액</th>
-            <th style="width:150px;text-align:center">지분변동사항</th>
-            <th style="width:165px">1년 추이</th>
+            <th style="width:34px">#</th>
+            <th style="width:118px">종목명</th>
+            <th style="width:178px">주주/제출인</th>
+            <th style="width:112px">보고의무발생일</th>
+            <th style="width:112px;text-align:right">추정변동금액</th>
+            <th style="width:124px;text-align:center">지분변동사항</th>
+            <th style="width:126px">1년 추이</th>
           </tr>
         </thead>
         <tbody>${body}</tbody>
@@ -269,12 +269,12 @@ const html = `<!doctype html>
   }
   * { box-sizing: border-box; }
   body { margin: 0; background: #f3f5f8; color: #101828; font-family: Pretendard, Arial, sans-serif; }
-  .sheet { width: 1280px; height: 1280px; padding: 38px 54px 34px; background: #fff; }
+  .sheet { width: 960px; min-height: 1420px; padding: 34px 40px 32px; background: #fff; }
   .topline { height: 8px; background: linear-gradient(90deg, #FA4905 0%, #FA4905 38%, #111827 38%, #111827 100%); margin-bottom: 24px; }
   .brand { display: flex; align-items: center; gap: 10px; color: #FA4905; font-size: 13px; font-weight: 800; letter-spacing: .08em; }
   .brand img { width: 34px; height: 34px; border-radius: 50%; }
-  h1 { margin: 12px 0 8px; font-size: 34px; line-height: 1.08; letter-spacing: 0; }
-  .subtitle { color: #667085; font-size: 16px; font-weight: 700; }
+  h1 { margin: 12px 0 8px; font-size: 31px; line-height: 1.08; letter-spacing: 0; }
+  .subtitle { color: #667085; font-size: 14px; font-weight: 700; }
   .intro { display: flex; justify-content: space-between; gap: 24px; align-items: end; margin-bottom: 20px; }
   .note { color: #98a2b3; font-size: 12px; font-weight: 700; text-align: right; }
   .section { border-top: 4px solid #111827; margin-top: 18px; }
@@ -287,16 +287,16 @@ const html = `<!doctype html>
   .section-head span { color: #667085; font-size: 12px; font-weight: 800; }
   table { width: 100%; border-collapse: collapse; table-layout: fixed; }
   thead th { padding: 8px 10px; border-bottom: 1px solid #d9e0ea; color: #475467; font-size: 11px; font-weight: 800; text-align: left; }
-  tbody td { height: 46px; padding: 6px 10px; border-bottom: 1px solid #e4e9f1; vertical-align: middle; font-size: 14px; font-weight: 800; }
+  tbody td { height: 47px; padding: 6px 8px; border-bottom: 1px solid #e4e9f1; vertical-align: middle; font-size: 13px; font-weight: 800; }
   .rank { color: #667085; text-align: center; }
   .stock, .holder { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
   .sub { margin-top: 2px; color: #667085; font-size: 10.5px; font-weight: 700; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
   .datepair b { display: block; font-size: 12px; }
   .datepair span { display: block; margin-top: 2px; color: #667085; font-size: 10.5px; font-weight: 700; }
-  .amount { text-align: right; font-size: 15px; white-space: nowrap; }
+  .amount { text-align: right; font-size: 14px; white-space: nowrap; }
   .pos { color: #e03131; }
   .neg { color: #1f6feb; }
-  .ratio { text-align: center; white-space: nowrap; font-size: 14px; }
+  .ratio { text-align: center; white-space: nowrap; font-size: 13px; }
   .spark { display: block; }
   .muted, .empty { color: #98a2b3; font-size: 12px; font-weight: 700; }
   .empty { height: 44px; text-align: center; }
@@ -309,7 +309,7 @@ const html = `<!doctype html>
     <div class="intro">
       <div>
         <div class="brand"><img src="${pathToFileURL(logoPath).href}" alt="">LEE&NOTE DISCLOSURE BRIEF</div>
-        <h1>${shortDateTitle(reportDate)} 리앤노트 대량보유 변동 브리프</h1>
+        <h1>${shortDateTitle(reportDate)} 주요 지분변동 공시 요약</h1>
         <div class="subtitle">접수일 ${dateText(reportDate)} · DART 대량보유 공시를 매수·매도·신규 5% 진입으로 재분류</div>
       </div>
       <div class="note">보고의무발생일 기준 가격·지분 변동을 함께 표시합니다.</div>
@@ -345,7 +345,7 @@ const executablePath = candidates.find((candidate) => fs.existsSync(candidate));
 const browser = await chromium.launch({ headless: true, executablePath, args: ["--disable-gpu", "--disable-dev-shm-usage"] });
 
 try {
-  const page = await browser.newPage({ viewport: { width: 1280, height: 1280 }, deviceScaleFactor: 1 });
+  const page = await browser.newPage({ viewport: { width: 960, height: 1420 }, deviceScaleFactor: 1 });
   await page.goto(pathToFileURL(htmlPath).href, { waitUntil: "networkidle" });
   await page.screenshot({ path: imagePath, fullPage: false });
 } finally {
@@ -360,7 +360,7 @@ if (send) {
 
   const form = new FormData();
   form.set("chat_id", chatId);
-  form.set("caption", `[${shortDateTitle(reportDate)} 리앤노트 대량보유 변동 브리프]\n매수·매도·신규 5% 진입 핵심 표 이미지입니다.\n${siteUrl.replace(/\/$/, "")}`);
+  form.set("caption", `[${shortDateTitle(reportDate)} 주요 지분변동 공시 요약]\n매수·매도·신규 5% 진입 핵심 표 이미지입니다.\n${siteUrl.replace(/\/$/, "")}`);
   form.set("photo", new Blob([fs.readFileSync(imagePath)], { type: "image/png" }), path.basename(imagePath));
 
   const res = await fetch(`https://api.telegram.org/${token}/sendPhoto`, { method: "POST", body: form });
