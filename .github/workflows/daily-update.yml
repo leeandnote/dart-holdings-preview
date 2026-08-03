@@ -3,10 +3,10 @@ name: Daily DART data update
 on:
   workflow_dispatch:
   schedule:
-    # KST 16:30, after the regular market close.
-    - cron: "30 7 * * 1-5"
-    # KST 23:30, after late filings and delayed price data.
-    - cron: "30 14 * * 1-5"
+    # KST 14:00, midday disclosure refresh.
+    - cron: "0 5 * * 1-5"
+    # KST 20:00, after regular filings and price data refresh.
+    - cron: "0 11 * * 1-5"
 
 permissions:
   contents: write
