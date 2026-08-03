@@ -44,6 +44,47 @@ function Invoke-DartJson([string]$Path, [hashtable]$Params) {
     return $response
 }
 
+function Save-DartFile([string]$Uri, [string]$OutFile) {
+    $headers = @{ 'User-Agent' = 'major-holdings-monitor/1.0' }
+    $errors = New-Object System.Collections.Generic.List[string]
+
+    foreach ($attempt in 1..3) {
+        try {
+            [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+            Invoke-WebRequest -Uri $Uri -OutFile $OutFile -Headers $headers -TimeoutSec 90
+            if ((Test-Path -LiteralPath $OutFile) -and ((Get-Item -LiteralPath $OutFile).Length -gt 0)) {
+                return
+            }
+        } catch {
+            $errors.Add("Invoke-WebRequest attempt ${attempt}: $($_.Exception.Message)")
+            Start-Sleep -Seconds ([Math]::Min(10, $attempt * 2))
+        }
+    }
+
+    $curl = Get-Command curl.exe -ErrorAction SilentlyContinue
+    if ($curl) {
+        $curlArgs = @(
+            "--fail",
+            "--location",
+            "--retry", "3",
+            "--retry-delay", "2",
+            "--connect-timeout", "30",
+            "--max-time", "120",
+            "--tlsv1.2",
+            "--user-agent", "major-holdings-monitor/1.0",
+            "--output", $OutFile,
+            $Uri
+        )
+        & $curl.Source @curlArgs
+        if ($LASTEXITCODE -eq 0 -and (Test-Path -LiteralPath $OutFile) -and ((Get-Item -LiteralPath $OutFile).Length -gt 0)) {
+            return
+        }
+        $errors.Add("curl.exe exit code: $LASTEXITCODE")
+    }
+
+    throw "DART file download failed. $($errors -join ' | ')"
+}
+
 function Get-CorpCodeXml([string]$Key, [string]$Dir) {
     New-Item -ItemType Directory -Force -Path $Dir | Out-Null
     $xmlPath = Join-Path $Dir 'CORPCODE.xml'
@@ -51,7 +92,7 @@ function Get-CorpCodeXml([string]$Key, [string]$Dir) {
 
     $zipPath = Join-Path $Dir 'corpCode.zip'
     $uri = "$BaseUrl/corpCode.xml?crtfc_key=$([uri]::EscapeDataString($Key))"
-    Invoke-WebRequest -Uri $uri -OutFile $zipPath -Headers @{ 'User-Agent' = 'major-holdings-monitor/1.0' } -TimeoutSec 90
+    Save-DartFile -Uri $uri -OutFile $zipPath
     Expand-Archive -LiteralPath $zipPath -DestinationPath $Dir -Force
     return $xmlPath
 }
