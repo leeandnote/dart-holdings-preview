@@ -61,6 +61,37 @@ function Save-DartFile([string]$Uri, [string]$OutFile) {
         }
     }
 
+    $python = Get-Command python -ErrorAction SilentlyContinue
+    if (-not $python) {
+        $python = Get-Command py -ErrorAction SilentlyContinue
+    }
+    if ($python) {
+        $script = @"
+import ssl
+import sys
+import urllib.request
+
+uri = sys.argv[1]
+out_file = sys.argv[2]
+request = urllib.request.Request(uri, headers={"User-Agent": "major-holdings-monitor/1.0"})
+context = ssl.create_default_context()
+context.minimum_version = ssl.TLSVersion.TLSv1_2
+with urllib.request.urlopen(request, timeout=120, context=context) as response:
+    data = response.read()
+if not data:
+    raise RuntimeError("empty response")
+with open(out_file, "wb") as handle:
+    handle.write(data)
+"@
+        $scriptPath = Join-Path ([IO.Path]::GetTempPath()) "dart_file_download.py"
+        Set-Content -LiteralPath $scriptPath -Value $script -Encoding UTF8
+        & $python.Source $scriptPath $Uri $OutFile
+        if ($LASTEXITCODE -eq 0 -and (Test-Path -LiteralPath $OutFile) -and ((Get-Item -LiteralPath $OutFile).Length -gt 0)) {
+            return
+        }
+        $errors.Add("python downloader exit code: $LASTEXITCODE")
+    }
+
     $curl = Get-Command curl.exe -ErrorAction SilentlyContinue
     if ($curl) {
         $curlArgs = @(
