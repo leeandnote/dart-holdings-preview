@@ -272,10 +272,39 @@ if (-not $BotToken -or -not $ChatId) {
 }
 
 $caption = "[" + (ShortDate $ReportDate) + " " + $L_TitleSuffix + "] " + $L_Image
-$form = @{
-  chat_id = $ChatId
-  caption = $caption
-  photo = Get-Item -LiteralPath $imagePath
+$sendPhotoUrl = "https://api.telegram.org/$BotToken/sendPhoto"
+$irmFormParam = (Get-Command Invoke-RestMethod).Parameters["Form"]
+if ($irmFormParam) {
+  $form = @{
+    chat_id = $ChatId
+    caption = $caption
+    photo = Get-Item -LiteralPath $imagePath
+  }
+  Invoke-RestMethod -Uri $sendPhotoUrl -Method Post -Form $form | Out-Null
+} else {
+  $uploadPath = Join-Path $env:TEMP ("leeandnote_telegram_brief_" + $ReportDate + ".png")
+  Copy-Item -LiteralPath $imagePath -Destination $uploadPath -Force
+
+  Add-Type -AssemblyName System.Net.Http
+  $client = [System.Net.Http.HttpClient]::new()
+  $content = [System.Net.Http.MultipartFormDataContent]::new()
+  $fileStream = [System.IO.File]::OpenRead($uploadPath)
+  try {
+    $content.Add([System.Net.Http.StringContent]::new($ChatId), "chat_id")
+    $content.Add([System.Net.Http.StringContent]::new($caption), "caption")
+    $fileContent = [System.Net.Http.StreamContent]::new($fileStream)
+    $fileContent.Headers.ContentType = [System.Net.Http.Headers.MediaTypeHeaderValue]::Parse("image/png")
+    $content.Add($fileContent, "photo", [System.IO.Path]::GetFileName($uploadPath))
+    $httpResponse = $client.PostAsync($sendPhotoUrl, $content).GetAwaiter().GetResult()
+    $result = $httpResponse.Content.ReadAsStringAsync().GetAwaiter().GetResult()
+    $response = $result | ConvertFrom-Json
+    if (-not $httpResponse.IsSuccessStatusCode -or -not $response.ok) {
+      throw "Telegram sendPhoto failed: $($response.description)"
+    }
+  } finally {
+    $fileStream.Dispose()
+    $content.Dispose()
+    $client.Dispose()
+  }
 }
-Invoke-RestMethod -Uri "https://api.telegram.org/$BotToken/sendPhoto" -Method Post -Form $form | Out-Null
 Write-Host "Telegram image notification sent for $ReportDate."
