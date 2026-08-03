@@ -37,7 +37,37 @@ function Invoke-DartJson([string]$Path, [hashtable]$Params) {
         '{0}={1}' -f [uri]::EscapeDataString($_.Key), [uri]::EscapeDataString([string]$_.Value)
     }) -join '&'
     $uri = "$BaseUrl/$Path`?$queryString"
-    $response = Invoke-RestMethod -Uri $uri -Headers @{ 'User-Agent' = 'major-holdings-monitor/1.0' } -TimeoutSec 60
+    $response = $null
+    try {
+        $response = Invoke-RestMethod -Uri $uri -Headers @{ 'User-Agent' = 'major-holdings-monitor/1.0' } -TimeoutSec 60
+    } catch {
+        $python = Get-Command python -ErrorAction SilentlyContinue
+        if (-not $python) {
+            $python = Get-Command py -ErrorAction SilentlyContinue
+        }
+        if (-not $python) {
+            throw
+        }
+        $script = @"
+import ssl
+import sys
+import urllib.request
+
+uri = sys.argv[1]
+request = urllib.request.Request(uri, headers={"User-Agent": "major-holdings-monitor/1.0"})
+context = ssl.create_default_context()
+context.minimum_version = ssl.TLSVersion.TLSv1_2
+with urllib.request.urlopen(request, timeout=90, context=context) as response:
+    sys.stdout.buffer.write(response.read())
+"@
+        $scriptPath = Join-Path ([IO.Path]::GetTempPath()) "dart_json_request.py"
+        Set-Content -LiteralPath $scriptPath -Value $script -Encoding UTF8
+        $jsonText = & $python.Source $scriptPath $uri
+        if ($LASTEXITCODE -ne 0 -or -not $jsonText) {
+            throw
+        }
+        $response = $jsonText | ConvertFrom-Json
+    }
     if ($response.status -ne '000' -and $response.status -ne '013') {
         throw "DART API 오류 $($response.status): $($response.message)"
     }
