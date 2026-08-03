@@ -168,12 +168,16 @@ $sectionHeader = 44
 $topHeight = 132
 $gap = 14
 $height = $topHeight + (3 * $sectionHeader) + (($buyRows.Count + $sellRows.Count + $newRows.Count) * $rowHeight) + (3 * $gap) + 34
+$scale = 2
 
-$bmp = [Drawing.Bitmap]::new($width, $height)
+$bmp = [Drawing.Bitmap]::new($width * $scale, $height * $scale)
 $g = [Drawing.Graphics]::FromImage($bmp)
 $g.SmoothingMode = [Drawing.Drawing2D.SmoothingMode]::AntiAlias
+$g.InterpolationMode = [Drawing.Drawing2D.InterpolationMode]::HighQualityBicubic
+$g.PixelOffsetMode = [Drawing.Drawing2D.PixelOffsetMode]::HighQuality
 $g.TextRenderingHint = [Drawing.Text.TextRenderingHint]::ClearTypeGridFit
 $g.Clear([Drawing.Color]::White)
+$g.ScaleTransform($scale, $scale)
 
 $black = [Drawing.Brushes]::Black
 $muted = [Drawing.SolidBrush]::new([Drawing.Color]::FromArgb(95, 108, 126))
