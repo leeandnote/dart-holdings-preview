@@ -217,5 +217,14 @@ if (-not $SkipTelegram) {
     Write-Host "Telegram daily disclosure notification"
     & $telegramScript
   }
+  $telegramImageScript = Join-Path $root "telegram_brief_image.ps1"
+  if (Test-Path -LiteralPath $telegramImageScript) {
+    Write-Host "Telegram daily disclosure image"
+    try {
+      & $telegramImageScript
+    } catch {
+      Write-Warning "Telegram image notification failed: $($_.Exception.Message)"
+    }
+  }
 }
 
