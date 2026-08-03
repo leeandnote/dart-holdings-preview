@@ -13,11 +13,12 @@ permissions:
 
 concurrency:
   group: daily-dart-data-update
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   update-and-deploy:
     runs-on: windows-latest
+    timeout-minutes: 25
 
     steps:
       - name: Checkout
@@ -25,6 +26,7 @@ jobs:
 
       - name: Run DART and price update
         shell: pwsh
+        timeout-minutes: 18
         env:
           DART_API_KEY: ${{ secrets.DART_API_KEY }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
@@ -40,6 +42,9 @@ jobs:
           if (Test-Path "site/data/prices.json") {
             Remove-Item "site/data/prices.json" -Force
           }
+          $latest = Get-Content "site/data/latest.json" -Raw -Encoding UTF8 | ConvertFrom-Json
+          $maxReceipt = $latest.rows | ForEach-Object { $_.접수일 } | Where-Object { $_ } | Sort-Object -Descending | Select-Object -First 1
+          Write-Host "Latest cache generatedAt: $($latest.generatedAt); max receipt: $maxReceipt; rows: $($latest.rows.Count)"
 
       - name: Sync cache to Supabase
         shell: pwsh

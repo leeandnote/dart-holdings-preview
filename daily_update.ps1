@@ -1,10 +1,16 @@
 ﻿param(
   [string]$ApiKey = $env:DART_API_KEY,
-  [string]$BgnDe = (Get-Date).AddYears(-1).ToString('yyyyMMdd'),
+  [string]$BgnDe = "",
+  [string]$HistoryBgnDe = (Get-Date).AddYears(-1).ToString('yyyyMMdd'),
   [string]$EndDe = (Get-Date).ToString('yyyyMMdd'),
   [string]$DisclosureBgnDe = (Get-Date).AddMonths(-6).ToString('yyyyMMdd'),
   [string]$PriceRange = "1y",
   [int]$PriceSleepMs = 120,
+  [int]$RefreshLookbackDays = 10,
+  [switch]$FullRefresh,
+  [switch]$RefreshDisclosureSignals,
+  [switch]$RefreshShareholders,
+  [switch]$RefreshLogos,
   [switch]$SkipTelegram
 )
 
@@ -78,7 +84,11 @@ function Write-MergedLatestData([array]$ChunkFiles, [string]$Bgn, [string]$End) 
       $rowsByReceipt[$key] = $row
     }
   }
-  $rows = @($rowsByReceipt.Values | Sort-Object @{ Expression = { Get-JsonPropertyValue $_ @("접수일") }; Descending = $true }, @{ Expression = { Get-JsonPropertyValue $_ @("종목명") }; Descending = $false }, @{ Expression = { Get-JsonPropertyValue $_ @("접수번호") }; Descending = $true })
+  $normalizedBgn = Normalize-UpdateDate $Bgn
+  $rows = @($rowsByReceipt.Values | Where-Object {
+    $receiptDate = [string](Get-JsonPropertyValue $_ @("접수일"))
+    -not $receiptDate -or $receiptDate -ge $normalizedBgn
+  } | Sort-Object @{ Expression = { Get-JsonPropertyValue $_ @("접수일") }; Descending = $true }, @{ Expression = { Get-JsonPropertyValue $_ @("종목명") }; Descending = $false }, @{ Expression = { Get-JsonPropertyValue $_ @("접수번호") }; Descending = $true })
   $corps = @($corpsByCode.Values | Sort-Object @{ Expression = { Get-JsonPropertyValue $_ @("name") }; Descending = $false })
   $latestJson = Join-Path $root "site\data\latest.json"
   New-Item -ItemType Directory -Force -Path (Split-Path -Parent $latestJson) | Out-Null
@@ -97,37 +107,76 @@ function Write-MergedLatestData([array]$ChunkFiles, [string]$Bgn, [string]$End) 
   Write-Host "Merged DART holdings cache: $($rows.Count) rows / $($corps.Count) stocks"
 }
 
+function Get-LatestReceiptDate([string]$LatestJsonPath) {
+  if (-not (Test-Path -LiteralPath $LatestJsonPath)) { return "" }
+  try {
+    $payload = Get-Content -LiteralPath $LatestJsonPath -Raw -Encoding UTF8 | ConvertFrom-Json
+    return [string](@($payload.rows | ForEach-Object { Get-JsonPropertyValue $_ @("접수일") } | Where-Object { $_ } | Sort-Object -Descending | Select-Object -First 1))
+  } catch {
+    return ""
+  }
+}
+
+$latestJson = Join-Path $root "site\data\latest.json"
+$historyBgn = Normalize-UpdateDate $HistoryBgnDe
+if (-not $BgnDe) {
+  if ($FullRefresh -or -not (Test-Path -LiteralPath $latestJson)) {
+    $BgnDe = $historyBgn
+  } else {
+    $latestReceipt = Get-LatestReceiptDate -LatestJsonPath $latestJson
+    if ($latestReceipt -match '^\d{8}$') {
+      $startDate = [datetime]::ParseExact($latestReceipt, "yyyyMMdd", $null).AddDays(-1 * [Math]::Max(1, $RefreshLookbackDays))
+      $historyStart = [datetime]::ParseExact($historyBgn, "yyyyMMdd", $null)
+      if ($startDate -lt $historyStart) { $startDate = $historyStart }
+      $BgnDe = $startDate.ToString("yyyyMMdd")
+    } else {
+      $BgnDe = $historyBgn
+    }
+  }
+}
+
 Write-Host "DART holdings update: $BgnDe ~ $EndDe"
 $holdingRanges = Split-DateRangeForDartList -Bgn $BgnDe -End $EndDe
-if ($holdingRanges.Count -le 1) {
-  & (Join-Path $root "major_holdings.ps1") -BgnDe $BgnDe -EndDe $EndDe -ApiKey $ApiKey
-} else {
-  $chunkDir = Join-Path $root ".cache\holding_chunks"
-  New-Item -ItemType Directory -Force -Path $chunkDir | Out-Null
-  $chunkFiles = @()
-  $index = 0
-  foreach ($range in $holdingRanges) {
-    $index += 1
-    $jsonOut = Join-Path $chunkDir "latest_$($range.Bgn)_$($range.End).json"
-    $csvOut = Join-Path $chunkDir "major_holdings_$($range.Bgn)_$($range.End).csv"
-    Write-Host "DART holdings chunk $index/$($holdingRanges.Count): $($range.Bgn) ~ $($range.End)"
-    & (Join-Path $root "major_holdings.ps1") -BgnDe $range.Bgn -EndDe $range.End -ApiKey $ApiKey -JsonOut $jsonOut -Out $csvOut
-    $chunkFiles += $jsonOut
-  }
-  Write-MergedLatestData -ChunkFiles $chunkFiles -Bgn $BgnDe -End $EndDe
+$chunkDir = Join-Path $root ".cache\holding_chunks"
+New-Item -ItemType Directory -Force -Path $chunkDir | Out-Null
+$chunkFiles = @()
+if ((Test-Path -LiteralPath $latestJson) -and -not $FullRefresh) {
+  $chunkFiles += $latestJson
 }
+$index = 0
+foreach ($range in $holdingRanges) {
+  $index += 1
+  $jsonOut = Join-Path $chunkDir "latest_$($range.Bgn)_$($range.End).json"
+  $csvOut = Join-Path $chunkDir "major_holdings_$($range.Bgn)_$($range.End).csv"
+  Write-Host "DART holdings chunk $index/$($holdingRanges.Count): $($range.Bgn) ~ $($range.End)"
+  & (Join-Path $root "major_holdings.ps1") -BgnDe $range.Bgn -EndDe $range.End -ApiKey $ApiKey -JsonOut $jsonOut -Out $csvOut
+  $chunkFiles += $jsonOut
+}
+Write-MergedLatestData -ChunkFiles $chunkFiles -Bgn $historyBgn -End $EndDe
 
 Write-Host "DART obligation-date enrichment"
 & (Join-Path $root "enrich_obligation_dates.ps1") -ApiKey $ApiKey
 
-Write-Host "DART earnings and contract disclosure signals: $DisclosureBgnDe ~ $EndDe"
-& (Join-Path $root "disclosure_signals.ps1") -BgnDe $DisclosureBgnDe -EndDe $EndDe -ApiKey $ApiKey -MaxSearchPages 20 -MaxCandidates 120 -MaxDocuments 25
+if ($RefreshDisclosureSignals -or $FullRefresh) {
+  Write-Host "DART earnings and contract disclosure signals: $DisclosureBgnDe ~ $EndDe"
+  & (Join-Path $root "disclosure_signals.ps1") -BgnDe $DisclosureBgnDe -EndDe $EndDe -ApiKey $ApiKey -MaxSearchPages 20 -MaxCandidates 120 -MaxDocuments 25
+} else {
+  Write-Host "Skipping disclosure signal refresh for fast daily update."
+}
 
-Write-Host "DART regular-report shareholder snapshot"
-& (Join-Path $root "shareholder_snapshot.ps1") -ApiKey $ApiKey -MaxStocks 180
+if ($RefreshShareholders -or $FullRefresh) {
+  Write-Host "DART regular-report shareholder snapshot"
+  & (Join-Path $root "shareholder_snapshot.ps1") -ApiKey $ApiKey -MaxStocks 180
+} else {
+  Write-Host "Skipping shareholder snapshot refresh for fast daily update."
+}
 
-Write-Host "DART company homepage favicon cache"
-& (Join-Path $root "company_logos.ps1") -ApiKey $ApiKey -MaxStocks 260
+if ($RefreshLogos -or $FullRefresh) {
+  Write-Host "DART company homepage favicon cache"
+  & (Join-Path $root "company_logos.ps1") -ApiKey $ApiKey -MaxStocks 260
+} else {
+  Write-Host "Skipping company logo refresh for fast daily update."
+}
 
 Write-Host "Price cache update: recent daily closes"
 $recentPriceJs = Join-Path $root "update_recent_prices.js"
