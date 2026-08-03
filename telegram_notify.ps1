@@ -4,7 +4,9 @@
   [string]$DataPath = (Join-Path $PSScriptRoot "site\data\latest.json"),
   [string]$SiteUrl = $env:SITE_URL,
   [string]$ReportDate = "",
-  [int]$Top = 5
+  [int]$Top = 5,
+  [switch]$DryRun,
+  [switch]$EnableWebPreview
 )
 
 $ErrorActionPreference = "Stop"
@@ -53,6 +55,14 @@ function Escape-TelegramHtml([string]$Text) {
 if (-not $BotToken -or -not $ChatId) {
   Write-Host "Telegram credentials not configured. Skipping notification."
   exit 0
+}
+
+if (-not $BotToken.StartsWith("bot")) {
+  $BotToken = "bot$BotToken"
+}
+
+if (-not $SiteUrl) {
+  $SiteUrl = "https://dart-holdings-preview.vercel.app"
 }
 
 if (-not (Test-Path -LiteralPath $DataPath)) {
@@ -161,16 +171,22 @@ if ($crossed.Count) {
 
 if ($SiteUrl) {
   $url = $SiteUrl.TrimEnd("/")
-  $lines.Add("<a href=""$url/index.html"">대시보드 보기</a> · <a href=""$url/blog.html"">일별 리포트</a>")
+  $lines.Add("<a href=""$url/"">대시보드 보기</a> · <a href=""$url/blog.html"">일별 리포트</a>")
 }
 
 $message = ($lines -join "`n")
+
+if ($DryRun) {
+  Write-Host $message
+  exit 0
+}
+
 $apiUrl = "https://api.telegram.org/$BotToken/sendMessage"
 $body = @{
   chat_id = $ChatId
   text = $message
   parse_mode = "HTML"
-  disable_web_page_preview = $true
+  disable_web_page_preview = (-not $EnableWebPreview)
 }
 
 Invoke-RestMethod -Uri $apiUrl -Method Post -Body $body -ContentType "application/x-www-form-urlencoded" | Out-Null
