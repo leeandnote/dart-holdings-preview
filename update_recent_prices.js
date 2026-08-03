@@ -1,7 +1,8 @@
-const fs = require("fs");
-const path = require("path");
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 
-const root = __dirname;
+const root = path.dirname(fileURLToPath(import.meta.url));
 const dataDir = path.join(root, "site", "data");
 const latestPath = path.join(dataDir, "latest.json");
 const priceDir = path.join(dataDir, "prices");
