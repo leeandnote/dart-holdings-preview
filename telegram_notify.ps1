@@ -143,7 +143,7 @@ $buyTotal = ($enriched | Where-Object { $null -ne $_.TradeValue -and $_.TradeVal
 $sellTotal = ($enriched | Where-Object { $null -ne $_.TradeValue -and $_.TradeValue -lt 0 } | Measure-Object -Property TradeValue -Sum).Sum
 
 $lines = New-Object System.Collections.Generic.List[string]
-$lines.Add("<b>[$(Escape-TelegramHtml (Format-ShortDate $ReportDate)) 리앤노트 일일 공시 업데이트]</b>")
+$lines.Add("<b>[$(Escape-TelegramHtml (Format-ShortDate $ReportDate)) 리앤노트 대량보유 변동 브리프]</b>")
 $lines.Add("접수일: $(Escape-TelegramHtml (Format-DateText $ReportDate))")
 $lines.Add("대량보유 공시: <b>$($daily.Count)건</b>")
 $lines.Add("추정 매수: $(Escape-TelegramHtml (Format-Eok $buyTotal)) / 추정 매도: $(Escape-TelegramHtml (Format-Eok $sellTotal))")
