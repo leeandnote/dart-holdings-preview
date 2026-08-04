@@ -3,8 +3,9 @@ name: Daily DART data update
 on:
   workflow_dispatch:
   schedule:
-    # KST 22:45, after regular filings and latest available price data refresh.
-    - cron: "45 13 * * 1-5"
+    # KST 16:00 and 21:00 on weekdays. Vercel Cron is primary; GitHub schedule is a fallback.
+    - cron: "0 7 * * 1-5"
+    - cron: "0 12 * * 1-5"
 
 permissions:
   contents: write

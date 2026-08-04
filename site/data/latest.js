@@ -1,5 +1,6 @@
 window.__DART_DATA__ = {
-  "generatedAt": "2026-08-04 07:45:51",
+  "generatedAt": "2026-08-04 16:45:51",
+  "generatedAtUtc": "2026-08-04T07:45:51.000Z",
   "scope": "KOSPI/KOSDAQ 최근 1년 전체",
   "query": [],
   "bgnDe": "20250804",
