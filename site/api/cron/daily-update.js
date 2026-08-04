@@ -58,7 +58,7 @@ async function dispatchWorkflow() {
   });
 }
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   if (!["GET", "POST"].includes(req.method)) {
     return json(res, 405, { ok: false, error: "Method not allowed" });
   }
@@ -90,4 +90,4 @@ export default async function handler(req, res) {
       error: error.message,
     });
   }
-}
+};
