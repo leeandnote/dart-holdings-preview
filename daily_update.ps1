@@ -36,6 +36,15 @@ function Normalize-UpdateDate([string]$Value) {
   return ([string]$Value).Replace("-", "").Trim()
 }
 
+function Get-KstNowString() {
+  try {
+    $tz = [TimeZoneInfo]::FindSystemTimeZoneById("Korea Standard Time")
+  } catch {
+    $tz = [TimeZoneInfo]::FindSystemTimeZoneById("Asia/Seoul")
+  }
+  return [TimeZoneInfo]::ConvertTimeFromUtc([DateTime]::UtcNow, $tz).ToString("yyyy-MM-dd HH:mm:ss")
+}
+
 function Split-DateRangeForDartList([string]$Bgn, [string]$End) {
   $start = [datetime]::ParseExact((Normalize-UpdateDate $Bgn), "yyyyMMdd", $null)
   $final = [datetime]::ParseExact((Normalize-UpdateDate $End), "yyyyMMdd", $null)
@@ -95,7 +104,8 @@ function Write-MergedLatestData([array]$ChunkFiles, [string]$Bgn, [string]$End) 
   $latestJson = Join-Path $root "site\data\latest.json"
   New-Item -ItemType Directory -Force -Path (Split-Path -Parent $latestJson) | Out-Null
   $payload = [pscustomobject]@{
-    generatedAt = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss")
+    generatedAt = Get-KstNowString
+    generatedAtUtc = (Get-Date).ToUniversalTime().ToString("o")
     scope = "KOSPI/KOSDAQ 최근 1년 전체"
     query = @()
     bgnDe = (Normalize-UpdateDate $Bgn)
@@ -128,8 +138,15 @@ if (-not $BgnDe) {
     $latestReceipt = Get-LatestReceiptDate -LatestJsonPath $latestJson
     if ($latestReceipt -match '^\d{8}$') {
       if ($RefreshLookbackDays -le 0) {
-        $BgnDe = Normalize-UpdateDate $EndDe
-        Write-Host "Fast daily mode: checking only today's receipt date ($BgnDe)."
+        $endNormalized = Normalize-UpdateDate $EndDe
+        if ($latestReceipt -lt $endNormalized) {
+          $startDate = [datetime]::ParseExact($latestReceipt, "yyyyMMdd", $null).AddDays(1)
+          $BgnDe = $startDate.ToString("yyyyMMdd")
+          Write-Host "Fast catch-up mode: checking missed receipt dates from $BgnDe to $endNormalized."
+        } else {
+          $BgnDe = $endNormalized
+          Write-Host "Fast daily mode: checking today's receipt date ($BgnDe)."
+        }
       } else {
         $startDate = [datetime]::ParseExact($latestReceipt, "yyyyMMdd", $null).AddDays(-1 * $RefreshLookbackDays)
       $historyStart = [datetime]::ParseExact($historyBgn, "yyyyMMdd", $null)

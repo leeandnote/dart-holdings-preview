@@ -38,8 +38,9 @@ jobs:
           }
           if ("${{ github.event_name }}" -eq "schedule" -and (Test-Path "site/data/latest.json")) {
             $latest = Get-Content "site/data/latest.json" -Raw -Encoding UTF8 | ConvertFrom-Json
-            if ($latest.generatedAt) {
-              $generatedAt = [DateTimeOffset]::Parse([string]$latest.generatedAt)
+            $generatedStamp = if ($latest.generatedAtUtc) { [string]$latest.generatedAtUtc } else { [string]$latest.generatedAt }
+            if ($generatedStamp) {
+              $generatedAt = [DateTimeOffset]::Parse($generatedStamp)
               $ageMinutes = ([DateTimeOffset]::Now - $generatedAt).TotalMinutes
               if ($ageMinutes -lt 120) {
                 Write-Host "Recent cache already generated $([Math]::Round($ageMinutes, 1)) minutes ago. Skipping fallback schedule run."
