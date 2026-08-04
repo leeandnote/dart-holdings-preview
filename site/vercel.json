@@ -1,0 +1,10 @@
+{
+  "cleanUrls": false,
+  "trailingSlash": false,
+  "crons": [
+    {
+      "path": "/api/cron/daily-update",
+      "schedule": "0 13 * * 1-5"
+    }
+  ]
+}
