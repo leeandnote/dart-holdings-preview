@@ -38,13 +38,12 @@ jobs:
           if (-not $env:DART_API_KEY) {
             throw "Missing repository secret: DART_API_KEY"
           }
-          ./daily_update.ps1 -ApiKey $env:DART_API_KEY -RefreshLookbackDays 7 -ObligationMaxRows 120 -PriceRecentDays 45 -PriceSleepMs 160
+          ./daily_update.ps1 -ApiKey $env:DART_API_KEY -RefreshLookbackDays 0 -ObligationMaxRows 80 -PriceRecentDays 7 -PriceSleepMs 120
           if (Test-Path "site/data/prices.json") {
             Remove-Item "site/data/prices.json" -Force
           }
           $latest = Get-Content "site/data/latest.json" -Raw -Encoding UTF8 | ConvertFrom-Json
-          $maxReceipt = $latest.rows | ForEach-Object { $_.접수일 } | Where-Object { $_ } | Sort-Object -Descending | Select-Object -First 1
-          Write-Host "Latest cache generatedAt: $($latest.generatedAt); max receipt: $maxReceipt; rows: $($latest.rows.Count)"
+          Write-Host "Latest cache generatedAt: $($latest.generatedAt); rows: $($latest.rows.Count)"
 
       - name: Prepare SEO files
         shell: pwsh
