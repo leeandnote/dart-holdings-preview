@@ -13,6 +13,7 @@
   [switch]$RefreshDisclosureSignals,
   [switch]$RefreshShareholders,
   [switch]$RefreshLogos,
+  [switch]$SendTelegram,
   [switch]$SkipTelegram
 )
 
@@ -228,7 +229,7 @@ if ($nodePath -and (Test-Path -LiteralPath $recentPriceJs)) {
 Write-Host "Daily update complete."
 Write-Host "Important: current close is based on the latest available price cache date, independent of receipt-date filters."
 
-if (-not $SkipTelegram) {
+if ($SendTelegram -and -not $SkipTelegram) {
   $telegramScript = Join-Path $root "telegram_notify.ps1"
   if (Test-Path -LiteralPath $telegramScript) {
     Write-Host "Telegram daily disclosure notification"
