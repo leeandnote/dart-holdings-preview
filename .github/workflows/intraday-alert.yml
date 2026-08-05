@@ -23,7 +23,7 @@ concurrency:
 jobs:
   alert:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 12
 
     steps:
       - name: Checkout
@@ -31,7 +31,7 @@ jobs:
 
       - name: Send intraday Telegram text alerts
         shell: pwsh
-        timeout-minutes: 7
+        timeout-minutes: 9
         env:
           DART_API_KEY: ${{ secrets.DART_API_KEY }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
@@ -47,7 +47,7 @@ jobs:
             $env:TELEGRAM_CHAT_ID = "@leeandnote"
           }
           Write-Host "Secrets available: DART_API_KEY=$(-not [string]::IsNullOrWhiteSpace($env:DART_API_KEY)); TELEGRAM_BOT_TOKEN=$(-not [string]::IsNullOrWhiteSpace($env:TELEGRAM_BOT_TOKEN)); TELEGRAM_CHAT_ID=$(-not [string]::IsNullOrWhiteSpace($env:TELEGRAM_CHAT_ID))"
-          pwsh -NoProfile -File ./intraday_alert.ps1 -ApiKey $env:DART_API_KEY -BotToken $env:TELEGRAM_BOT_TOKEN -ChatId $env:TELEGRAM_CHAT_ID
+          pwsh -NoProfile -File ./intraday_alert.ps1 -ApiKey $env:DART_API_KEY -BotToken $env:TELEGRAM_BOT_TOKEN -ChatId $env:TELEGRAM_CHAT_ID -EnrichDetails
 
       - name: Commit intraday alert state
         shell: pwsh

@@ -449,14 +449,23 @@ foreach ($item in $newItems) {
   if ($confirmedItems.Count -ge $MaxItems) { break }
   $receiptNo = [string]$item.rcept_no
   $cachedRow = if ($latestRowsByReceipt.ContainsKey($receiptNo)) { $latestRowsByReceipt[$receiptNo] } else { $null }
-  if ($EnrichDetails) {
+  $changeLines = @(Get-IntradayChangeLines -CachedRow $cachedRow)
+  $reasonTextRaw = Get-IntradayReason -CachedRow $cachedRow
+  $obligationDate = Format-DisplayDate ([string](Get-JsonField $cachedRow @("보고의무발생일")))
+  $needsDetail = ($changeLines.Count -eq 0 -or -not $reasonTextRaw -or -not $obligationDate)
+  if ($EnrichDetails -and $needsDetail) {
     $detailRow = Get-MajorDetailByReceipt -ListItem $item
     if ($detailRow) {
       $cachedRow = $detailRow
     }
+    $changeLines = @(Get-IntradayChangeLines -CachedRow $cachedRow)
+    $reasonTextRaw = Get-IntradayReason -CachedRow $cachedRow
+    $obligationDate = Format-DisplayDate ([string](Get-JsonField $cachedRow @("보고의무발생일")))
   }
-  $changeLines = @(Get-IntradayChangeLines -CachedRow $cachedRow)
-  $reasonTextRaw = Get-IntradayReason -CachedRow $cachedRow
+  if ($changeLines.Count -eq 0) {
+    Write-Host "Skipping intraday disclosure without parsed ratio detail: $receiptNo"
+    continue
+  }
   $confirmedItems.Add([pscustomobject]@{
     Item = $item
     Row = $cachedRow
