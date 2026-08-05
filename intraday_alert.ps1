@@ -207,10 +207,8 @@ function Get-IntradayShareChange([object]$CachedRow) {
 
 function Get-IntradayChangeLines([object]$CachedRow) {
   $lines = New-Object System.Collections.Generic.List[string]
-  $pending = "$([char]0xC9C0)$([char]0xBD84)$([char]0xBCC0)$([char]0xB3D9) $([char]0xD655)$([char]0xC778)$([char]0xC911)"
   if (-not $CachedRow) {
-    $lines.Add("<b>지분변동</b>: $pending")
-    return @($lines)
+    return @()
   }
 
   $previousHoldingValue = Convert-ToNumber (Get-JsonField $CachedRow @("직전지분율"))
@@ -243,15 +241,13 @@ function Get-IntradayChangeLines([object]$CachedRow) {
     }
   } elseif ($contractText) {
     $lines.Add("<b>주요계약체결 비율</b>: $contractText")
-  } else {
-    $lines.Add("<b>지분변동</b>: $pending")
   }
 
   return @($lines)
 }
 
 function Get-IntradayReason([object]$CachedRow) {
-  if (-not $CachedRow) { return "사유 확인중" }
+  if (-not $CachedRow) { return "" }
   $reason = [string](Get-JsonField $CachedRow @("보고사유", "사유", "변동사유"))
   $detail = [string](Get-JsonField $CachedRow @("보고사유상세", "보고사유구체적내용", "상세사유"))
   if ($reason -and $detail) {
@@ -267,7 +263,26 @@ function Get-IntradayReason([object]$CachedRow) {
     }
     return $detail
   }
-  return "사유 확인중"
+  return ""
+}
+
+function Get-ReporterType([string]$Reporter, [string]$Reason) {
+  $text = "$Reporter $Reason"
+  $lower = $text.ToLowerInvariant()
+  $foreignWords = @(
+    "blackrock", "morgan", "jpmorgan", "jp morgan", "goldman", "dalton", "vanguard",
+    "fidelity", "wellington", "mirae asset global", "templeton", "capital", "llc", "ltd",
+    "plc", "limited", "inc.", "inc", "assetmanagement", "investment"
+  )
+  foreach ($word in $foreignWords) {
+    if ($lower.Contains($word)) { return "외국계 금융" }
+  }
+  if ($Reporter -match "국민연금|연기금|공무원연금|사학연금|교직원공제|군인공제") { return "연기금·공제회" }
+  if ($Reporter -match "자산운용|투자신탁|투자자문|증권|캐피탈|벤처|사모|펀드|조합|신기술|인베스트|파트너스|운용") { return "국내 금융·투자" }
+  if ($Reporter -match "홀딩스|지주|컨소시엄|컴퍼니|코퍼레이션|산업|상사|전자|화학|건설|테크|솔루션|시스템|바이오|엔터") { return "전략적/관계사" }
+  if ($text -match "대표|회장|임원|최대주주|특별관계자|친인척|증여|상속|담보") { return "오너·특수관계" }
+  if ($Reporter.Trim() -match "^[가-힣]{2,5}$") { return "개인" }
+  return "기타/확인필요"
 }
 
 function Format-DisplayDate([string]$Value) {
@@ -370,55 +385,83 @@ if ($newItems.Count -eq 0) {
   exit 0
 }
 
-$displayItems = @($newItems | Select-Object -First $MaxItems)
-$lines = New-Object System.Collections.Generic.List[string]
-$lines.Add("<b>[장중 대량보유 공시 알림]</b>")
-$lines.Add("기준: $($now.ToString("yyyy-MM-dd HH:mm")) KST")
-$lines.Add("접수일: $($Date.Substring(0,4))-$($Date.Substring(4,2))-$($Date.Substring(6,2))")
-$lines.Add("신규 대량보유 공시: <b>$($newItems.Count)건</b>")
-$lines.Add("")
-
-$i = 1
-foreach ($item in $displayItems) {
-  $stockCode = [string]$item.stock_code
-  $market = if ($marketMap.ContainsKey($stockCode)) { $marketMap[$stockCode].Market } else { "" }
-  $corpName = Escape-Html ([string]$item.corp_name)
-  $reporter = Escape-Html ([string]$item.flr_nm)
+$confirmedItems = New-Object System.Collections.Generic.List[object]
+foreach ($item in $newItems) {
+  if ($confirmedItems.Count -ge $MaxItems) { break }
   $receiptNo = [string]$item.rcept_no
   $cachedRow = if ($latestRowsByReceipt.ContainsKey($receiptNo)) { $latestRowsByReceipt[$receiptNo] } else { $null }
   $detailRow = Get-MajorDetailByReceipt -ListItem $item
   if ($detailRow) {
     $cachedRow = $detailRow
   }
+  $changeLines = @(Get-IntradayChangeLines -CachedRow $cachedRow)
+  $reasonTextRaw = Get-IntradayReason -CachedRow $cachedRow
+  if ($changeLines.Count -eq 0 -and -not $reasonTextRaw) {
+    continue
+  }
+  $confirmedItems.Add([pscustomobject]@{
+    Item = $item
+    Row = $cachedRow
+    ChangeLines = $changeLines
+    Reason = $reasonTextRaw
+  }) | Out-Null
+}
+
+if ($confirmedItems.Count -eq 0) {
+  $state.updatedAt = $now.ToString("yyyy-MM-dd HH:mm:ss")
+  if (-not $DryRun) {
+    Save-State -State $state
+  }
+  Write-Host "No confirmed intraday holding details yet for $Date. new=$($newItems.Count)"
+  exit 0
+}
+
+$lines = New-Object System.Collections.Generic.List[string]
+$lines.Add("<b>[장중 대량보유 공시 알림]</b>")
+$lines.Add("기준: $($now.ToString("yyyy-MM-dd HH:mm")) KST")
+$lines.Add("접수일: $($Date.Substring(0,4))-$($Date.Substring(4,2))-$($Date.Substring(6,2))")
+$lines.Add("대량보유 공시: <b>$($confirmedItems.Count)건</b>")
+$lines.Add("")
+
+$i = 1
+foreach ($entry in $confirmedItems) {
+  $item = $entry.Item
+  $cachedRow = $entry.Row
+  $stockCode = [string]$item.stock_code
+  $market = if ($marketMap.ContainsKey($stockCode)) { $marketMap[$stockCode].Market } else { "" }
+  $corpName = Escape-Html ([string]$item.corp_name)
+  $reporter = Escape-Html ([string]$item.flr_nm)
+  $receiptNo = [string]$item.rcept_no
   if ($cachedRow) {
     $cachedReporter = [string](Get-JsonField $cachedRow @("보고자"))
     if ($cachedReporter) { $reporter = Escape-Html $cachedReporter }
   }
-  $changeLines = @(Get-IntradayChangeLines -CachedRow $cachedRow)
-  $reasonText = Escape-Html (Get-IntradayReason -CachedRow $cachedRow)
+  $changeLines = @($entry.ChangeLines)
+  $reasonTextRaw = [string]$entry.Reason
+  $reasonText = Escape-Html $reasonTextRaw
+  $reporterType = Escape-Html (Get-ReporterType -Reporter ([string]($reporter -replace "&amp;", "&")) -Reason $reasonTextRaw)
   $obligationDate = Format-DisplayDate ([string](Get-JsonField $cachedRow @("보고의무발생일")))
   $dartUrl = "https://dart.fss.or.kr/dsaf001/main.do?rcpNo=$receiptNo"
   $codeLine = if ($market) { "$stockCode · $market" } else { "$stockCode" }
-  $lines.Add("<b>$i. $corpName</b> ($reporter)")
+  $lines.Add("<b>$i. $corpName</b> ($reporter · $reporterType)")
   foreach ($changeLine in $changeLines) {
     $lines.Add("   $changeLine")
   }
-  $lines.Add("   <b>보고사유</b>: $reasonText")
+  if ($reasonText) {
+    $lines.Add("   <b>보고사유</b>: $reasonText")
+  }
   if ($obligationDate) {
     $lines.Add("   <b>보고의무발생일</b>: $obligationDate")
   }
   $lines.Add("   $codeLine · <a href=""$dartUrl"">원문 보기</a>")
+  $lines.Add("")
   $i += 1
 }
-if ($newItems.Count -gt $displayItems.Count) {
-  $lines.Add("")
-  $lines.Add("외 $($newItems.Count - $displayItems.Count)건은 밤 10시 정식 브리프에서 함께 정리됩니다.")
-}
-
 Send-TelegramMessage -Text ($lines -join "`n")
 
 $mergedSent = @($state.sent)
-foreach ($item in $newItems) {
+foreach ($entry in $confirmedItems) {
+  $item = $entry.Item
   $receiptNo = [string]$item.rcept_no
   if ($receiptNo -and -not ($mergedSent -contains $receiptNo)) {
     $mergedSent += $receiptNo
@@ -430,5 +473,5 @@ if (-not $DryRun) {
   Save-State -State $state
 }
 
-Write-Host "Intraday Telegram alert sent for $Date. new=$($newItems.Count)"
+Write-Host "Intraday Telegram alert sent for $Date. confirmed=$($confirmedItems.Count), new=$($newItems.Count)"
 
