@@ -55,6 +55,7 @@ function Convert-ToNumber([object]$Value) {
 }
 
 function Get-JsonField([object]$Row, [string[]]$Names) {
+  if (-not $Row) { return $null }
   foreach ($name in $Names) {
     if ($Row.PSObject.Properties[$name]) {
       return $Row.PSObject.Properties[$name].Value
@@ -108,11 +109,24 @@ function Get-MajorDetailByReceipt([object]$ListItem) {
     if ($match.Count -eq 0) { return $null }
 
     $item = $match[0]
+    $itemDate = Normalize-Date ([string]$item.rcept_dt)
+    $reporterName = [string]$item.repror
+    $previousItem = @($data.list | Where-Object {
+      [string]$_.rcept_no -ne $receiptNo -and
+      [string]$_.repror -eq $reporterName -and
+      (Normalize-Date ([string]$_.rcept_dt)) -lt $itemDate
+    } | Sort-Object @{ Expression = { Normalize-Date ([string]$_.rcept_dt) }; Descending = $true }, @{ Expression = { [string]$_.rcept_no }; Descending = $true } | Select-Object -First 1)
+
     $current = Convert-ToNumber $item.stkrt
     $delta = Convert-ToNumber $item.stkrt_irds
     $previous = $null
     if ($null -ne $current -and $null -ne $delta) {
       $previous = [math]::Round($current - $delta, 4)
+    }
+    $currentContract = Convert-ToNumber $item.ctr_stkrt
+    $previousContract = $null
+    if ($previousItem.Count -gt 0) {
+      $previousContract = Convert-ToNumber $previousItem[0].ctr_stkrt
     }
     $obligationDate = Normalize-Date ([string]$(if ($item.report_ostn) { $item.report_ostn } elseif ($item.report_de) { $item.report_de } elseif ($item.report_dt) { $item.report_dt } else { $item.rcept_dt }))
 
@@ -125,6 +139,9 @@ function Get-MajorDetailByReceipt([object]$ListItem) {
       직전지분율 = $previous
       이번지분율 = $current
       증감률 = $delta
+      직전주요계약지분율 = $previousContract
+      이번주요계약지분율 = $currentContract
+      주요계약주식수 = [string]$item.ctr_stkqy
       보고사유 = [string]$item.report_resn
       접수번호 = $receiptNo
     }
@@ -188,6 +205,51 @@ function Get-IntradayShareChange([object]$CachedRow) {
   return $pending
 }
 
+function Get-IntradayChangeLines([object]$CachedRow) {
+  $lines = New-Object System.Collections.Generic.List[string]
+  $pending = "$([char]0xC9C0)$([char]0xBD84)$([char]0xBCC0)$([char]0xB3D9) $([char]0xD655)$([char]0xC778)$([char]0xC911)"
+  if (-not $CachedRow) {
+    $lines.Add("<b>지분변동</b>: $pending")
+    return @($lines)
+  }
+
+  $previousHoldingValue = Convert-ToNumber (Get-JsonField $CachedRow @("직전지분율"))
+  $currentHoldingValue = Convert-ToNumber (Get-JsonField $CachedRow @("이번지분율"))
+  $previousContractValue = Convert-ToNumber (Get-JsonField $CachedRow @("직전주요계약지분율"))
+  $currentContractValue = Convert-ToNumber (Get-JsonField $CachedRow @("이번주요계약지분율", "주요계약지분율"))
+
+  $holdingText = ""
+  if ($null -ne $previousHoldingValue -and $null -ne $currentHoldingValue) {
+    $holdingText = "$(Format-Percent $previousHoldingValue) → $(Format-Percent $currentHoldingValue)"
+  }
+
+  $contractText = ""
+  if ($null -ne $previousContractValue -and $null -ne $currentContractValue) {
+    $contractText = "$(Format-Percent $previousContractValue) → $(Format-Percent $currentContractValue)"
+  }
+
+  $holdingDelta = if ($null -ne $previousHoldingValue -and $null -ne $currentHoldingValue) { [math]::Abs($currentHoldingValue - $previousHoldingValue) } else { -1 }
+  $contractDelta = if ($null -ne $previousContractValue -and $null -ne $currentContractValue) { [math]::Abs($currentContractValue - $previousContractValue) } else { -1 }
+
+  if ($contractText -and $contractDelta -gt [math]::Max($holdingDelta, 0.001)) {
+    $lines.Add("<b>주요계약체결 비율</b>: $contractText")
+    if ($holdingText) {
+      $lines.Add("<b>보유비율</b>: $holdingText")
+    }
+  } elseif ($holdingText) {
+    $lines.Add("<b>보유비율</b>: $holdingText")
+    if ($contractText -and $contractDelta -gt 0.001) {
+      $lines.Add("<b>주요계약체결 비율</b>: $contractText")
+    }
+  } elseif ($contractText) {
+    $lines.Add("<b>주요계약체결 비율</b>: $contractText")
+  } else {
+    $lines.Add("<b>지분변동</b>: $pending")
+  }
+
+  return @($lines)
+}
+
 function Get-IntradayReason([object]$CachedRow) {
   if (-not $CachedRow) { return "사유 확인중" }
   $reason = [string](Get-JsonField $CachedRow @("보고사유", "사유", "변동사유"))
@@ -243,13 +305,17 @@ function Send-TelegramMessage([string]$Text) {
   }
   if (-not $BotToken) { throw "Telegram bot token is missing." }
   if (-not $ChatId) { throw "Telegram chat id is missing." }
+  $telegramToken = ([string]$BotToken).Trim()
+  if ($telegramToken.StartsWith("bot")) {
+    $telegramToken = $telegramToken.Substring(3)
+  }
   $body = @{
     chat_id = $ChatId
     text = $Text
     parse_mode = "HTML"
     disable_web_page_preview = $false
   }
-  Invoke-RestMethod -Uri "https://api.telegram.org/bot$BotToken/sendMessage" -Method Post -Body $body -TimeoutSec 30 | Out-Null
+  Invoke-RestMethod -Uri "https://api.telegram.org/bot$telegramToken/sendMessage" -Method Post -Body $body -TimeoutSec 30 | Out-Null
 }
 
 if (-not $ApiKey) {
@@ -320,23 +386,23 @@ foreach ($item in $displayItems) {
   $reporter = Escape-Html ([string]$item.flr_nm)
   $receiptNo = [string]$item.rcept_no
   $cachedRow = if ($latestRowsByReceipt.ContainsKey($receiptNo)) { $latestRowsByReceipt[$receiptNo] } else { $null }
-  if (-not $cachedRow) {
-    $cachedRow = Get-MajorDetailByReceipt -ListItem $item
+  $detailRow = Get-MajorDetailByReceipt -ListItem $item
+  if ($detailRow) {
+    $cachedRow = $detailRow
   }
   if ($cachedRow) {
     $cachedReporter = [string](Get-JsonField $cachedRow @("보고자"))
     if ($cachedReporter) { $reporter = Escape-Html $cachedReporter }
   }
-  $shareChangeText = Escape-Html (Get-IntradayShareChange -CachedRow $cachedRow)
-  if (-not $shareChangeText) {
-    $shareChangeText = Escape-Html "$([char]0xC9C0)$([char]0xBD84)$([char]0xBCC0)$([char]0xB3D9) $([char]0xD655)$([char]0xC778)$([char]0xC911)"
-  }
+  $changeLines = @(Get-IntradayChangeLines -CachedRow $cachedRow)
   $reasonText = Escape-Html (Get-IntradayReason -CachedRow $cachedRow)
   $obligationDate = Format-DisplayDate ([string](Get-JsonField $cachedRow @("보고의무발생일")))
   $dartUrl = "https://dart.fss.or.kr/dsaf001/main.do?rcpNo=$receiptNo"
   $codeLine = if ($market) { "$stockCode · $market" } else { "$stockCode" }
   $lines.Add("<b>$i. $corpName</b> ($reporter)")
-  $lines.Add("   <b>지분변동</b>: $shareChangeText")
+  foreach ($changeLine in $changeLines) {
+    $lines.Add("   $changeLine")
+  }
   $lines.Add("   <b>보고사유</b>: $reasonText")
   if ($obligationDate) {
     $lines.Add("   <b>보고의무발생일</b>: $obligationDate")
