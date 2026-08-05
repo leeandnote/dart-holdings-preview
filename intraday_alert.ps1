@@ -11,6 +11,8 @@
 )
 
 $ErrorActionPreference = "Stop"
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+$PSDefaultParameterValues["Invoke-WebRequest:SslProtocol"] = "Tls12"
 
 $root = Split-Path -Parent $MyInvocation.MyCommand.Path
 Set-Location $root
@@ -70,7 +72,7 @@ function Get-DartList([string]$TargetDate) {
   $page = 1
   do {
     $uri = "https://opendart.fss.or.kr/api/list.json?crtfc_key=$ApiKey&bgn_de=$TargetDate&end_de=$TargetDate&page_no=$page&page_count=100&last_reprt_at=N"
-    $response = Invoke-RestMethod -Uri $uri -Method Get -TimeoutSec 30
+    $response = Invoke-RestMethod -Uri $uri -Method Get -Headers @{ "User-Agent" = "leeandnote-intraday-alert/1.0" } -TimeoutSec 45
     if ($response.status -ne "000" -and $response.status -ne "013") {
       throw "DART API error $($response.status): $($response.message)"
     }
