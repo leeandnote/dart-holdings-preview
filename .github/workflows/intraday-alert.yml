@@ -49,7 +49,7 @@ jobs:
             $env:TELEGRAM_CHAT_ID = "@leeandnote"
           }
           Write-Host "Secrets available: DART_API_KEY=$(-not [string]::IsNullOrWhiteSpace($env:DART_API_KEY)); TELEGRAM_BOT_TOKEN=$(-not [string]::IsNullOrWhiteSpace($env:TELEGRAM_BOT_TOKEN)); TELEGRAM_CHAT_ID=$(-not [string]::IsNullOrWhiteSpace($env:TELEGRAM_CHAT_ID))"
-          powershell -NoProfile -ExecutionPolicy Bypass -File .\intraday_alert.ps1 -ApiKey $env:DART_API_KEY -BotToken $env:TELEGRAM_BOT_TOKEN -ChatId $env:TELEGRAM_CHAT_ID
+          pwsh -NoProfile -File ./intraday_alert.ps1 -ApiKey $env:DART_API_KEY -BotToken $env:TELEGRAM_BOT_TOKEN -ChatId $env:TELEGRAM_CHAT_ID
 
       - name: Commit intraday alert state
         shell: pwsh
