@@ -9,9 +9,9 @@ on:
       - ".github/workflows/intraday-alert.yml"
       - "intraday_alert.ps1"
   schedule:
-    # KST 09:00-17:55 every 5 minutes on weekdays. Text-only Telegram alert.
-    # GitHub schedule can be delayed or dropped, so use a tighter cadence.
-    - cron: "*/5 0-8 * * 1-5"
+    # KST 09:02-17:57 every 5 minutes on weekdays. Text-only Telegram alert.
+    # Offset from :00/:05 to reduce GitHub schedule congestion and dropped runs.
+    - cron: "2-57/5 0-8 * * 1-5"
 
 permissions:
   contents: write
