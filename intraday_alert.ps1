@@ -18,10 +18,10 @@ $root = Split-Path -Parent $MyInvocation.MyCommand.Path
 Set-Location $root
 
 if (-not $DataPath) {
-  $DataPath = Join-Path $root "site\data\latest.json"
+  $DataPath = Join-Path $root (Join-Path "site" (Join-Path "data" "latest.json"))
 }
 if (-not $StatePath) {
-  $StatePath = Join-Path $root "site\data\intraday_alert_state.json"
+  $StatePath = Join-Path $root (Join-Path "site" (Join-Path "data" "intraday_alert_state.json"))
 }
 
 function Get-KstNow() {
@@ -67,12 +67,33 @@ function Get-JsonField([object]$Row, [string[]]$Names) {
   return $null
 }
 
+function Invoke-JsonWithRetry([string]$Uri, [int]$TimeoutSec = 45) {
+  $lastError = $null
+  for ($attempt = 1; $attempt -le 4; $attempt += 1) {
+    try {
+      return Invoke-RestMethod `
+        -Uri $Uri `
+        -Method Get `
+        -Headers @{ "User-Agent" = "leeandnote-intraday-alert/1.0" } `
+        -TimeoutSec $TimeoutSec
+    } catch {
+      $lastError = $_
+      $sleepSeconds = [Math]::Min(20, 3 * $attempt)
+      Write-Host "DART request failed on attempt ${attempt}/4. Retrying in ${sleepSeconds}s: $($_.Exception.Message)"
+      if ($attempt -lt 4) {
+        Start-Sleep -Seconds $sleepSeconds
+      }
+    }
+  }
+  throw $lastError
+}
+
 function Get-DartList([string]$TargetDate) {
   $all = @()
   $page = 1
   do {
     $uri = "https://opendart.fss.or.kr/api/list.json?crtfc_key=$ApiKey&bgn_de=$TargetDate&end_de=$TargetDate&page_no=$page&page_count=100&last_reprt_at=N"
-    $response = Invoke-RestMethod -Uri $uri -Method Get -Headers @{ "User-Agent" = "leeandnote-intraday-alert/1.0" } -TimeoutSec 45
+    $response = Invoke-JsonWithRetry -Uri $uri -TimeoutSec 45
     if ($response.status -ne "000" -and $response.status -ne "013") {
       throw "DART API error $($response.status): $($response.message)"
     }
@@ -89,7 +110,7 @@ function Invoke-DartJson([string]$Path, [hashtable]$Params) {
     "{0}={1}" -f [uri]::EscapeDataString($_.Key), [uri]::EscapeDataString([string]$_.Value)
   }) -join "&"
   $uri = "https://opendart.fss.or.kr/api/$Path`?$queryString"
-  $response = Invoke-RestMethod -Uri $uri -Method Get -Headers @{ "User-Agent" = "leeandnote-intraday-alert/1.0" } -TimeoutSec 45
+  $response = Invoke-JsonWithRetry -Uri $uri -TimeoutSec 45
   if ($response.status -ne "000" -and $response.status -ne "013") {
     throw "DART API error $($response.status): $($response.message)"
   }

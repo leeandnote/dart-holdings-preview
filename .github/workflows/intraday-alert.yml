@@ -22,8 +22,8 @@ concurrency:
 
 jobs:
   alert:
-    runs-on: windows-latest
-    timeout-minutes: 8
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     steps:
       - name: Checkout
@@ -31,14 +31,12 @@ jobs:
 
       - name: Send intraday Telegram text alerts
         shell: pwsh
-        timeout-minutes: 5
+        timeout-minutes: 7
         env:
           DART_API_KEY: ${{ secrets.DART_API_KEY }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: |
-          [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-          $PSDefaultParameterValues["Invoke-WebRequest:SslProtocol"] = "Tls12"
           if (-not $env:DART_API_KEY) {
             throw "Missing repository secret: DART_API_KEY"
           }
