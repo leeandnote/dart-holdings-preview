@@ -3,8 +3,9 @@ name: Intraday DART text alerts
 on:
   workflow_dispatch:
   schedule:
-    # KST 09:00-17:30 every 30 minutes on weekdays. Text-only, no price/chart/site rebuild.
-    - cron: "0,30 0-8 * * 1-5"
+    # KST 09:05-17:35 every 30 minutes on weekdays. Text-only, no price/chart/site rebuild.
+    # Avoid exact :00/:30 because GitHub scheduled workflows can be delayed or skipped at peak minutes.
+    - cron: "5,35 0-8 * * 1-5"
 
 permissions:
   contents: write
