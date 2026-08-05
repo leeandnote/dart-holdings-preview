@@ -4,13 +4,10 @@ on:
   workflow_dispatch:
     inputs:
       mode:
-        description: "daily or intraday"
+        description: "daily"
         required: false
         default: "daily"
   schedule:
-    # KST 09:05-17:35 every 30 minutes on weekdays. Text-only intraday Telegram alert.
-    # Avoid exact :00/:30 because GitHub scheduled workflows can be delayed or skipped at peak minutes.
-    - cron: "5,35 0-8 * * 1-5"
     # KST 22:00 on weekdays. Full site/price/image briefing.
     - cron: "0 13 * * 1-5"
 
@@ -22,47 +19,7 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  intraday-alert:
-    if: ${{ (github.event_name == 'schedule' && github.event.schedule == '5,35 0-8 * * 1-5') || (github.event_name == 'workflow_dispatch' && github.event.inputs.mode == 'intraday') }}
-    runs-on: windows-latest
-    timeout-minutes: 8
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Send intraday Telegram text alerts
-        shell: pwsh
-        timeout-minutes: 5
-        env:
-          DART_API_KEY: ${{ secrets.DART_API_KEY }}
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-        run: |
-          [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-          $PSDefaultParameterValues["Invoke-WebRequest:SslProtocol"] = "Tls12"
-          if (-not $env:DART_API_KEY) {
-            throw "Missing repository secret: DART_API_KEY"
-          }
-          ./intraday_alert.ps1 -ApiKey $env:DART_API_KEY -BotToken $env:TELEGRAM_BOT_TOKEN -ChatId $env:TELEGRAM_CHAT_ID
-
-      - name: Commit intraday alert state
-        shell: pwsh
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add site/data/intraday_alert_state.json
-          git diff --cached --quiet
-          if ($LASTEXITCODE -ne 0) {
-            git commit -m "Update intraday alert state"
-            git pull --rebase
-            git push
-          } else {
-            Write-Host "No intraday state changes."
-          }
-
   update-and-deploy:
-    if: ${{ (github.event_name == 'workflow_dispatch' && github.event.inputs.mode != 'intraday') || github.event.schedule == '0 13 * * 1-5' }}
     runs-on: windows-latest
     timeout-minutes: 25
 

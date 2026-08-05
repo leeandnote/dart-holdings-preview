@@ -1,0 +1,60 @@
+name: Intraday DART text alert
+
+on:
+  workflow_dispatch:
+  schedule:
+    # KST 09:07-17:37 every 30 minutes on weekdays. Text-only Telegram alert.
+    # Offset from exact :00/:30 to reduce GitHub schedule congestion.
+    - cron: "7,37 0-8 * * 1-5"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: intraday-dart-text-alert
+  cancel-in-progress: false
+
+jobs:
+  alert:
+    runs-on: windows-latest
+    timeout-minutes: 8
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Send intraday Telegram text alerts
+        shell: pwsh
+        timeout-minutes: 5
+        env:
+          DART_API_KEY: ${{ secrets.DART_API_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+          $PSDefaultParameterValues["Invoke-WebRequest:SslProtocol"] = "Tls12"
+          if (-not $env:DART_API_KEY) {
+            throw "Missing repository secret: DART_API_KEY"
+          }
+          if (-not $env:TELEGRAM_BOT_TOKEN) {
+            throw "Missing repository secret: TELEGRAM_BOT_TOKEN"
+          }
+          if (-not $env:TELEGRAM_CHAT_ID) {
+            throw "Missing repository secret: TELEGRAM_CHAT_ID"
+          }
+          ./intraday_alert.ps1 -ApiKey $env:DART_API_KEY -BotToken $env:TELEGRAM_BOT_TOKEN -ChatId $env:TELEGRAM_CHAT_ID
+
+      - name: Commit intraday alert state
+        shell: pwsh
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add site/data/intraday_alert_state.json
+          git diff --cached --quiet
+          if ($LASTEXITCODE -ne 0) {
+            git commit -m "Update intraday alert state"
+            git pull --rebase
+            git push
+          } else {
+            Write-Host "No intraday state changes."
+          }
