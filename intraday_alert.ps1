@@ -67,15 +67,51 @@ function Get-JsonField([object]$Row, [string[]]$Names) {
   return $null
 }
 
+function Invoke-CurlJson([string]$Uri, [int]$TimeoutSec = 45) {
+  $isWindowsHost = ($PSVersionTable.PSEdition -eq "Desktop") -or ($PSVersionTable.Platform -eq "Win32NT") -or ($IsWindows -eq $true)
+  $curlCommand = if ($isWindowsHost) { "curl.exe" } else { "curl" }
+  $baseArgs = @(
+    "--fail",
+    "--silent",
+    "--show-error",
+    "--location",
+    "--http1.1",
+    "--tlsv1.2",
+    "--connect-timeout", "15",
+    "--max-time", [string]$TimeoutSec,
+    "-A", "leeandnote-intraday-alert/1.0",
+    $Uri
+  )
+  $json = & $curlCommand @baseArgs 2>&1
+  if ($LASTEXITCODE -ne 0) {
+    if (-not $isWindowsHost) {
+      $fallbackArgs = @(
+        "--fail",
+        "--silent",
+        "--show-error",
+        "--location",
+        "--http1.1",
+        "--tlsv1.2",
+        "--ciphers", "DEFAULT:@SECLEVEL=1",
+        "--connect-timeout", "15",
+        "--max-time", [string]$TimeoutSec,
+        "-A", "leeandnote-intraday-alert/1.0",
+        $Uri
+      )
+      $json = & $curlCommand @fallbackArgs 2>&1
+    }
+  }
+  if ($LASTEXITCODE -ne 0) {
+    throw "curl failed with exit code ${LASTEXITCODE}: $($json -join ' ')"
+  }
+  return (($json -join "`n") | ConvertFrom-Json)
+}
+
 function Invoke-JsonWithRetry([string]$Uri, [int]$TimeoutSec = 45) {
   $lastError = $null
   for ($attempt = 1; $attempt -le 4; $attempt += 1) {
     try {
-      return Invoke-RestMethod `
-        -Uri $Uri `
-        -Method Get `
-        -Headers @{ "User-Agent" = "leeandnote-intraday-alert/1.0" } `
-        -TimeoutSec $TimeoutSec
+      return Invoke-CurlJson -Uri $Uri -TimeoutSec $TimeoutSec
     } catch {
       $lastError = $_
       $sleepSeconds = [Math]::Min(20, 3 * $attempt)
