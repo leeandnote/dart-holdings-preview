@@ -80,6 +80,60 @@ function Get-DartList([string]$TargetDate) {
   return @($all)
 }
 
+function Invoke-DartJson([string]$Path, [hashtable]$Params) {
+  $queryString = ($Params.GetEnumerator() | ForEach-Object {
+    "{0}={1}" -f [uri]::EscapeDataString($_.Key), [uri]::EscapeDataString([string]$_.Value)
+  }) -join "&"
+  $uri = "https://opendart.fss.or.kr/api/$Path`?$queryString"
+  $response = Invoke-RestMethod -Uri $uri -Method Get -Headers @{ "User-Agent" = "leeandnote-intraday-alert/1.0" } -TimeoutSec 45
+  if ($response.status -ne "000" -and $response.status -ne "013") {
+    throw "DART API error $($response.status): $($response.message)"
+  }
+  return $response
+}
+
+function Get-MajorDetailByReceipt([object]$ListItem) {
+  $corpCode = [string]$ListItem.corp_code
+  $receiptNo = [string]$ListItem.rcept_no
+  if (-not $corpCode -or -not $receiptNo) { return $null }
+
+  try {
+    $data = Invoke-DartJson -Path "majorstock.json" -Params @{
+      crtfc_key = $ApiKey
+      corp_code = $corpCode
+      bsns_year = (Get-KstNow).Year
+      reprt_code = "11011"
+    }
+    $match = @($data.list | Where-Object { [string]$_.rcept_no -eq $receiptNo } | Select-Object -First 1)
+    if ($match.Count -eq 0) { return $null }
+
+    $item = $match[0]
+    $current = Convert-ToNumber $item.stkrt
+    $delta = Convert-ToNumber $item.stkrt_irds
+    $previous = $null
+    if ($null -ne $current -and $null -ne $delta) {
+      $previous = [math]::Round($current - $delta, 4)
+    }
+    $obligationDate = Normalize-Date ([string]$(if ($item.report_ostn) { $item.report_ostn } elseif ($item.report_de) { $item.report_de } elseif ($item.report_dt) { $item.report_dt } else { $item.rcept_dt }))
+
+    return [pscustomobject]@{
+      보고의무발생일 = $obligationDate
+      접수일 = Normalize-Date ([string]$item.rcept_dt)
+      종목명 = [string]$item.corp_name
+      종목코드 = [string]$ListItem.stock_code
+      보고자 = [string]$item.repror
+      직전지분율 = $previous
+      이번지분율 = $current
+      증감률 = $delta
+      보고사유 = [string]$item.report_resn
+      접수번호 = $receiptNo
+    }
+  } catch {
+    Write-Host "Major detail could not be loaded for ${receiptNo}: $($_.Exception.Message)"
+    return $null
+  }
+}
+
 function Load-MarketMap() {
   $map = @{}
   if (-not (Test-Path -LiteralPath $DataPath)) { return $map }
@@ -152,6 +206,12 @@ function Get-IntradayReason([object]$CachedRow) {
     return $detail
   }
   return "사유 확인중"
+}
+
+function Format-DisplayDate([string]$Value) {
+  $normalized = Normalize-Date $Value
+  if ($normalized.Length -ne 8) { return "" }
+  return "$($normalized.Substring(0,4))-$($normalized.Substring(4,2))-$($normalized.Substring(6,2))"
 }
 
 function Load-State([string]$TargetDate) {
@@ -260,6 +320,9 @@ foreach ($item in $displayItems) {
   $reporter = Escape-Html ([string]$item.flr_nm)
   $receiptNo = [string]$item.rcept_no
   $cachedRow = if ($latestRowsByReceipt.ContainsKey($receiptNo)) { $latestRowsByReceipt[$receiptNo] } else { $null }
+  if (-not $cachedRow) {
+    $cachedRow = Get-MajorDetailByReceipt -ListItem $item
+  }
   if ($cachedRow) {
     $cachedReporter = [string](Get-JsonField $cachedRow @("보고자"))
     if ($cachedReporter) { $reporter = Escape-Html $cachedReporter }
@@ -269,11 +332,15 @@ foreach ($item in $displayItems) {
     $shareChangeText = Escape-Html "$([char]0xC9C0)$([char]0xBD84)$([char]0xBCC0)$([char]0xB3D9) $([char]0xD655)$([char]0xC778)$([char]0xC911)"
   }
   $reasonText = Escape-Html (Get-IntradayReason -CachedRow $cachedRow)
+  $obligationDate = Format-DisplayDate ([string](Get-JsonField $cachedRow @("보고의무발생일")))
   $dartUrl = "https://dart.fss.or.kr/dsaf001/main.do?rcpNo=$receiptNo"
   $codeLine = if ($market) { "$stockCode · $market" } else { "$stockCode" }
   $lines.Add("<b>$i. $corpName</b> ($reporter)")
   $lines.Add("   <b>지분변동</b>: $shareChangeText")
   $lines.Add("   <b>보고사유</b>: $reasonText")
+  if ($obligationDate) {
+    $lines.Add("   <b>보고의무발생일</b>: $obligationDate")
+  }
   $lines.Add("   $codeLine · <a href=""$dartUrl"">원문 보기</a>")
   $i += 1
 }
