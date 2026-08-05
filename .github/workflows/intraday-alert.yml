@@ -2,6 +2,12 @@ name: Intraday DART text alert
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/intraday-alert.yml"
+      - "intraday_alert.ps1"
   schedule:
     # KST 09:07-17:37 every 30 minutes on weekdays. Text-only Telegram alert.
     # Offset from exact :00/:30 to reduce GitHub schedule congestion.
