@@ -46,9 +46,10 @@ jobs:
             throw "Missing repository secret: TELEGRAM_BOT_TOKEN"
           }
           if (-not $env:TELEGRAM_CHAT_ID) {
-            throw "Missing repository secret: TELEGRAM_CHAT_ID"
+            $env:TELEGRAM_CHAT_ID = "@leeandnote"
           }
-          ./intraday_alert.ps1 -ApiKey $env:DART_API_KEY -BotToken $env:TELEGRAM_BOT_TOKEN -ChatId $env:TELEGRAM_CHAT_ID
+          Write-Host "Secrets available: DART_API_KEY=$(-not [string]::IsNullOrWhiteSpace($env:DART_API_KEY)); TELEGRAM_BOT_TOKEN=$(-not [string]::IsNullOrWhiteSpace($env:TELEGRAM_BOT_TOKEN)); TELEGRAM_CHAT_ID=$(-not [string]::IsNullOrWhiteSpace($env:TELEGRAM_CHAT_ID))"
+          powershell -NoProfile -ExecutionPolicy Bypass -File .\intraday_alert.ps1 -ApiKey $env:DART_API_KEY -BotToken $env:TELEGRAM_BOT_TOKEN -ChatId $env:TELEGRAM_CHAT_ID
 
       - name: Commit intraday alert state
         shell: pwsh
@@ -56,8 +57,8 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add site/data/intraday_alert_state.json
-          git diff --cached --quiet
-          if ($LASTEXITCODE -ne 0) {
+          $changes = git status --porcelain site/data/intraday_alert_state.json
+          if ($changes) {
             git commit -m "Update intraday alert state"
             git pull --rebase
             git push
