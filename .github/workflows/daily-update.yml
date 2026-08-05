@@ -2,6 +2,11 @@ name: Daily DART data update
 
 on:
   workflow_dispatch:
+    inputs:
+      mode:
+        description: "daily or intraday"
+        required: false
+        default: "daily"
   schedule:
     # KST 09:05-17:35 every 30 minutes on weekdays. Text-only intraday Telegram alert.
     # Avoid exact :00/:30 because GitHub scheduled workflows can be delayed or skipped at peak minutes.
@@ -18,7 +23,7 @@ concurrency:
 
 jobs:
   intraday-alert:
-    if: ${{ github.event_name == 'schedule' && github.event.schedule == '5,35 0-8 * * 1-5' }}
+    if: ${{ (github.event_name == 'schedule' && github.event.schedule == '5,35 0-8 * * 1-5') || (github.event_name == 'workflow_dispatch' && github.event.inputs.mode == 'intraday') }}
     runs-on: windows-latest
     timeout-minutes: 8
 
@@ -57,7 +62,7 @@ jobs:
           }
 
   update-and-deploy:
-    if: ${{ github.event_name == 'workflow_dispatch' || github.event.schedule == '0 13 * * 1-5' }}
+    if: ${{ (github.event_name == 'workflow_dispatch' && github.event.inputs.mode != 'intraday') || github.event.schedule == '0 13 * * 1-5' }}
     runs-on: windows-latest
     timeout-minutes: 25
 

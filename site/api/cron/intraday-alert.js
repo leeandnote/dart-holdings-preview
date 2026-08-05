@@ -2,7 +2,7 @@ const OWNER = process.env.GITHUB_OWNER || "leeandnote";
 const REPO = process.env.GITHUB_REPO || "dart-holdings-preview";
 const WORKFLOW = process.env.GITHUB_WORKFLOW || "daily-update.yml";
 const BRANCH = process.env.GITHUB_BRANCH || "main";
-const DEDUPE_MINUTES = Number(process.env.CRON_DEDUPE_MINUTES || 70);
+const DEDUPE_MINUTES = Number(process.env.INTRADAY_CRON_DEDUPE_MINUTES || 20);
 
 function json(res, status, body) {
   res.setHeader("Content-Type", "application/json; charset=utf-8");
@@ -40,21 +40,21 @@ async function github(path, options = {}) {
   return text ? JSON.parse(text) : null;
 }
 
-async function hasRecentRun() {
+async function hasRecentIntradayRun() {
   const runs = await github(
-    `/repos/${OWNER}/${REPO}/actions/workflows/${WORKFLOW}/runs?per_page=10`
+    `/repos/${OWNER}/${REPO}/actions/workflows/${WORKFLOW}/runs?event=workflow_dispatch&per_page=20`
   );
   const since = Date.now() - DEDUPE_MINUTES * 60 * 1000;
   return (runs.workflow_runs || []).some((run) => {
     const createdAt = new Date(run.created_at).getTime();
-    return createdAt >= since && ["queued", "in_progress", "completed"].includes(run.status);
+    return createdAt >= since && ["queued", "in_progress"].includes(run.status);
   });
 }
 
 async function dispatchWorkflow() {
   await github(`/repos/${OWNER}/${REPO}/actions/workflows/${WORKFLOW}/dispatches`, {
     method: "POST",
-    body: JSON.stringify({ ref: BRANCH, inputs: { mode: "daily" } }),
+    body: JSON.stringify({ ref: BRANCH, inputs: { mode: "intraday" } }),
   });
 }
 
@@ -68,11 +68,11 @@ module.exports = async function handler(req, res) {
   }
 
   try {
-    if (await hasRecentRun()) {
+    if (await hasRecentIntradayRun()) {
       return json(res, 200, {
         ok: true,
         skipped: true,
-        reason: `Recent ${WORKFLOW} run exists within ${DEDUPE_MINUTES} minutes.`,
+        reason: `Recent intraday run exists within ${DEDUPE_MINUTES} minutes.`,
       });
     }
 
@@ -82,7 +82,8 @@ module.exports = async function handler(req, res) {
       dispatched: true,
       workflow: WORKFLOW,
       ref: BRANCH,
-      schedule: "KST 22:00 weekdays via Vercel Cron",
+      mode: "intraday",
+      schedule: "KST 09:05-17:35 weekdays via Vercel Cron",
     });
   } catch (error) {
     return json(res, 500, {
