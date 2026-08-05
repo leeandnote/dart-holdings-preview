@@ -7,7 +7,7 @@
       "schedule": "0 13 * * 1-5"
     },
     {
-      "path": "/api/cron/intraday-alert",
+      "path": "/api/intraday-alert",
       "schedule": "5,35 0-8 * * 1-5"
     }
   ]
