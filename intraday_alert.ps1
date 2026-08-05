@@ -6,6 +6,7 @@
   [int]$MaxItems = 20,
   [string]$DataPath = "",
   [string]$StatePath = "",
+  [switch]$EnrichDetails,
   [switch]$DryRun
 )
 
@@ -390,15 +391,14 @@ foreach ($item in $newItems) {
   if ($confirmedItems.Count -ge $MaxItems) { break }
   $receiptNo = [string]$item.rcept_no
   $cachedRow = if ($latestRowsByReceipt.ContainsKey($receiptNo)) { $latestRowsByReceipt[$receiptNo] } else { $null }
-  $detailRow = Get-MajorDetailByReceipt -ListItem $item
-  if ($detailRow) {
-    $cachedRow = $detailRow
+  if ($EnrichDetails) {
+    $detailRow = Get-MajorDetailByReceipt -ListItem $item
+    if ($detailRow) {
+      $cachedRow = $detailRow
+    }
   }
   $changeLines = @(Get-IntradayChangeLines -CachedRow $cachedRow)
   $reasonTextRaw = Get-IntradayReason -CachedRow $cachedRow
-  if ($changeLines.Count -eq 0 -and -not $reasonTextRaw) {
-    continue
-  }
   $confirmedItems.Add([pscustomobject]@{
     Item = $item
     Row = $cachedRow
@@ -412,7 +412,7 @@ if ($confirmedItems.Count -eq 0) {
   if (-not $DryRun) {
     Save-State -State $state
   }
-  Write-Host "No confirmed intraday holding details yet for $Date. new=$($newItems.Count)"
+  Write-Host "No intraday holdings disclosures to send for $Date. new=$($newItems.Count)"
   exit 0
 }
 
@@ -449,6 +449,9 @@ foreach ($entry in $confirmedItems) {
   }
   if ($reasonText) {
     $lines.Add("   <b>보고사유</b>: $reasonText")
+  } elseif ($item.report_nm) {
+    $reportName = Escape-Html ([string]$item.report_nm)
+    $lines.Add("   <b>공시명</b>: $reportName")
   }
   if ($obligationDate) {
     $lines.Add("   <b>보고의무발생일</b>: $obligationDate")
