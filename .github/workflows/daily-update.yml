@@ -7,9 +7,6 @@ on:
         description: "daily"
         required: false
         default: "daily"
-  schedule:
-    # KST 22:00 on weekdays. Full site/price/image briefing.
-    - cron: "0 13 * * 1-5"
 
 permissions:
   contents: write
