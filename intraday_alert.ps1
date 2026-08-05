@@ -1,4 +1,4 @@
-param(
+﻿param(
   [string]$ApiKey = $env:DART_API_KEY,
   [string]$BotToken = $env:TELEGRAM_BOT_TOKEN,
   [string]$ChatId = $env:TELEGRAM_CHAT_ID,
@@ -43,6 +43,26 @@ function Escape-Html([string]$Value) {
     Replace(">", "&gt;")
 }
 
+function Convert-ToNumber([object]$Value) {
+  if ($null -eq $Value) { return $null }
+  $text = ([string]$Value).Replace(",", "").Replace("%", "").Trim()
+  if (-not $text -or $text -eq "-") { return $null }
+  $number = 0.0
+  if ([double]::TryParse($text, [Globalization.NumberStyles]::Any, [Globalization.CultureInfo]::InvariantCulture, [ref]$number)) {
+    return $number
+  }
+  return $null
+}
+
+function Get-JsonField([object]$Row, [string[]]$Names) {
+  foreach ($name in $Names) {
+    if ($Row.PSObject.Properties[$name]) {
+      return $Row.PSObject.Properties[$name].Value
+    }
+  }
+  return $null
+}
+
 function Get-DartList([string]$TargetDate) {
   $all = @()
   $page = 1
@@ -78,6 +98,60 @@ function Load-MarketMap() {
     Write-Host "Market map could not be loaded. Proceeding with stock-code only filter."
   }
   return $map
+}
+
+function Load-LatestRowsByReceipt() {
+  $map = @{}
+  if (-not (Test-Path -LiteralPath $DataPath)) { return $map }
+  try {
+    $payload = Get-Content -LiteralPath $DataPath -Raw -Encoding UTF8 | ConvertFrom-Json
+    foreach ($row in @($payload.rows)) {
+      $receiptNo = [string](Get-JsonField $row @("접수번호", "rcept_no"))
+      if ($receiptNo -and -not $map.ContainsKey($receiptNo)) {
+        $map[$receiptNo] = $row
+      }
+    }
+  } catch {
+    Write-Host "Latest disclosure cache could not be loaded. Intraday alert will use DART list fields only."
+  }
+  return $map
+}
+
+function Format-Percent([object]$Value) {
+  $number = Convert-ToNumber $Value
+  if ($null -eq $number) { return "" }
+  return "{0:N2}%" -f $number
+}
+
+function Get-IntradayShareChange([object]$CachedRow) {
+  $pending = "$([char]0xC9C0)$([char]0xBD84)$([char]0xBCC0)$([char]0xB3D9) $([char]0xD655)$([char]0xC778)$([char]0xC911)"
+  if (-not $CachedRow) { return $null }
+  $previous = Format-Percent (Get-JsonField $CachedRow @("직전지분율"))
+  $current = Format-Percent (Get-JsonField $CachedRow @("이번지분율"))
+  if ($previous -and $current) {
+    return "$previous → $current"
+  }
+  return $pending
+}
+
+function Get-IntradayReason([object]$CachedRow) {
+  if (-not $CachedRow) { return "사유 확인중" }
+  $reason = [string](Get-JsonField $CachedRow @("보고사유", "사유", "변동사유"))
+  $detail = [string](Get-JsonField $CachedRow @("보고사유상세", "보고사유구체적내용", "상세사유"))
+  if ($reason -and $detail) {
+    if ($detail.Length -gt 48) {
+      $detail = $detail.Substring(0, 48) + "..."
+    }
+    return "$reason - $detail"
+  }
+  if ($reason) { return $reason }
+  if ($detail) {
+    if ($detail.Length -gt 56) {
+      $detail = $detail.Substring(0, 56) + "..."
+    }
+    return $detail
+  }
+  return "사유 확인중"
 }
 
 function Load-State([string]$TargetDate) {
@@ -131,6 +205,7 @@ $Date = Normalize-Date $Date
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
 $marketMap = Load-MarketMap
+$latestRowsByReceipt = Load-LatestRowsByReceipt
 $state = Load-State -TargetDate $Date
 $sentSet = @{}
 foreach ($id in @($state.sent)) {
@@ -182,13 +257,24 @@ foreach ($item in $displayItems) {
   $stockCode = [string]$item.stock_code
   $market = if ($marketMap.ContainsKey($stockCode)) { $marketMap[$stockCode].Market } else { "" }
   $corpName = Escape-Html ([string]$item.corp_name)
-  $reportName = Escape-Html ([string]$item.report_nm)
+  $reporter = Escape-Html ([string]$item.flr_nm)
   $receiptNo = [string]$item.rcept_no
+  $cachedRow = if ($latestRowsByReceipt.ContainsKey($receiptNo)) { $latestRowsByReceipt[$receiptNo] } else { $null }
+  if ($cachedRow) {
+    $cachedReporter = [string](Get-JsonField $cachedRow @("보고자"))
+    if ($cachedReporter) { $reporter = Escape-Html $cachedReporter }
+  }
+  $shareChangeText = Escape-Html (Get-IntradayShareChange -CachedRow $cachedRow)
+  if (-not $shareChangeText) {
+    $shareChangeText = Escape-Html "$([char]0xC9C0)$([char]0xBD84)$([char]0xBCC0)$([char]0xB3D9) $([char]0xD655)$([char]0xC778)$([char]0xC911)"
+  }
+  $reasonText = Escape-Html (Get-IntradayReason -CachedRow $cachedRow)
   $dartUrl = "https://dart.fss.or.kr/dsaf001/main.do?rcpNo=$receiptNo"
   $codeLine = if ($market) { "$stockCode · $market" } else { "$stockCode" }
-  $lines.Add("$i. <b>$corpName</b> ($codeLine)")
-  $lines.Add("   $reportName")
-  $lines.Add("   <a href=""$dartUrl"">DART 원문 보기</a>")
+  $lines.Add("<b>$i. $corpName</b> ($reporter)")
+  $lines.Add("   <b>지분변동</b>: $shareChangeText")
+  $lines.Add("   <b>보고사유</b>: $reasonText")
+  $lines.Add("   $codeLine · <a href=""$dartUrl"">원문 보기</a>")
   $i += 1
 }
 if ($newItems.Count -gt $displayItems.Count) {
@@ -212,3 +298,4 @@ if (-not $DryRun) {
 }
 
 Write-Host "Intraday Telegram alert sent for $Date. new=$($newItems.Count)"
+
