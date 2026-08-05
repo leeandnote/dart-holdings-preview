@@ -875,28 +875,7 @@ function renderShareholderSummary(rows) {
 }
 
 function renderStockDisclosurePanel(stockCode) {
-  const rows = state.disclosureRows
-    .filter((row) => row.stockCode === stockCode)
-    .sort((a, b) => b.date.localeCompare(a.date))
-    .slice(0, 10);
-  const contracts = rows.filter((row) => row.type === "contract").slice(0, 5);
-  const earnings = rows.filter((row) => row.type === "earnings").slice(0, 5);
-  if (!contracts.length && !earnings.length) {
-    return "";
-  }
-  return `<section class="stockDisclosurePanel">
-    <div class="shareholderHead">
-      <div>
-        <h3>실적·계약 공시</h3>
-        <p>선택 종목 관련 최신 공시 · 계약 ${contracts.length}건 · 실적 ${earnings.length}건</p>
-      </div>
-      <a class="stockDisclosureMore" href="disclosure-signals.html?search=${encodeURIComponent(stockCode)}">전체 보기</a>
-    </div>
-    <div class="stockDisclosureGrid">
-      ${renderStockDisclosureList("단일판매·공급계약", contracts, "contract")}
-      ${renderStockDisclosureList("영업실적·손익", earnings, "earnings")}
-    </div>
-  </section>`;
+  return "";
 }
 
 function renderStockDisclosureList(title, rows, type) {

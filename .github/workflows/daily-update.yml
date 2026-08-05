@@ -3,9 +3,8 @@ name: Daily DART data update
 on:
   workflow_dispatch:
   schedule:
-    # KST 16:00 and 21:00 on weekdays. Vercel Cron is primary; GitHub schedule is a fallback.
-    - cron: "0 7 * * 1-5"
-    - cron: "0 12 * * 1-5"
+    # KST 22:00 on weekdays. Vercel Cron is primary; GitHub schedule is a fallback.
+    - cron: "0 13 * * 1-5"
 
 permissions:
   contents: write
@@ -83,19 +82,9 @@ jobs:
             "    <priority>1.0</priority>",
             "  </url>",
             "  <url>",
-            "    <loc>${siteUrl}institutions.html</loc>",
-            "    <lastmod>${today}</lastmod>",
-            "    <priority>0.8</priority>",
-            "  </url>",
-            "  <url>",
             "    <loc>${siteUrl}blog.html</loc>",
             "    <lastmod>${today}</lastmod>",
             "    <priority>0.7</priority>",
-            "  </url>",
-            "  <url>",
-            "    <loc>${siteUrl}disclosure-signals.html</loc>",
-            "    <lastmod>${today}</lastmod>",
-            "    <priority>0.6</priority>",
             "  </url>",
             "  <url>",
             "    <loc>${siteUrl}prices.html</loc>",
