@@ -83,7 +83,7 @@ module.exports = async function handler(req, res) {
       workflow: WORKFLOW,
       ref: BRANCH,
       mode: "intraday",
-      schedule: "KST 09:05-17:35 weekdays via Vercel Cron",
+      schedule: "KST 09:05-17:35 weekdays via Vercel Cron text alert",
     });
   } catch (error) {
     return json(res, 500, {
