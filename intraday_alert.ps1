@@ -255,14 +255,13 @@ function Format-Percent([object]$Value) {
 }
 
 function Get-IntradayShareChange([object]$CachedRow) {
-  $pending = "$([char]0xC9C0)$([char]0xBD84)$([char]0xBCC0)$([char]0xB3D9) $([char]0xD655)$([char]0xC778)$([char]0xC911)"
   if (-not $CachedRow) { return $null }
   $previous = Format-Percent (Get-JsonField $CachedRow @("직전지분율"))
   $current = Format-Percent (Get-JsonField $CachedRow @("이번지분율"))
   if ($previous -and $current) {
     return "$previous → $current"
   }
-  return $pending
+  return $null
 }
 
 function Get-IntradayChangeLines([object]$CachedRow) {
@@ -342,7 +341,7 @@ function Get-ReporterType([string]$Reporter, [string]$Reason) {
   if ($Reporter -match "홀딩스|지주|컨소시엄|컴퍼니|코퍼레이션|산업|상사|전자|화학|건설|테크|솔루션|시스템|바이오|엔터") { return "전략적/관계사" }
   if ($text -match "대표|회장|임원|최대주주|특별관계자|친인척|증여|상속|담보") { return "오너·특수관계" }
   if ($Reporter.Trim() -match "^[가-힣]{2,5}$") { return "개인" }
-  return "기타/확인필요"
+  return "기타"
 }
 
 function Format-DisplayDate([string]$Value) {
@@ -390,7 +389,7 @@ function Send-TelegramMessage([string]$Text) {
     parse_mode = "HTML"
     disable_web_page_preview = $false
   }
-  Invoke-RestMethod -Uri "https://api.telegram.org/bot$telegramToken/sendMessage" -Method Post -Body $body -TimeoutSec 30 | Out-Null
+  Invoke-RestMethod -Uri "https://api.telegram.org/bot$telegramToken/sendMessage" -Method Post -ContentType "application/x-www-form-urlencoded" -Body $body -TimeoutSec 30 | Out-Null
 }
 
 if (-not $ApiKey) {
@@ -502,7 +501,7 @@ foreach ($entry in $confirmedItems) {
   $obligationDate = Format-DisplayDate ([string](Get-JsonField $cachedRow @("보고의무발생일")))
   $dartUrl = "https://dart.fss.or.kr/dsaf001/main.do?rcpNo=$receiptNo"
   $codeLine = if ($market) { "$stockCode · $market" } else { "$stockCode" }
-  $lines.Add("<b>$i. $corpName</b> ($reporter · $reporterType)")
+  $lines.Add("$i. <b>$corpName</b> ($reporter · $reporterType)")
   foreach ($changeLine in $changeLines) {
     $lines.Add("   $changeLine")
   }
