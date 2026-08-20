@@ -2,16 +2,9 @@ name: Intraday DART text alert
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
-    paths:
-      - ".github/workflows/intraday-alert.yml"
-      - "intraday_alert.ps1"
-  schedule:
-    # KST 09:02-17:57 every 5 minutes on weekdays. Text-only Telegram alert.
-    # Offset from :00/:05 to reduce GitHub schedule congestion and dropped runs.
-    - cron: "2-57/5 0-8 * * 1-5"
+  # Disabled: Convex cloud now owns DART polling and Telegram alerts.
+  # Leaving this workflow manual-only prevents duplicate public-channel messages
+  # and the old numbered "[장중 대량보유 공시 알림]" format.
 
 permissions:
   contents: write
