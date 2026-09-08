@@ -3,3 +3,10 @@ site/data/prices.json
 *.zip
 .env.local
 telegram_config.local.ps1
+convex/_generated/
+convex_config.local.ps1
+dart_config.local.ps1
+x_config.local.ps1
+meta_config.local.ps1
+node_modules/
+public_dist/

@@ -1,174 +1,133 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="ko">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>리앤노트 | 대량보유 변동 스캐너</title>
-  <meta name="description" content="DART 대량보유 공시와 가격 데이터를 한눈에 보는 리앤노트 공시 데이터 모니터입니다.">
+  <meta name="google-adsense-account" content="ca-pub-5230074340613849">
+  <meta name="naver-site-verification" content="98320b375ec48f676f3586776324282d722d905a">
+  <title>리앤노트 | 국내주식 DART 공시 데이터 레이더</title>
+  <meta name="description" content="리앤노트는 5%보고, 임원보고, 대형수주보고를 중심으로 국내주식 DART 공시의 핵심 변동을 빠르게 정리하는 데이터 레이더입니다.">
+  <link rel="canonical" href="https://leeandnote.com/">
   <meta property="og:type" content="website">
-  <meta property="og:site_name" content="리앤노트">
-  <meta property="og:title" content="리앤노트 | 대량보유 변동 스캐너">
-  <meta property="og:description" content="DART 대량보유 공시와 가격 데이터를 한눈에 확인하세요.">
-  <meta property="og:url" content="https://dart-holdings-preview.vercel.app/">
-  <meta property="og:image" content="https://dart-holdings-preview.vercel.app/assets/share-leeandnote-original-v3.png">
-  <meta property="og:image:secure_url" content="https://dart-holdings-preview.vercel.app/assets/share-leeandnote-original-v3.png">
-  <meta property="og:image:type" content="image/png">
-  <meta property="og:image:width" content="1346">
-  <meta property="og:image:height" content="656">
+  <meta property="og:site_name" content="LEE&NOTE">
+  <meta property="og:title" content="리앤노트 | 국내주식 DART 공시 데이터 레이더">
+  <meta property="og:description" content="시장보다 한발 빠른 공시 해석. 5%보고, 임원보고, 대형수주보고를 빠르게 정리합니다.">
+  <meta property="og:url" content="https://leeandnote.com/">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="리앤노트 | 대량보유 변동 스캐너">
-  <meta name="twitter:description" content="DART 대량보유 공시와 가격 데이터를 한눈에 확인하세요.">
-  <meta name="twitter:image" content="https://dart-holdings-preview.vercel.app/assets/share-leeandnote-original-v3.png">
+  <meta name="twitter:title" content="리앤노트 | 국내주식 DART 공시 데이터 레이더">
+  <meta name="twitter:description" content="DART 핵심 공시를 데이터 시그널로 빠르게 정리합니다.">
+  <meta property="og:image" content="https://leeandnote.com/assets/leeandnote-mark.png">
+  <meta name="twitter:image" content="https://leeandnote.com/assets/leeandnote-mark.png">
   <link rel="icon" href="assets/favicon.ico" sizes="any">
   <link rel="icon" type="image/png" href="assets/favicon-32.png" sizes="32x32">
   <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
-  <link rel="stylesheet" href="styles.css">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5230074340613849" crossorigin="anonymous"></script>
+
+  <style id="critical-radar-home">
+    body.radarHomeBody{margin:0;min-height:100vh;background:radial-gradient(circle at 18% 72%,rgba(255,83,16,.10),transparent 34%),radial-gradient(circle at 82% 22%,rgba(16,24,39,.06),transparent 36%),#f6f7f9;color:#101722;font-family:Pretendard,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}.radarMain{position:relative;display:grid;grid-template-columns:minmax(0,1.04fr) minmax(380px,.78fr);gap:clamp(34px,5vw,84px);align-items:stretch;max-width:1180px;min-height:calc(100vh - 86px);margin:0 auto;padding:clamp(54px,8vh,96px) 28px 64px;box-sizing:border-box}.radarHero{position:relative;display:flex;flex-direction:column;justify-content:flex-start;min-height:520px;padding-top:clamp(96px,15vh,170px);overflow:hidden;box-sizing:border-box}.radarHeroLogo{position:relative;z-index:4;display:inline-flex;width:fit-content;margin-bottom:clamp(88px,12vh,138px);text-decoration:none}.radarHeroLogo img{display:block;width:clamp(138px,12vw,178px);height:auto}.radarHero h1{position:relative;z-index:2;max-width:500px;margin:0;color:#101722;font-size:clamp(25px,2.15vw,32px);font-weight:660;line-height:1.46;letter-spacing:0;word-break:keep-all}.radarMars{position:absolute;right:4px;bottom:56px;width:min(34vw,360px);aspect-ratio:1;border-radius:50%;opacity:.52;background:linear-gradient(135deg,#ff6a1f 0%,#f24414 48%,#b53a22 100%);box-shadow:-34px 42px 110px rgba(255,77,13,.20),inset -42px -54px 78px rgba(52,20,13,.20),inset 28px 28px 72px rgba(255,223,196,.22)}.radarMars:before,.radarMars:after{content:"";position:absolute;inset:-24px;border:1px solid rgba(255,77,13,.16);border-radius:50%;transform:rotate(-18deg) scaleX(1.28) scaleY(.56)}.radarMars:after{inset:-52px;border-color:rgba(16,23,34,.08);transform:rotate(-18deg) scaleX(1.34) scaleY(.50)}.radarPanel{align-self:center;position:relative;z-index:3;min-height:560px;display:flex;flex-direction:column;justify-content:center;border:1px solid #e4e8ee;border-radius:24px;padding:34px;background:rgba(255,255,255,.78);box-shadow:0 28px 80px rgba(18,27,39,.08);backdrop-filter:blur(18px)}.radarPanelHead p{margin:0 0 12px;color:#ff4d0d;font-size:12px;font-weight:720;line-height:1}.radarPanelHead h2{margin:0;color:#101722;font-size:clamp(25px,2.15vw,32px);font-weight:660;line-height:1.38;letter-spacing:0}.radarGroup{margin-top:28px;padding-top:24px;border-top:1px solid #e7ebf0}.radarGroupTitle{display:inline-flex;align-items:center;gap:8px;margin-bottom:14px;color:#7a8390;font-size:11px;font-weight:760;line-height:1}.radarGroupTitle span{width:7px;height:7px;border-radius:50%;background:#18a86b;box-shadow:0 0 0 5px rgba(24,168,107,.10)}.radarRow{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:48px;border-radius:12px;padding:0 14px;color:#17202c;text-decoration:none}.radarRow+.radarRow{margin-top:4px}.radarRow strong{font-size:15px;font-weight:650;letter-spacing:0}.radarRow em{flex:0 0 auto;min-width:66px;border:1px solid rgba(255,77,13,.18);border-radius:999px;padding:7px 10px;background:rgba(255,77,13,.08);color:#ff4d0d;font-size:10px;font-style:normal;font-weight:780;text-align:center}.radarGroupMuted .radarRow{color:#7a8390}.radarGroupMuted .radarRow em{border-color:#e5e9ee;background:#f4f6f8;color:#8a929d}.radarTelegram{display:inline-flex;align-items:center;justify-content:center;min-height:50px;margin-top:30px;border-radius:999px;background:#101722;color:#fff;box-shadow:0 18px 46px rgba(16,23,34,.18);font-size:14px;font-weight:680;text-decoration:none}.radarFooter{max-width:1180px;margin:0 auto;padding:0 28px 34px;color:#969ba4;font-size:11px;font-weight:620}.radarFooter p{margin:0 0 10px}.radarFooter nav{display:flex;flex-wrap:wrap;gap:12px}.radarFooter a{color:#6f7682;text-decoration:none;font-weight:760}@media(max-width:920px){.radarMain{grid-template-columns:1fr;min-height:auto;padding-top:34px}.radarHero,.radarPanel{min-height:auto}.radarHero{min-height:430px;padding-top:42px}.radarHeroLogo{margin-bottom:54px}.radarMars{right:-54px;bottom:-28px;width:300px;opacity:.36}.radarHero h1,.radarPanelHead h2{font-size:28px}}@media(max-width:560px){.radarMain{gap:28px;padding:28px 18px 42px}.radarHero{min-height:300px;padding-top:18px}.radarHeroLogo{margin-bottom:44px}.radarHeroLogo img{width:128px}.radarMars{right:-72px;bottom:-18px;width:250px;opacity:.30}.radarHero h1,.radarPanelHead h2{font-size:24px}.radarPanel{border-radius:20px;padding:24px 18px}.radarRow{min-height:46px;padding:0 10px}.radarRow strong{font-size:13.5px}.radarRow em{min-width:56px;padding:6px 8px}.radarTelegram{min-height:48px;font-size:13px}}
+  </style>
+  <link rel="stylesheet" href="/styles.css">
+
+  <style id="adsense-quality-style">
+    .homeQuality{max-width:1180px;margin:0 auto 56px;padding:0 28px;color:#101722}.homeQualityInner{border-top:1px solid #e2e8f0;padding-top:34px}.homeQuality h2{margin:0 0 14px;font-size:28px;line-height:1.35;font-weight:760;letter-spacing:0}.homeQualityIntro{max-width:820px;margin:0;color:#4b5563;font-size:16px;line-height:1.78}.homeQualityGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin-top:24px}.homeQualityCard{border:1px solid #e3e8ef;border-radius:18px;background:rgba(255,255,255,.82);padding:20px;box-shadow:0 14px 42px rgba(16,24,39,.045)}.homeQualityCard h3{margin:0 0 9px;font-size:17px;line-height:1.42}.homeQualityCard p{margin:0;color:#596272;font-size:14px;line-height:1.72}.homeQualityNote{margin-top:20px;color:#6b7280;font-size:13px;line-height:1.72}.homeQualityLinks{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}.homeQualityLinks a{display:inline-flex;align-items:center;border:1px solid #ffd8cc;border-radius:999px;background:#fffaf8;color:#f0521d;padding:9px 13px;text-decoration:none;font-size:13px;font-weight:780}@media(max-width:860px){.homeQualityGrid{grid-template-columns:1fr}.homeQuality h2{font-size:24px}}@media(max-width:560px){.homeQuality{padding:0 18px 42px}.homeQualityInner{padding-top:26px}.homeQualityIntro{font-size:15px}.homeQualityCard{padding:18px}}
+  </style>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "LEE&NOTE",
+    "alternateName": "리앤노트",
+    "url": "https://leeandnote.com/",
+    "description": "DART 5%보고, 임원보고, 대형수주보고 공시를 쉽고 빠르게 확인하는 국내주식 공시 데이터 레이더입니다.",
+    "publisher": {
+      "@type": "Organization",
+      "name": "LEE&NOTE",
+      "url": "https://leeandnote.com/",
+      "logo": "https://leeandnote.com/assets/leeandnote-logo.png"
+    },
+    "sameAs": ["https://t.me/leeandnote"]
+  }
+  </script>
 </head>
-<body>
-  <header class="topbar">
-    <a class="brandHome" href="index.html" aria-label="리앤노트 홈">
-      <img class="brandMark" src="assets/leeandnote-mark.png" alt="">
-      <img class="brandLogo" src="assets/leeandnote-logo.png" alt="LEE&NOTE">
-    </a>
-    <nav class="siteNav" aria-label="주요 카테고리">
-      <div class="navGroup active">
-        <a class="navLink" href="index.html"><span class="navIcon disclosureIcon"></span>공시데이터<span class="navArrow">▾</span></a>
-        <div class="navMenu" aria-label="공시데이터 하위 메뉴">
-          <a href="index.html">대량보유 스캐너</a>
-        </div>
-      </div>
-      <a class="navLink" href="blog.html"><span class="navIcon blogIcon"></span>블로그</a>
-      <a class="navLink" href="prices.html"><span class="navIcon priceIcon"></span>가격</a>
-    </nav>
-  </header>
+<body class="minimalHomeBody radarHomeBody">
 
-  <main>
-    <section class="pageHero">
-      <div>
-        <p class="eyebrow">DART 대량보유 모니터</p>
-        <h1 id="title" class="homeTitle" role="button" tabindex="0" title="전체 테이블로 이동">대량보유 변동 스캐너</h1>
-        <p id="period" class="muted">데이터를 불러오는 중</p>
-      </div>
+  <main class="radarMain">
+    <section class="radarHero" aria-labelledby="landingTitle">
+      <div class="radarMars" aria-hidden="true"></div>
+      <a class="radarHeroLogo" href="/" aria-label="리앤노트 홈"><img src="assets/leeandnote-logo.png" alt="LEE&NOTE"></a>
+      <h1 id="landingTitle">복잡한 DART 공시<br>쉽고 빠르게 확인하세요</h1>
     </section>
 
-    <section id="topRankings" class="topRankings" aria-label="오늘 Top5 요약"></section>
-
-    <div class="contentShell">
-      <section class="issueList" aria-label="지분변동 목록">
-        <div class="panelHead">
-          <h2 id="listTitle">대량보유 변동 테이블</h2>
-          <p id="listHint">종목명을 누르면 차트와 공시 마커를 봅니다.</p>
-        </div>
-        <section class="controls" aria-label="테이블 필터">
-          <input id="searchInput" class="searchInput" type="search" placeholder="종목, 제출인, 사유 검색" aria-label="검색">
-          <button id="csvBtn" class="toolIconButton" type="button" title="Excel 저장" aria-label="Excel 저장">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8"/><path d="M8 17h8"/><path d="M8 9h2"/></svg>
-            <span>XLS</span>
-          </button>
-          <button id="imageBtn" class="toolIconButton" type="button" title="이미지 저장" aria-label="이미지 저장">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="10.5" r="1.5"/><path d="M21 15l-5-5L5 19"/></svg>
-            <span>IMG</span>
-          </button>
-          <button id="filterBtn" class="toolIconButton" type="button" title="필터" aria-label="필터">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h18"/><path d="M7 12h10"/><path d="M10 19h4"/></svg>
-            <span>필터</span>
-          </button>
-          <button id="columnsBtn" class="toolIconButton" type="button" title="열 설정" aria-label="열 설정">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/><path d="M8 4v16"/><path d="M16 4v16"/></svg>
-            <span>열</span>
-          </button>
-          <select id="pageSize" class="filterSelect pageSizeSelect" aria-label="페이지당 표시 개수">
-            <option value="10">10개씩 보기</option>
-            <option value="20">20개씩 보기</option>
-            <option value="50">50개씩 보기</option>
-          </select>
-          <span id="imageStatus" class="imageStatus" aria-live="polite"></span>
-        </section>
-        <div id="filterModal" class="modalOverlay hidden" role="dialog" aria-modal="true" aria-labelledby="filterModalTitle">
-          <div class="tableModal">
-            <div class="modalHead">
-              <div>
-                <h3 id="filterModalTitle">필터 변경하기</h3>
-                <p>기간, 종목, 제출인, 금액/괴리 정렬을 조정합니다.</p>
-              </div>
-              <button class="modalClose" type="button" data-close-modal="filterModal" aria-label="닫기">×</button>
-            </div>
-            <div class="modalBody">
-              <div class="filterModalBasics">
-                <select id="stockSelect" class="stockSelect" aria-label="종목 선택">
-                  <option value="all">전체 종목</option>
-                </select>
-                <select id="marketFilter" class="filterSelect" aria-label="시장 필터">
-                  <option value="all">전체 시장</option>
-                  <option value="KOSPI">KOSPI</option>
-                  <option value="KOSDAQ">KOSDAQ</option>
-                </select>
-                <select id="directionFilter" class="filterSelect" aria-label="지분변동 필터">
-                  <option value="all">전체 지분변동</option>
-                  <option value="up">지분 증가</option>
-                  <option value="cross">5% 상향돌파</option>
-                  <option value="down">지분 감소</option>
-                </select>
-                <input id="fromDate" class="dateInput" type="date" aria-label="시작일">
-                <input id="toDate" class="dateInput" type="date" aria-label="종료일">
-              </div>
-              <div id="advancedFilterPanel" class="holdingFilterPanel modalFilterPanel" aria-label="컬럼별 필터와 정렬"></div>
-            </div>
-            <div class="modalActions">
-              <button class="ghostButton" type="button" data-close-modal="filterModal">닫기</button>
-              <button class="iconButton" type="button" data-close-modal="filterModal">적용</button>
-            </div>
-          </div>
-        </div>
-        <div id="columnsModal" class="modalOverlay hidden" role="dialog" aria-modal="true" aria-labelledby="columnsModalTitle">
-          <div class="tableModal small">
-            <div class="modalHead">
-              <div>
-                <h3 id="columnsModalTitle">열 설정</h3>
-                <p>화면에서 확인할 열을 선택합니다.</p>
-              </div>
-              <button class="modalClose" type="button" data-close-modal="columnsModal" aria-label="닫기">×</button>
-            </div>
-            <div id="columnsPanel" class="columnsPanel modalColumns"></div>
-            <div class="modalActions">
-              <button class="ghostButton" type="button" data-close-modal="columnsModal">취소</button>
-              <button class="iconButton" type="button" data-close-modal="columnsModal">적용</button>
-            </div>
-          </div>
-        </div>
-        <div id="list"></div>
-      </section>
-
-    </div>
-
-    <section id="chartPanel" class="chartPanel hidden">
-      <div class="panelHead">
-        <h2 id="chartTitle">가격·지분변동 차트</h2>
-        <p id="chartHint">캐싱된 일봉 가격 위에 DART 지분변동 이벤트를 표시합니다.</p>
+    <section class="radarPanel" aria-label="공시 데이터 레이더">
+      <div class="radarPanelHead">
+        <p>공시 데이터 레이더</p>
+        <h2>DART 공시 확인하러가기</h2>
       </div>
-      <div id="chart" class="chart" role="img" aria-label="지분율 증감 추이"></div>
-      <div id="eventRail" class="eventRail" aria-label="지분변동 이벤트 마커"></div>
-    </section>
 
-    <footer class="siteFooter">
-      <p>본 서비스는 DART 공시와 공개 가격 데이터를 기반으로 한 정보 제공 서비스이며, 특정 종목의 매수·매도 추천이 아닙니다.</p>
-      <nav aria-label="사이트 정책">
-        <a href="disclaimer.html">투자유의사항</a>
-        <a href="privacy.html">개인정보처리방침</a>
-        <a href="terms.html">이용약관</a>
-        <a href="contact.html">문의</a>
-      </nav>
-    </footer>
+      <div class="radarGroup">
+        <div class="radarGroupTitle"><span></span>LIVE NOW</div>
+        <a class="radarRow" href="/5percent">
+          <strong>5% 대량보유 보고</strong>
+          <em>OPEN</em>
+        </a>
+        <a class="radarRow" href="/executives">
+          <strong>임원·주요주주 매매</strong>
+          <em>OPEN</em>
+        </a>
+        <a class="radarRow" href="/contracts">
+          <strong>대형수주 보고</strong>
+          <em>OPEN</em>
+        </a>
+        <a class="radarRow" href="/blog">
+          <strong>DART 공시 블로그</strong>
+          <em>OPEN</em>
+        </a>
+      </div>
+
+
+      <a class="radarTelegram" href="https://t.me/leeandnote" target="_blank" rel="noreferrer">텔레그램 실시간 알림 받기</a>
+    </section>
   </main>
 
-  <script src="data/latest.js"></script>
-  <script src="data/logos.js"></script>
-  <script src="data/prices.js"></script>
-  <script src="data/event_prices.js"></script>
-  <script src="data/current_prices.js"></script>
-  <script src="data/shareholders.js"></script>
-  <script src="data/disclosure_signals.js"></script>
-  <script src="app.js"></script>
+  <section class="homeQuality" aria-labelledby="qualityTitle">
+    <div class="homeQualityInner">
+      <h2 id="qualityTitle">DART 공시를 읽기 쉬운 데이터 노트로 정리합니다</h2>
+      <p class="homeQualityIntro">리앤노트는 금융감독원 DART에 접수되는 5%보고, 임원·주요주주 보고, 단일판매·공급계약 공시를 바탕으로, 투자자가 원문을 확인하기 전에 먼저 살펴봐야 할 변동 정보를 정리합니다. 공시 원문을 대체하지 않고 종목, 제출인, 보고의무발생일, 보유비율, 보유주식수, 계약금액과 가격 흐름을 한 화면에서 비교할 수 있도록 구성했습니다.</p>
+      <div class="homeQualityGrid">
+        <article class="homeQualityCard"><h3>5%보고 흐름</h3><p>신규 5% 진입, 보유비율 확대·축소, 주요 기관과 특수관계자 변동을 접수일 기준으로 모아 보여줍니다. 단순한 상승·하락 표시보다 누가 어떤 사유로 보고했는지를 함께 확인할 수 있게 정리합니다.</p></article>
+        <article class="homeQualityCard"><h3>임원·주요주주 보고</h3><p>임원과 주요주주의 소유상황 변동을 보유비율과 보유주식수 중심으로 정리합니다. 보고자 성격과 보고사유를 함께 표시해 내부자 거래 흐름을 더 빠르게 살펴볼 수 있습니다.</p></article>
+        <article class="homeQualityCard"><h3>대형수주보고</h3><p>단일판매·공급계약 공시에서 계약금액, 매출액 대비 비중, 계약상대방과 계약기간을 함께 정리합니다. 수주 규모만 보지 않고 실제 매출 반영 가능성과 공시 정정 여부를 같이 확인할 수 있게 구성합니다.</p></article>
+        <article class="homeQualityCard"><h3>블로그 요약 노트</h3><p>장 마감 후 데이터 누락과 오류를 먼저 점검한 뒤, 날짜별 공시 요약을 블로그로 누적합니다. 개별 종목 추천이 아니라 공시에서 유의할 지점과 확인 순서를 설명하는 데 초점을 둡니다.</p></article>
+      </div>
+      <p class="homeQualityNote">데이터는 공개 공시와 공개 가격 데이터를 기반으로 제공되며, 지분변동금액 등 일부 항목은 원문 세부 변동내역 또는 보고의무발생일 가격을 기준으로 추정될 수 있습니다. 중요한 판단 전에는 반드시 DART 원문을 함께 확인해야 합니다.</p>
+      <div class="homeQualityLinks" aria-label="주요 서비스 바로가기"><a href="/5percent">5%보고 보기</a><a href="/executives">임원보고 보기</a><a href="/contracts">대형수주보고 보기</a><a href="/blog/">공시 블로그 보기</a></div>
+    </div>
+  </section>
+
+  <footer class="minimalFooter radarFooter">
+    <p>본 서비스는 DART 공시와 공개 가격 데이터를 기반으로 한 정보 제공 서비스이며, 특정 종목의 매수·매도 추천이 아닙니다.</p>
+    <nav aria-label="사이트 정책">
+      <a href="about.html">리앤노트 소개</a>
+      <a href="editorial-policy.html">데이터·편집 기준</a>
+      <a href="disclaimer.html">투자유의사항</a>
+      <a href="privacy.html">개인정보처리방침</a>
+      <a href="terms.html">이용약관</a>
+      <a href="contact.html">문의</a>
+    </nav>
+  </footer>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
 

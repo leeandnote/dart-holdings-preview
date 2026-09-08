@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <meta name="google-adsense-account" content="ca-pub-5230074340613849">
+  <meta name="naver-site-verification" content="98320b375ec48f676f3586776324282d722d905a">
+  <title>리앤노트 | 임원보고 스캐너</title>
+  <meta name="description" content="리앤노트는 DART 5% 대량보유 공시, 지분변동, 주요주주 변동을 빠르게 정리하는 국내주식 공시 데이터 서비스입니다.">
+  <link rel="canonical" href="https://leeandnote.com/executives">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="LEE&NOTE">
+  <meta property="og:title" content="리앤노트 | 임원보고 스캐너">
+  <meta property="og:description" content="리앤노트는 DART 5% 대량보유 공시, 지분변동, 주요주주 변동을 빠르게 정리하는 국내주식 공시 데이터 서비스입니다.">
+  <meta property="og:url" content="https://leeandnote.com/executives">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="리앤노트 | 임원보고 스캐너">
+  <meta name="twitter:description" content="리앤노트는 DART 5% 대량보유 공시, 지분변동, 주요주주 변동을 빠르게 정리하는 국내주식 공시 데이터 서비스입니다.">
+  <meta property="og:image" content="https://leeandnote.com/assets/leeandnote-mark.png">
+  <meta name="twitter:image" content="https://leeandnote.com/assets/leeandnote-mark.png">
+  <link rel="icon" href="/assets/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" href="/assets/favicon-32.png" sizes="32x32">
+  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5230074340613849" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="/styles.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "임원보고 스캐너",
+    "url": "https://leeandnote.com/executives",
+    "description": "DART 임원·주요주주 보고 공시의 보유비율, 보고자, 보고사유, 가격 흐름을 확인하는 데이터 페이지입니다.",
+    "isPartOf": { "@type": "WebSite", "name": "LEE&NOTE", "url": "https://leeandnote.com/" }
+  }
+  </script>
+</head>
+<body data-holdings-kind="executive">
+  <header class="topbar">
+    <a class="brandHome" href="/" aria-label="리앤노트 홈">
+      <img class="brandMark" src="/assets/leeandnote-mark.png" alt="">
+      <img class="brandLogo" src="/assets/leeandnote-logo.png" alt="LEE&NOTE">
+    </a>
+    <nav class="siteNav" aria-label="주요 카테고리">
+      <a class="navLink" href="/5percent"><span class="navIcon disclosureIcon"></span>5%보고</a>
+      <a class="navLink active" href="/executives"><span class="navIcon disclosureIcon"></span>임원보고</a>
+      <a class="navLink" href="/contracts"><span class="navIcon disclosureIcon"></span>대형수주보고</a>
+      <a class="navLink" href="/blog"><span class="navIcon disclosureIcon"></span>블로그</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="pageHero">
+      <div>
+        <p class="eyebrow">DART 임원보고 모니터</p>
+        <h1 id="title" class="homeTitle" role="button" tabindex="0" title="전체 테이블로 이동">임원보고 스캐너</h1>
+        <p id="period" class="muted">데이터를 불러오는 중</p>
+      </div>
+    </section>
+
+    <section id="topRankings" class="topRankings" aria-label="오늘 Top5 요약"></section>
+
+    <div class="contentShell">
+      <section class="issueList" aria-label="지분변동 목록">
+        <div class="panelHead">
+          <h2 id="listTitle">임원보고 테이블</h2>
+          <p id="listHint">필터 조건에 맞는 임원·주요주주 소유보고 공시를 표로 확인합니다.</p>
+        </div>
+        <section class="controls" aria-label="테이블 필터">
+          <input id="searchInput" class="searchInput" type="search" placeholder="종목, 제출인, 사유 검색" aria-label="검색">
+          <button id="csvBtn" class="toolIconButton" type="button" title="Excel 저장" aria-label="Excel 저장">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8"/><path d="M8 17h8"/><path d="M8 9h2"/></svg>
+            <span>XLS</span>
+          </button>
+          <button id="imageBtn" class="toolIconButton" type="button" title="이미지 저장" aria-label="이미지 저장">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="10.5" r="1.5"/><path d="M21 15l-5-5L5 19"/></svg>
+            <span>IMG</span>
+          </button>
+          <button id="filterBtn" class="toolIconButton" type="button" title="필터" aria-label="필터">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h18"/><path d="M7 12h10"/><path d="M10 19h4"/></svg>
+            <span>필터</span>
+          </button>
+          <button id="columnsBtn" class="toolIconButton" type="button" title="열 설정" aria-label="열 설정">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/><path d="M8 4v16"/><path d="M16 4v16"/></svg>
+            <span>열</span>
+          </button>
+          <select id="pageSize" class="filterSelect pageSizeSelect" aria-label="페이지당 표시 개수">
+            <option value="10">10개씩 보기</option>
+            <option value="20">20개씩 보기</option>
+            <option value="50">50개씩 보기</option>
+          </select>
+          <span id="imageStatus" class="imageStatus" aria-live="polite"></span>
+        </section>
+        <div id="filterModal" class="modalOverlay hidden" role="dialog" aria-modal="true" aria-labelledby="filterModalTitle">
+          <div class="tableModal">
+            <div class="modalHead">
+              <div>
+                <h3 id="filterModalTitle">필터 변경하기</h3>
+                <p>기간, 종목, 제출인, 금액/괴리 정렬을 조정합니다.</p>
+              </div>
+              <button class="modalClose" type="button" data-close-modal="filterModal" aria-label="닫기">×</button>
+            </div>
+            <div class="modalBody">
+              <div class="filterModalBasics">
+                <select id="stockSelect" class="stockSelect" aria-label="종목 선택">
+                  <option value="all">전체 종목</option>
+                </select>
+                <select id="marketFilter" class="filterSelect" aria-label="시장 필터">
+                  <option value="all">전체 시장</option>
+                  <option value="KOSPI">KOSPI</option>
+                  <option value="KOSDAQ">KOSDAQ</option>
+                </select>
+                <select id="directionFilter" class="filterSelect" aria-label="지분변동 필터">
+                  <option value="all">전체 지분변동</option>
+                  <option value="up">지분 증가</option>
+                  <option value="cross">5% 상향돌파</option>
+                  <option value="down">지분 감소</option>
+                </select>
+                <input id="fromDate" class="dateInput" type="date" aria-label="시작일">
+                <input id="toDate" class="dateInput" type="date" aria-label="종료일">
+              </div>
+              <div id="advancedFilterPanel" class="holdingFilterPanel modalFilterPanel" aria-label="컬럼별 필터와 정렬"></div>
+            </div>
+            <div class="modalActions">
+              <button class="ghostButton" type="button" data-close-modal="filterModal">닫기</button>
+              <button class="iconButton" type="button" data-close-modal="filterModal">적용</button>
+            </div>
+          </div>
+        </div>
+        <div id="columnsModal" class="modalOverlay hidden" role="dialog" aria-modal="true" aria-labelledby="columnsModalTitle">
+          <div class="tableModal small">
+            <div class="modalHead">
+              <div>
+                <h3 id="columnsModalTitle">열 설정</h3>
+                <p>화면에서 확인할 열을 선택합니다.</p>
+              </div>
+              <button class="modalClose" type="button" data-close-modal="columnsModal" aria-label="닫기">×</button>
+            </div>
+            <div id="columnsPanel" class="columnsPanel modalColumns"></div>
+            <div class="modalActions">
+              <button class="ghostButton" type="button" data-close-modal="columnsModal">취소</button>
+              <button class="iconButton" type="button" data-close-modal="columnsModal">적용</button>
+            </div>
+          </div>
+        </div>
+        <div id="list"></div>
+      </section>
+
+    </div>
+
+    <section id="chartPanel" class="chartPanel hidden">
+      <div class="panelHead">
+        <h2 id="chartTitle">가격·지분변동 차트</h2>
+        <p id="chartHint">캐싱된 일봉 가격 위에 DART 지분변동 이벤트를 표시합니다.</p>
+      </div>
+      <div id="chart" class="chart" role="img" aria-label="지분율 증감 추이"></div>
+      <div id="eventRail" class="eventRail" aria-label="지분변동 이벤트 마커"></div>
+    </section>
+
+    <section class="infoEssay" aria-label="임원보고 데이터 이용 안내">
+      <div class="infoEssayGrid">
+        <article class="infoEssayCard"><h2>임원보고에서 먼저 볼 점</h2><p>임원·주요주주 보고는 회사 내부자와 주요 관계자의 소유상황 변동을 확인하는 자료입니다. 보유비율뿐 아니라 보유주식수 변화까지 함께 봐야 실제 변동 규모를 놓치지 않을 수 있습니다.</p></article>
+        <article class="infoEssayCard"><h2>0주 표기와 원문 확인</h2><p>원문 구조가 불규칙한 경우 보유주식수 또는 보유비율을 자동 추출하기 어려울 수 있습니다. 리앤노트는 원문 표의 보유주식 수와 비율을 함께 보강해 반복적인 누락을 줄이는 방향으로 개선하고 있습니다.</p></article>
+        <article class="infoEssayCard"><h2>보고사유 해석</h2><p>장내매수, 장내매도, 신규선임, 퇴임, 증여, 특수관계자 변동은 서로 다른 의미를 가집니다. 단순히 증가·감소 색상만 보지 말고 보고자와 보고의무발생일을 함께 확인하는 것이 중요합니다.</p></article>
+      </div>
+      <div class="infoEssayWide"><strong>유의사항:</strong> 임원보고 데이터는 공시 원문을 읽기 쉽게 재정리한 참고 정보입니다. 보유비율과 보유주식수는 원문 정정, 보고자별 합산 방식, 특수관계자 포함 여부에 따라 해석이 달라질 수 있습니다.</div>
+    </section>
+
+    <footer class="siteFooter">
+      <p>본 서비스는 DART 공시와 공개 가격 데이터를 기반으로 한 정보 제공 서비스이며, 특정 종목의 매수·매도 추천이 아닙니다.</p>
+      <nav aria-label="사이트 정책">
+        <a href="/disclaimer.html">투자유의사항</a>
+        <a href="/privacy.html">개인정보처리방침</a>
+        <a href="/terms.html">이용약관</a>
+        <a href="/contact.html">문의</a>
+      </nav>
+    </footer>
+  </main>
+
+  <script src="/data/latest.js"></script>
+  <script src="/data/logos.js"></script>
+  <script src="/data/prices.js"></script>
+  <script src="/data/event_prices.js"></script>
+  <script src="/data/current_prices.js"></script>
+  <script src="/data/shareholders.js"></script>
+  <script src="/data/disclosure_signals.js"></script>
+  <script src="/app.js"></script></body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

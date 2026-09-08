@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="google-adsense-account" content="ca-pub-5230074340613849">
+  <title>리앤노트 | 실적 발표 스캐너</title>
+  <meta name="description" content="DART 잠정실적, 분기보고서, 반기보고서, 사업보고서 기반 매출액·영업이익·순이익 성장률을 정리하는 실적 발표 스캐너입니다.">
+  <link rel="canonical" href="https://leeandnote.com/earnings/quarterly">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="LEE&NOTE">
+  <meta property="og:title" content="리앤노트 | 실적 발표 스캐너">
+  <meta property="og:description" content="DART 실적 관련 공시의 매출액, 영업이익, 순이익, OPM과 주가 흐름을 한 화면에서 확인합니다.">
+  <meta property="og:url" content="https://leeandnote.com/earnings/quarterly">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="리앤노트 | 실적 발표 스캐너">
+  <meta name="twitter:description" content="DART 실적 관련 공시의 매출액, 영업이익, 순이익, OPM과 주가 흐름을 한 화면에서 확인합니다.">
+  <link rel="icon" href="/assets/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" href="/assets/favicon-32.png" sizes="32x32">
+  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body data-earnings-page="quarterly">
+  <header class="topbar">
+    <a class="brandHome" href="/" aria-label="리앤노트 홈">
+      <img class="brandMark" src="/assets/leeandnote-mark.png" alt="">
+      <img class="brandLogo" src="/assets/leeandnote-logo.png" alt="LEE&NOTE">
+    </a>
+    <nav class="siteNav" aria-label="주요 카테고리">
+      <a class="navLink" href="/"><span class="navIcon disclosureIcon"></span>5%보고</a>
+      <a class="navLink" href="/executives.html"><span class="navIcon disclosureIcon"></span>임원보고</a>
+    </nav>
+  </header>
+
+  <main class="earningsPage">
+    <section class="pageHero earningsHero">
+      <div>
+        <p class="eyebrow">DART 실적 발표 모니터</p>
+        <h1>실적 발표 스캐너</h1>
+        <p id="earningsPeriod" class="muted">데이터를 불러오는 중</p>
+      </div>
+      <nav class="earningsTabs" aria-label="실적 페이지 전환">
+        <a class="active" href="/earnings/quarterly">실적 발표</a>
+        <a href="/earnings/turnaround">손익구조 변동</a>
+      </nav>
+    </section>
+
+    <section id="earningsRankings" class="earningsRankings" aria-label="실적 발표 Top5 랭킹"></section>
+
+    <section class="earningsControls" aria-label="실적 발표 필터">
+      <input id="earningsSearch" class="searchInput" type="search" placeholder="종목, 공시구분 검색" aria-label="검색">
+      <select id="earningsMarket" class="filterSelect" aria-label="시장 필터">
+        <option value="all">전체 시장</option>
+        <option value="KOSPI">KOSPI</option>
+        <option value="KOSDAQ">KOSDAQ</option>
+      </select>
+      <select id="earningsReportType" class="filterSelect" aria-label="공시구분 필터">
+        <option value="all">전체 공시구분</option>
+        <option value="잠정실적">잠정실적</option>
+        <option value="분기보고서">분기보고서</option>
+        <option value="반기보고서">반기보고서</option>
+        <option value="사업보고서">사업보고서</option>
+      </select>
+      <select id="earningsSort" class="filterSelect" aria-label="정렬">
+        <option value="receiptDesc">최신 접수순</option>
+        <option value="opYoYDesc">영업이익 YoY 높은 순</option>
+        <option value="opAmountDesc">영업이익 규모 큰 순</option>
+        <option value="salesYoYDesc">매출 YoY 높은 순</option>
+        <option value="opmDesc">OPM 높은 순</option>
+        <option value="opYoYAsc">영업이익 YoY 낮은 순</option>
+      </select>
+    </section>
+
+    <section class="issueList earningsTablePanel" aria-label="실적 발표 테이블">
+      <div class="panelHead">
+        <h2>실적 발표 테이블</h2>
+        <p id="earningsTableHint">매출액, 영업이익, 순이익의 규모와 YoY/QoQ 성장률을 확인합니다.</p>
+      </div>
+      <div id="earningsTable"></div>
+    </section>
+
+    <footer class="siteFooter">
+      <p>본 서비스는 DART 공시와 공개 가격 데이터를 기반으로 한 정보 제공 서비스이며, 특정 종목의 매수·매도 추천이 아닙니다.</p>
+      <nav aria-label="사이트 정책">
+        <a href="/disclaimer.html">투자유의사항</a>
+        <a href="/privacy.html">개인정보처리방침</a>
+        <a href="/terms.html">이용약관</a>
+        <a href="/contact.html">문의</a>
+      </nav>
+    </footer>
+  </main>
+
+  <script src="/data/earnings.js"></script>
+  <script src="/data/prices.js"></script>
+  <script src="/data/current_prices.js"></script>
+  <script src="/earnings.js"></script>
+</body>
+</html>
+
+
+
+
+
+
+
+

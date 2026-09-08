@@ -1,10 +1,19 @@
 {
-  "name": "lee-note-dart-monitor",
-  "version": "0.1.0",
   "private": true,
-  "type": "module",
   "scripts": {
-    "sync:supabase": "node scripts/sync-supabase-cache.mjs",
-    "verify:supabase": "node scripts/verify-supabase-cache.mjs"
+    "convex:dev": "convex dev",
+    "convex:deploy": "convex deploy",
+    "shortform:package": "node shortform/generate_package.mjs",
+    "shortform:short-script": "node shortform/generate_short_script.mjs",
+    "shortform:cards": "node shortform/export_cards_svg.mjs",
+    "shortform:png": "node shortform/render_cards_png.mjs",
+    "shortform:tts": "node shortform/render_tts.mjs",
+    "shortform:subtitles": "node shortform/render_subtitles.mjs",
+    "shortform:video": "node shortform/render_video.mjs"
+  },
+  "devDependencies": {
+    "convex": "^1.25.4",
+    "fflate": "^0.8.2",
+    "typescript": "^5.5.4"
   }
 }

@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="google-adsense-account" content="ca-pub-5230074340613849">
+  <meta name="naver-site-verification" content="98320b375ec48f676f3586776324282d722d905a">
+  <title>리앤노트 | 대형수주보고</title>
+  <meta name="description" content="DART 단일판매·공급계약 공시의 계약금액, 매출액 대비 비중, 계약기간과 최근 가격 흐름을 정리하는 대형수주보고 대시보드입니다.">
+  <link rel="canonical" href="https://leeandnote.com/contracts">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="LEE&NOTE">
+  <meta property="og:title" content="리앤노트 | 대형수주보고">
+  <meta property="og:description" content="DART 단일판매·공급계약 공시를 계약금액과 매출액 대비 비중 중심으로 확인합니다.">
+  <meta property="og:url" content="https://leeandnote.com/contracts">
+  <meta property="og:image" content="https://leeandnote.com/assets/leeandnote-mark.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="리앤노트 | 대형수주보고">
+  <meta name="twitter:description" content="DART 단일판매·공급계약 공시를 계약금액과 매출액 대비 비중 중심으로 확인합니다.">
+  <meta name="twitter:image" content="https://leeandnote.com/assets/leeandnote-mark.png">
+  <link rel="icon" href="/assets/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" href="/assets/favicon-32.png" sizes="32x32">
+  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5230074340613849" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="/styles.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "대형수주보고",
+    "url": "https://leeandnote.com/contracts",
+    "description": "DART 단일판매·공급계약 공시의 계약금액, 매출액 대비 비중, 계약기간과 최근 가격 흐름을 확인하는 데이터 페이지입니다.",
+    "isPartOf": { "@type": "WebSite", "name": "LEE&NOTE", "url": "https://leeandnote.com/" }
+  }
+  </script>
+</head>
+<body data-page-kind="contracts">
+  <header class="topbar">
+    <a class="brandHome" href="/" aria-label="리앤노트 홈">
+      <img class="brandMark" src="/assets/leeandnote-mark.png" alt="">
+      <img class="brandLogo" src="/assets/leeandnote-logo.png" alt="LEE&NOTE">
+    </a>
+    <nav class="siteNav" aria-label="주요 카테고리">
+      <a class="navLink" href="/5percent"><span class="navIcon disclosureIcon"></span>5%보고</a>
+      <a class="navLink" href="/executives"><span class="navIcon disclosureIcon"></span>임원보고</a>
+      <a class="navLink active" href="/contracts" aria-current="page"><span class="navIcon disclosureIcon"></span>대형수주보고</a>
+      <a class="navLink" href="/blog"><span class="navIcon disclosureIcon"></span>블로그</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="pageHero">
+      <div>
+        <p class="eyebrow">DART 단일판매·공급계약 모니터</p>
+        <h1 id="title" class="homeTitle">대형수주보고</h1>
+        <p id="period" class="muted">데이터를 불러오는 중</p>
+      </div>
+    </section>
+
+    <section id="contractRankings" class="topRankings contractRankings" aria-label="대형수주 핵심 큐레이션"></section>
+
+    <div class="contentShell">
+      <section class="issueList contractList" aria-label="대형수주보고 목록">
+        <div class="panelHead">
+          <h2 id="listTitle">일별 대형수주보고 테이블</h2>
+          <p id="listHint">DART 단일판매·공급계약 공시를 계약 규모와 매출액 대비 비중 기준으로 확인합니다.</p>
+        </div>
+        <section class="contractTableToolbar" aria-label="대형수주보고 테이블 도구">
+          <input id="contractSearch" class="searchInput" type="search" placeholder="종목, 계약상대방, 계약내용 검색" aria-label="검색">
+          <button id="contractXlsBtn" class="toolIconButton" type="button" title="엑셀 다운로드"><span aria-hidden="true">▤</span> XLS</button>
+          <button id="contractImgBtn" class="toolIconButton" type="button" title="현재 페이지 이미지 다운로드"><span aria-hidden="true">▧</span> IMG</button>
+          <button id="contractFilterBtn" class="toolIconButton" type="button"><span aria-hidden="true">≡</span> 필터</button>
+          <button id="contractColumnsBtn" class="toolIconButton" type="button"><span aria-hidden="true">#</span> 열</button>
+          <select id="contractPageSize" class="filterSelect pageSizeSelect" aria-label="페이지당 표시 개수">
+            <option value="10">10개씩 보기</option>
+            <option value="20">20개씩 보기</option>
+            <option value="50">50개씩 보기</option>
+          </select>
+        </section>
+
+        <div id="contractList"></div>
+      </section>
+    </div>
+
+
+    <div id="contractFilterModal" class="modalOverlay hidden" role="dialog" aria-modal="true" aria-labelledby="contractFilterTitle">
+      <div class="tableModal small">
+        <div class="modalHead">
+          <div><h3 id="contractFilterTitle">필터</h3><p>대형수주 공시 조건을 좁혀 봅니다.</p></div>
+          <button class="ghostButton modalClose" type="button" data-contract-close="contractFilterModal" aria-label="닫기">×</button>
+        </div>
+        <div class="modalBody">
+          <section class="contractAdvancedFilters modalFilterPanel" aria-label="상세 필터">
+            <label><span>시장</span><select id="contractMarket" class="filterSelect"><option value="all">전체 시장</option><option value="KOSPI">KOSPI</option><option value="KOSDAQ">KOSDAQ</option></select></label>
+            <label><span>정렬</span><select id="contractSort" class="filterSelect"><option value="date">최근 공시순</option><option value="amount">계약금액 큰 순</option><option value="ratio">매출액 대비 큰 순</option><option value="term">계약기간 짧은 순</option></select></label>
+            <label><span>공시구분</span><select id="contractCorrection" class="filterSelect"><option value="all">전체</option><option value="new">신규 공시</option><option value="correction">정정 공시</option></select></label>
+            <label><span>매출액 대비</span><select id="contractRatioFilter" class="filterSelect"><option value="all">전체</option><option value="50">50% 이상</option><option value="100">100% 이상</option></select></label>
+            <label><span>계약금액</span><select id="contractAmountFilter" class="filterSelect"><option value="all">전체</option><option value="10000000000">100억 이상</option><option value="50000000000">500억 이상</option><option value="100000000000">1,000억 이상</option></select></label>
+          </section>
+        </div>
+        <div class="modalActions"><button class="ghostButton" type="button" data-contract-close="contractFilterModal">닫기</button></div>
+      </div>
+    </div>
+
+    <div id="contractColumnsModal" class="modalOverlay hidden" role="dialog" aria-modal="true" aria-labelledby="contractColumnsTitle">
+      <div class="tableModal small">
+        <div class="modalHead">
+          <div><h3 id="contractColumnsTitle">열 설정</h3><p>테이블에 표시할 컬럼을 선택합니다.</p></div>
+          <button class="ghostButton modalClose" type="button" data-contract-close="contractColumnsModal" aria-label="닫기">×</button>
+        </div>
+        <div id="contractColumnPanel" class="modalColumns" aria-label="표시 컬럼 선택"></div>
+        <div class="modalActions"><button class="ghostButton" type="button" data-contract-close="contractColumnsModal">닫기</button></div>
+      </div>
+    </div>
+    <section class="infoEssay" aria-label="대형수주보고 데이터 이용 안내">
+      <div class="infoEssayGrid">
+        <article class="infoEssayCard"><h2>계약금액보다 비중</h2><p>수주 공시는 절대 금액도 중요하지만 회사의 최근 매출액 대비 비중이 더 직접적인 실적 민감도를 보여줍니다. 중소형사의 경우 같은 금액이라도 매출 대비 영향이 훨씬 클 수 있습니다.</p></article>
+        <article class="infoEssayCard"><h2>정정 공시 구분</h2><p>[기재정정]은 신규 계약 체결이 아니라 계약금액, 기간, 상대방 등 기존 조건이 바뀐 공시일 수 있습니다. 신규 수주와 정정 수주는 분리해서 보는 것이 좋습니다.</p></article>
+        <article class="infoEssayCard"><h2>매출 반영 속도</h2><p>계약 종료일까지 남은 기간이 짧을수록 실적 반영 시점이 가까울 수 있습니다. 다만 장기 프로젝트는 진행률, 검수, 납품 조건에 따라 매출 인식이 나뉠 수 있습니다.</p></article>
+      </div>
+      <div class="infoEssayWide"><strong>유의사항:</strong> 본 화면은 DART 단일판매·공급계약 공시를 빠르게 비교하기 위한 정보 정리 서비스입니다. 계약 취소, 정정, 조건부 계약 여부와 실제 매출 인식은 원문과 후속 공시를 함께 확인해야 합니다.</div>
+    </section>
+
+    <footer class="siteFooter">
+      <p>본 서비스는 DART 공시와 공개 가격 데이터를 기반으로 한 정보 제공 서비스이며, 특정 종목의 매수·매도 추천이 아닙니다.</p>
+      <nav aria-label="사이트 정책">
+        <a href="/disclaimer.html">투자유의사항</a>
+        <a href="/privacy.html">개인정보처리방침</a>
+        <a href="/terms.html">이용약관</a>
+        <a href="/contact.html">문의</a>
+      </nav>
+    </footer>
+  </main>
+
+  <script src="/data/disclosure_signals.js"></script>
+  <script src="/data/prices.js"></script>
+  <script src="/data/current_prices.js"></script>
+  <script src="/contracts_app.js"></script>
+</body>
+</html>
+
+
+
