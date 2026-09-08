@@ -355,7 +355,8 @@ async function renderPng(html, outDir, name) {
 }
 
 async function loadTelegramConfig() {
-  const text = await readFile(path.join(ROOT, "telegram_config.local.ps1"), "utf8");
+  const configPath = path.join(ROOT, "telegram_config.local.ps1");
+  const text = existsSync(configPath) ? await readFile(configPath, "utf8") : "";
   const value = (key) => process.env[key] || text.match(new RegExp(`${key}\\s*=\\s*["']([^"']+)`))?.[1] || "";
   const token = value("TELEGRAM_BOT_TOKEN").replace(/^bot/, "");
   const channelId = value("TELEGRAM_CHANNEL_ID");

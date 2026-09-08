@@ -10,6 +10,11 @@ on:
         description: "Report date in yyyyMMdd. Empty uses today's KST date."
         required: false
         type: string
+      send_telegram:
+        description: "Send the 3-image Telegram album. Scheduled runs always send it."
+        required: false
+        default: false
+        type: boolean
       post_x:
         description: "Post the 3-image bundle to X."
         required: false
@@ -99,9 +104,12 @@ jobs:
             "-File", ".\daily_blog_publish_after_check.ps1",
             "-ReportDate", $env:REPORT_DATE,
             "-BackfillDays", "8",
-            "-PublishDays", "120",
-            "-SendSocialCards"
+            "-PublishDays", "120"
           )
+          $sendTelegram = "${{ github.event_name }}" -eq "schedule" -or "${{ inputs.send_telegram }}" -eq "true"
+          if ($sendTelegram -or "${{ inputs.post_x }}" -ne "false" -or "${{ inputs.post_threads }}" -ne "false" -or "${{ inputs.post_instagram }}" -ne "false") {
+            $args += "-SendSocialCards"
+          }
           if ("${{ inputs.post_x }}" -ne "false") { $args += "-PostXCards" }
           if ("${{ inputs.post_threads }}" -ne "false") { $args += "-PostThreadsCards" }
           if ("${{ inputs.post_instagram }}" -ne "false") { $args += "-PostInstagramCards" }
