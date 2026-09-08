@@ -58,7 +58,8 @@ function Invoke-DartJson([string]$Path, [hashtable]$Params) {
   }
   if (-not $response) {
     $curl = Get-Command curl.exe -ErrorAction SilentlyContinue
-    if (-not $curl) { throw "DART API request failed and curl.exe is unavailable." }
+    if (-not $curl) { $curl = Get-Command curl -ErrorAction SilentlyContinue }
+    if (-not $curl) { throw "DART API request failed and curl is unavailable." }
     $raw = & $curl.Source -fsSL --retry 4 --retry-all-errors --connect-timeout 20 --max-time 60 -A "dart-disclosure-signals/1.0" $uri
     if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($raw)) {
       throw "DART API curl fallback failed with exit code $LASTEXITCODE"
