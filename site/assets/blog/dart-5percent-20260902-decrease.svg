@@ -1,0 +1,80 @@
+
+  <svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1920" viewBox="0 0 1080 1920">
+    <rect width="1080" height="1920" fill="#f8f8f7"/>
+    <foreignObject x="86" y="92" width="908" height="1720">
+      <div xmlns="http://www.w3.org/1999/xhtml" class="card">
+        <style>
+          .card{font-family:Pretendard,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#333}
+          .top{display:flex;align-items:center;justify-content:space-between;margin-bottom:58px}
+          .date{color:#ff4d0d;font-size:36px;font-weight:800;letter-spacing:-.02em}
+          .logo{color:#666;font-size:30px;font-weight:800;letter-spacing:-.04em}
+          h1{margin:0 0 8px;font-size:48px;line-height:1.18;letter-spacing:-.04em;color:#444}
+          h2{margin:0 0 62px;font-size:46px;line-height:1.15;letter-spacing:-.04em;color:#777}
+          table{width:100%;border-collapse:collapse;table-layout:fixed;background:white;border:1px solid #cfcfcf}
+          th,td{border:1px solid #cfcfcf;text-align:center;vertical-align:middle}
+          th{height:68px;background:#ecebea;color:#444;font-size:21px;font-weight:800}
+          td{height:112px;padding:10px 12px;font-size:20px;line-height:1.28;font-weight:650}
+          td:nth-child(1){width:24%}td:nth-child(2){width:29%}td:nth-child(3){width:22%}td:nth-child(4){width:25%}
+          small{display:block;margin-top:6px;color:#777;font-size:16px;font-weight:700;line-height:1.2}
+          .up{color:#ff3b30}.down{color:#1f6feb}.flat{color:#777}
+          .source{margin-top:38px;text-align:right;color:#aaa;font-size:15px;font-weight:700}
+        </style>
+        <div class="top"><div class="date">2026.09.02</div><div class="logo">LEE &amp; NOTE</div></div>
+        <h1>Daily Dart 전자공시 요약표</h1>
+        <h2>#지분율하락</h2>
+        <table>
+          <thead><tr><th>종목</th><th>주주/제출인</th><th>직전→이번<br/><small>(단위:%)</small></th><th>보고사유</th></tr></thead>
+          <tbody>
+    <tr>
+      <td><strong>에스앤더블류</strong><br><small>103230 · KOSDAQ</small></td>
+      <td>정화섭<br><small>오너·특수관계</small></td>
+      <td><strong>50.57 → 0</strong><br><span class="down">▼50.57%p</span></td>
+      <td>대표보고자 변경에 따른 기존대표보고자의 연명보고 제외</td>
+    </tr>
+    <tr>
+      <td><strong>오픈베이스</strong><br><small>049480 · KOSDAQ</small></td>
+      <td>정진섭<br><small>오너·특수관계</small></td>
+      <td><strong>27.64 → 0</strong><br><span class="down">▼27.64%p</span></td>
+      <td>대표보고자 변경에 따른 변동보고(증여)</td>
+    </tr>
+    <tr>
+      <td><strong>루멘스</strong><br><small>038060 · KOSDAQ</small></td>
+      <td>디티씨<br><small>오너·특수관계</small></td>
+      <td><strong>21.97 → 0</strong><br><span class="down">▼21.97%p</span></td>
+      <td>주식 양수도 계약 이행에 따른 주식양도, 대표보고자변경으로 인한 변동</td>
+    </tr>
+    <tr>
+      <td><strong>사토시홀딩스</strong><br><small>223310 · KOSDAQ</small></td>
+      <td>메타플렉스<br><small>오너·특수관계</small></td>
+      <td><strong>50.64 → 43.67</strong><br><span class="down">▼6.97%p</span></td>
+      <td>특별관계자의 보유주식 장내매도 및 장외매도</td>
+    </tr>
+    <tr>
+      <td><strong>지에프아이</strong><br><small>493330 · KOSDAQ</small></td>
+      <td>비엔케이 안전 신기술투자조합 제2호<br><small>기관·투자자</small></td>
+      <td><strong>18.48 → 15.07</strong><br><span class="down">▼3.41%p</span></td>
+      <td>장내매매에 따른 변동보고</td>
+    </tr>
+    <tr>
+      <td><strong>교보19호스팩</strong><br><small>0098T0 · KOSDAQ</small></td>
+      <td>더블유자산운용<br><small>기관·투자자</small></td>
+      <td><strong>8.37 → 5.5</strong><br><span class="down">▼2.87%p</span></td>
+      <td>보유비율 1% 이상 변동</td>
+    </tr>
+    <tr>
+      <td><strong>코스메카코리아</strong><br><small>241710 · KOSDAQ</small></td>
+      <td>KB자산운용<br><small>기관·투자자</small></td>
+      <td><strong>5.34 → 3.16</strong><br><span class="down">▼2.18%p</span></td>
+      <td>1%이상 변동</td>
+    </tr>
+    <tr>
+      <td><strong>한스바이오메드</strong><br><small>042520 · KOSDAQ</small></td>
+      <td>KB자산운용<br><small>기관·투자자</small></td>
+      <td><strong>5.89 → 4.3</strong><br><span class="down">▼1.59%p</span></td>
+      <td>1%이상 변동</td>
+    </tr></tbody>
+        </table>
+        <div class="source">출처: DART 전자공시</div>
+      </div>
+    </foreignObject>
+  </svg>

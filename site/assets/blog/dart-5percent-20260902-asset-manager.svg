@@ -1,0 +1,68 @@
+
+  <svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1920" viewBox="0 0 1080 1920">
+    <rect width="1080" height="1920" fill="#f8f8f7"/>
+    <foreignObject x="86" y="92" width="908" height="1720">
+      <div xmlns="http://www.w3.org/1999/xhtml" class="card">
+        <style>
+          .card{font-family:Pretendard,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#333}
+          .top{display:flex;align-items:center;justify-content:space-between;margin-bottom:58px}
+          .date{color:#ff4d0d;font-size:36px;font-weight:800;letter-spacing:-.02em}
+          .logo{color:#666;font-size:30px;font-weight:800;letter-spacing:-.04em}
+          h1{margin:0 0 8px;font-size:48px;line-height:1.18;letter-spacing:-.04em;color:#444}
+          h2{margin:0 0 62px;font-size:46px;line-height:1.15;letter-spacing:-.04em;color:#777}
+          table{width:100%;border-collapse:collapse;table-layout:fixed;background:white;border:1px solid #cfcfcf}
+          th,td{border:1px solid #cfcfcf;text-align:center;vertical-align:middle}
+          th{height:68px;background:#ecebea;color:#444;font-size:21px;font-weight:800}
+          td{height:150px;padding:10px 12px;font-size:20px;line-height:1.28;font-weight:650}
+          td:nth-child(1){width:24%}td:nth-child(2){width:29%}td:nth-child(3){width:22%}td:nth-child(4){width:25%}
+          small{display:block;margin-top:6px;color:#777;font-size:16px;font-weight:700;line-height:1.2}
+          .up{color:#ff3b30}.down{color:#1f6feb}.flat{color:#777}
+          .source{margin-top:38px;text-align:right;color:#aaa;font-size:15px;font-weight:700}
+        </style>
+        <div class="top"><div class="date">2026.09.02</div><div class="logo">LEE &amp; NOTE</div></div>
+        <h1>Daily Dart 전자공시 요약표</h1>
+        <h2>#대형자산운용사</h2>
+        <table>
+          <thead><tr><th>종목</th><th>주주/제출인</th><th>직전→이번<br/><small>(단위:%)</small></th><th>보고사유</th></tr></thead>
+          <tbody>
+    <tr>
+      <td><strong>신한지주</strong><br><small>055550 · KOSPI</small></td>
+      <td>CapitalResearchandManagementCompany<br><small>외국계</small></td>
+      <td><strong>4.99 → 5.02</strong><br><span class="up">▲0.03%p</span></td>
+      <td>단순투자목적으로 장내에서 발행회사의 주식 매수 - 단순투자목적으로 장외에서 </td>
+    </tr>
+    <tr>
+      <td><strong>에스오에스랩</strong><br><small>464080 · KOSDAQ</small></td>
+      <td>KB자산운용<br><small>기관·투자자</small></td>
+      <td><strong>5.36 → 6.34</strong><br><span class="up">▲0.98%p</span></td>
+      <td>1%이상 변동</td>
+    </tr>
+    <tr>
+      <td><strong>KT나스미디어</strong><br><small>089600 · KOSDAQ</small></td>
+      <td>브이아이피자산운용<br><small>기관·투자자</small></td>
+      <td><strong>4.99 → 5.87</strong><br><span class="up">▲0.88%p</span></td>
+      <td>5% 이상 신규취득</td>
+    </tr>
+    <tr>
+      <td><strong>코스메카코리아</strong><br><small>241710 · KOSDAQ</small></td>
+      <td>KB자산운용<br><small>기관·투자자</small></td>
+      <td><strong>5.34 → 3.16</strong><br><span class="down">▼2.18%p</span></td>
+      <td>1%이상 변동</td>
+    </tr>
+    <tr>
+      <td><strong>한스바이오메드</strong><br><small>042520 · KOSDAQ</small></td>
+      <td>KB자산운용<br><small>기관·투자자</small></td>
+      <td><strong>5.89 → 4.3</strong><br><span class="down">▼1.59%p</span></td>
+      <td>1%이상 변동</td>
+    </tr>
+    <tr>
+      <td><strong>교보19호스팩</strong><br><small>0098T0 · KOSDAQ</small></td>
+      <td>더블유자산운용<br><small>기관·투자자</small></td>
+      <td><strong>8.37 → 5.5</strong><br><span class="down">▼2.87%p</span></td>
+      <td>보유비율 1% 이상 변동</td>
+    </tr></tbody>
+        </table>
+        <div class="source">출처: DART 전자공시</div>
+      </div>
+    </foreignObject>
+  </svg>

@@ -1,0 +1,80 @@
+
+  <svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1920" viewBox="0 0 1080 1920">
+    <rect width="1080" height="1920" fill="#f8f8f7"/>
+    <foreignObject x="86" y="92" width="908" height="1720">
+      <div xmlns="http://www.w3.org/1999/xhtml" class="card">
+        <style>
+          .card{font-family:Pretendard,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#333}
+          .top{display:flex;align-items:center;justify-content:space-between;margin-bottom:58px}
+          .date{color:#ff4d0d;font-size:36px;font-weight:800;letter-spacing:-.02em}
+          .logo{color:#666;font-size:30px;font-weight:800;letter-spacing:-.04em}
+          h1{margin:0 0 8px;font-size:48px;line-height:1.18;letter-spacing:-.04em;color:#444}
+          h2{margin:0 0 62px;font-size:46px;line-height:1.15;letter-spacing:-.04em;color:#777}
+          table{width:100%;border-collapse:collapse;table-layout:fixed;background:white;border:1px solid #cfcfcf}
+          th,td{border:1px solid #cfcfcf;text-align:center;vertical-align:middle}
+          th{height:68px;background:#ecebea;color:#444;font-size:21px;font-weight:800}
+          td{height:112px;padding:10px 12px;font-size:20px;line-height:1.28;font-weight:650}
+          td:nth-child(1){width:24%}td:nth-child(2){width:29%}td:nth-child(3){width:22%}td:nth-child(4){width:25%}
+          small{display:block;margin-top:6px;color:#777;font-size:16px;font-weight:700;line-height:1.2}
+          .up{color:#ff3b30}.down{color:#1f6feb}.flat{color:#777}
+          .source{margin-top:38px;text-align:right;color:#aaa;font-size:15px;font-weight:700}
+        </style>
+        <div class="top"><div class="date">2026.09.08</div><div class="logo">LEE &amp; NOTE</div></div>
+        <h1>Daily Dart 전자공시 요약표</h1>
+        <h2>#오너특수관계</h2>
+        <table>
+          <thead><tr><th>종목</th><th>주주/제출인</th><th>직전→이번<br/><small>(단위:%)</small></th><th>보고사유</th></tr></thead>
+          <tbody>
+    <tr>
+      <td><strong>한탑</strong><br><small>002680 · KOSDAQ</small></td>
+      <td>류원기<br><small>오너·특수관계</small></td>
+      <td><strong>42.4 → 51.56</strong><br><span class="up">▲9.16%p</span></td>
+      <td>특별관계자의 제3자배정 유상증자에 따른 신주취득 및 특별관계자의 주식담보대출</td>
+    </tr>
+    <tr>
+      <td><strong>고영</strong><br><small>098460 · KOSDAQ</small></td>
+      <td>J.P.MORGANSECURITIESPLC<br><small>오너·특수관계</small></td>
+      <td><strong>5.11 → 4.91</strong><br><span class="down">▼0.2%p</span></td>
+      <td>특별관계자 변동</td>
+    </tr>
+    <tr>
+      <td><strong>에스에이티</strong><br><small>060540 · KOSDAQ</small></td>
+      <td>에프넷<br><small>오너·특수관계</small></td>
+      <td><strong>42.14 → 43.18</strong><br><span class="up">▲1.04%p</span></td>
+      <td>최대주주의 장내 추가 매수</td>
+    </tr>
+    <tr>
+      <td><strong>더라미</strong><br><small>032860 · KOSDAQ</small></td>
+      <td>바이오스마트<br><small>오너·특수관계</small></td>
+      <td><strong>54.17 → 54.75</strong><br><span class="up">▲0.58%p</span></td>
+      <td>주식 병합에 따른 발행주식 총수 및 보유 주식수 변동 특별관계자의 장내매수</td>
+    </tr>
+    <tr>
+      <td><strong>에스제이그룹</strong><br><small>306040 · KOSDAQ</small></td>
+      <td>이주영<br><small>오너·특수관계</small></td>
+      <td><strong>55.42 → 56.03</strong><br><span class="up">▲0.61%p</span></td>
+      <td>최대주주 장내매수에 따른 보유주식 수 및 보유비율 변동</td>
+    </tr>
+    <tr>
+      <td><strong>씨앤투스</strong><br><small>352700 · KOSDAQ</small></td>
+      <td>하춘욱<br><small>오너·특수관계</small></td>
+      <td><strong>49.19 → 49.33</strong><br><span class="up">▲0.14%p</span></td>
+      <td>특수관계인 지분 추가 취득</td>
+    </tr>
+    <tr>
+      <td><strong>지엔코</strong><br><small>065060 · KOSDAQ</small></td>
+      <td>크레오에스지<br><small>오너·특수관계</small></td>
+      <td><strong>73.88 → 73.95</strong><br><span class="up">▲0.07%p</span></td>
+      <td>특별관계자 주식장내매수 및 주식근질권설정변경계약체결외</td>
+    </tr>
+    <tr>
+      <td><strong>수성웹툰</strong><br><small>084180 · KOSDAQ</small></td>
+      <td>투믹스홀딩스<br><small>오너·특수관계</small></td>
+      <td><strong>43.13 → 42.94</strong><br><span class="down">▼0.19%p</span></td>
+      <td>[변동] 특수관계자 주식 취득 및 전환사채 전환권 소멸</td>
+    </tr></tbody>
+        </table>
+        <div class="source">출처: DART 전자공시</div>
+      </div>
+    </foreignObject>
+  </svg>

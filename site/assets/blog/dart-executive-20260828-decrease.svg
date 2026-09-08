@@ -1,0 +1,80 @@
+
+  <svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1920" viewBox="0 0 1080 1920">
+    <rect width="1080" height="1920" fill="#f8f8f7"/>
+    <foreignObject x="86" y="92" width="908" height="1720">
+      <div xmlns="http://www.w3.org/1999/xhtml" class="card">
+        <style>
+          .card{font-family:Pretendard,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#333}
+          .top{display:flex;align-items:center;justify-content:space-between;margin-bottom:58px}
+          .date{color:#ff4d0d;font-size:36px;font-weight:800;letter-spacing:-.02em}
+          .logo{color:#666;font-size:30px;font-weight:800;letter-spacing:-.04em}
+          h1{margin:0 0 8px;font-size:48px;line-height:1.18;letter-spacing:-.04em;color:#444}
+          h2{margin:0 0 62px;font-size:46px;line-height:1.15;letter-spacing:-.04em;color:#777}
+          table{width:100%;border-collapse:collapse;table-layout:fixed;background:white;border:1px solid #cfcfcf}
+          th,td{border:1px solid #cfcfcf;text-align:center;vertical-align:middle}
+          th{height:68px;background:#ecebea;color:#444;font-size:21px;font-weight:800}
+          td{height:112px;padding:10px 12px;font-size:20px;line-height:1.28;font-weight:650}
+          td:nth-child(1){width:24%}td:nth-child(2){width:29%}td:nth-child(3){width:22%}td:nth-child(4){width:25%}
+          small{display:block;margin-top:6px;color:#777;font-size:16px;font-weight:700;line-height:1.2}
+          .up{color:#ff3b30}.down{color:#1f6feb}.flat{color:#777}
+          .source{margin-top:38px;text-align:right;color:#aaa;font-size:15px;font-weight:700}
+        </style>
+        <div class="top"><div class="date">2026.08.28</div><div class="logo">LEE &amp; NOTE</div></div>
+        <h1>Daily Dart 임원보고 요약표</h1>
+        <h2>#임원보유감소</h2>
+        <table>
+          <thead><tr><th>종목</th><th>주주/제출인</th><th>직전→이번<br/><small>(단위:%)</small></th><th>보고사유</th></tr></thead>
+          <tbody>
+    <tr>
+      <td><strong>롯데관광개발</strong><br><small>032350 · KOSPI</small></td>
+      <td>신정희<br><small>이사 · 등기임원</small></td>
+      <td><strong>3.08 → 0</strong><br><span class="down">▼3.08%p</span></td>
+      <td>임원·주요주주 소유상황 변동</td>
+    </tr>
+    <tr>
+      <td><strong>유성기업</strong><br><small>002920 · KOSPI</small></td>
+      <td>류시영<br><small>회 장 · 10%이상주주 · 비등기임원</small></td>
+      <td><strong>22.05 → 17.42</strong><br><span class="down">▼4.63%p</span></td>
+      <td>임원·주요주주 소유상황 변동</td>
+    </tr>
+    <tr>
+      <td><strong>대동스틸</strong><br><small>048470 · KOSDAQ</small></td>
+      <td>오수복<br><small>10%이상주주</small></td>
+      <td><strong>10.36 → 0</strong><br><span class="down">▼10.36%p</span></td>
+      <td>임원·주요주주 소유상황 변동</td>
+    </tr>
+    <tr>
+      <td><strong>센서뷰</strong><br><small>321370 · KOSDAQ</small></td>
+      <td>김병남<br><small>대표이사 · 등기임원</small></td>
+      <td><strong>8.65 → 6.41</strong><br><span class="down">▼2.24%p</span></td>
+      <td>임원·주요주주 소유상황 변동</td>
+    </tr>
+    <tr>
+      <td><strong>국영지앤엠</strong><br><small>006050 · KOSDAQ</small></td>
+      <td>김정숙<br><small>부사장 · 등기임원</small></td>
+      <td><strong>2.03 → 2.03</strong><br><span class="flat">0%p</span></td>
+      <td>임원·주요주주 소유상황 변동</td>
+    </tr>
+    <tr>
+      <td><strong>국영지앤엠</strong><br><small>006050 · KOSDAQ</small></td>
+      <td>최저스틴제이<br><small>대표이사 사장 · 등기임원</small></td>
+      <td><strong>1.88 → 1.88</strong><br><span class="flat">0%p</span></td>
+      <td>임원·주요주주 소유상황 변동</td>
+    </tr>
+    <tr>
+      <td><strong>센서뷰</strong><br><small>321370 · KOSDAQ</small></td>
+      <td>강경일<br><small>전무이사 · 등기임원</small></td>
+      <td><strong>4.16 → 3.07</strong><br><span class="down">▼1.09%p</span></td>
+      <td>임원·주요주주 소유상황 변동</td>
+    </tr>
+    <tr>
+      <td><strong>에코아이</strong><br><small>448280 · KOSDAQ</small></td>
+      <td>안상전<br><small>본부장/상무 · 비등기임원</small></td>
+      <td><strong>6.57 → 6.31</strong><br><span class="down">▼0.26%p</span></td>
+      <td>임원·주요주주 소유상황 변동</td>
+    </tr></tbody>
+        </table>
+        <div class="source">출처: DART 전자공시</div>
+      </div>
+    </foreignObject>
+  </svg>

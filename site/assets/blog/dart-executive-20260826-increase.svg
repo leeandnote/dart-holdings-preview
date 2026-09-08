@@ -1,0 +1,80 @@
+
+  <svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1920" viewBox="0 0 1080 1920">
+    <rect width="1080" height="1920" fill="#f8f8f7"/>
+    <foreignObject x="86" y="92" width="908" height="1720">
+      <div xmlns="http://www.w3.org/1999/xhtml" class="card">
+        <style>
+          .card{font-family:Pretendard,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#333}
+          .top{display:flex;align-items:center;justify-content:space-between;margin-bottom:58px}
+          .date{color:#ff4d0d;font-size:36px;font-weight:800;letter-spacing:-.02em}
+          .logo{color:#666;font-size:30px;font-weight:800;letter-spacing:-.04em}
+          h1{margin:0 0 8px;font-size:48px;line-height:1.18;letter-spacing:-.04em;color:#444}
+          h2{margin:0 0 62px;font-size:46px;line-height:1.15;letter-spacing:-.04em;color:#777}
+          table{width:100%;border-collapse:collapse;table-layout:fixed;background:white;border:1px solid #cfcfcf}
+          th,td{border:1px solid #cfcfcf;text-align:center;vertical-align:middle}
+          th{height:68px;background:#ecebea;color:#444;font-size:21px;font-weight:800}
+          td{height:112px;padding:10px 12px;font-size:20px;line-height:1.28;font-weight:650}
+          td:nth-child(1){width:24%}td:nth-child(2){width:29%}td:nth-child(3){width:22%}td:nth-child(4){width:25%}
+          small{display:block;margin-top:6px;color:#777;font-size:16px;font-weight:700;line-height:1.2}
+          .up{color:#ff3b30}.down{color:#1f6feb}.flat{color:#777}
+          .source{margin-top:38px;text-align:right;color:#aaa;font-size:15px;font-weight:700}
+        </style>
+        <div class="top"><div class="date">2026.08.26</div><div class="logo">LEE &amp; NOTE</div></div>
+        <h1>Daily Dart 임원보고 요약표</h1>
+        <h2>#임원보유증가</h2>
+        <table>
+          <thead><tr><th>종목</th><th>주주/제출인</th><th>직전→이번<br/><small>(단위:%)</small></th><th>보고사유</th></tr></thead>
+          <tbody>
+    <tr>
+      <td><strong>S-Oil</strong><br><small>010950 · KOSPI</small></td>
+      <td>국민연금공단<br><small>10%이상주주</small></td>
+      <td><strong>0 → 9.7</strong><br><span class="up">▲9.7%p</span></td>
+      <td>임원·주요주주 소유상황 변동</td>
+    </tr>
+    <tr>
+      <td><strong>에코심플렉스</strong><br><small>038870 · KOSDAQ</small></td>
+      <td>농업회사법인토탈아그로<br><small>10%이상주주</small></td>
+      <td><strong>21.66 → 35.98</strong><br><span class="up">▲14.32%p</span></td>
+      <td>임원·주요주주 소유상황 변동</td>
+    </tr>
+    <tr>
+      <td><strong>HLB제약</strong><br><small>047920 · KOSDAQ</small></td>
+      <td>HLB생명과학<br><small>10%이상주주</small></td>
+      <td><strong>16.16 → 18.32</strong><br><span class="up">▲2.16%p</span></td>
+      <td>임원·주요주주 소유상황 변동</td>
+    </tr>
+    <tr>
+      <td><strong>인성정보</strong><br><small>033230 · KOSDAQ</small></td>
+      <td>에스넷<br><small>10%이상주주</small></td>
+      <td><strong>19.09 → 20.36</strong><br><span class="up">▲1.27%p</span></td>
+      <td>임원·주요주주 소유상황 변동</td>
+    </tr>
+    <tr>
+      <td><strong>코웨이</strong><br><small>021240 · KOSPI</small></td>
+      <td>넷마블<br><small>10%이상주주</small></td>
+      <td><strong>26.96 → 27.17</strong><br><span class="up">▲0.21%p</span></td>
+      <td>임원·주요주주 소유상황 변동</td>
+    </tr>
+    <tr>
+      <td><strong>자비스</strong><br><small>254120 · KOSDAQ</small></td>
+      <td>김형철<br><small>대표이사 · 10%이상주주 · 등기임원</small></td>
+      <td><strong>24.58 → 25.01</strong><br><span class="up">▲0.43%p</span></td>
+      <td>임원·주요주주 소유상황 변동</td>
+    </tr>
+    <tr>
+      <td><strong>카스</strong><br><small>016920 · KOSDAQ</small></td>
+      <td>전종일<br><small>전무이사 · 등기임원</small></td>
+      <td><strong>0.16 → 0.66</strong><br><span class="up">▲0.5%p</span></td>
+      <td>임원·주요주주 소유상황 변동</td>
+    </tr>
+    <tr>
+      <td><strong>MDS스피어</strong><br><small>009810 · KOSPI</small></td>
+      <td>트라이콘홀딩스<br><small>사실상지배주주</small></td>
+      <td><strong>0.8 → 1.55</strong><br><span class="up">▲0.75%p</span></td>
+      <td>임원·주요주주 소유상황 변동</td>
+    </tr></tbody>
+        </table>
+        <div class="source">출처: DART 전자공시</div>
+      </div>
+    </foreignObject>
+  </svg>

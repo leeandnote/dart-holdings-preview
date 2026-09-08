@@ -1,0 +1,80 @@
+
+  <svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1920" viewBox="0 0 1080 1920">
+    <rect width="1080" height="1920" fill="#f8f8f7"/>
+    <foreignObject x="86" y="92" width="908" height="1720">
+      <div xmlns="http://www.w3.org/1999/xhtml" class="card">
+        <style>
+          .card{font-family:Pretendard,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#333}
+          .top{display:flex;align-items:center;justify-content:space-between;margin-bottom:58px}
+          .date{color:#ff4d0d;font-size:36px;font-weight:800;letter-spacing:-.02em}
+          .logo{color:#666;font-size:30px;font-weight:800;letter-spacing:-.04em}
+          h1{margin:0 0 8px;font-size:48px;line-height:1.18;letter-spacing:-.04em;color:#444}
+          h2{margin:0 0 62px;font-size:46px;line-height:1.15;letter-spacing:-.04em;color:#777}
+          table{width:100%;border-collapse:collapse;table-layout:fixed;background:white;border:1px solid #cfcfcf}
+          th,td{border:1px solid #cfcfcf;text-align:center;vertical-align:middle}
+          th{height:68px;background:#ecebea;color:#444;font-size:21px;font-weight:800}
+          td{height:112px;padding:10px 12px;font-size:20px;line-height:1.28;font-weight:650}
+          td:nth-child(1){width:24%}td:nth-child(2){width:29%}td:nth-child(3){width:22%}td:nth-child(4){width:25%}
+          small{display:block;margin-top:6px;color:#777;font-size:16px;font-weight:700;line-height:1.2}
+          .up{color:#ff3b30}.down{color:#1f6feb}.flat{color:#777}
+          .source{margin-top:38px;text-align:right;color:#aaa;font-size:15px;font-weight:700}
+        </style>
+        <div class="top"><div class="date">2026.09.04</div><div class="logo">LEE &amp; NOTE</div></div>
+        <h1>Daily Dart 임원보고 요약표</h1>
+        <h2>#임원변동금액</h2>
+        <table>
+          <thead><tr><th>종목</th><th>주주/제출인</th><th>직전→이번<br/><small>(단위:%)</small></th><th>보고사유</th></tr></thead>
+          <tbody>
+    <tr>
+      <td><strong>KR모터스</strong><br><small>000040 · KOSPI</small></td>
+      <td>라피너스콘코르디아제1호사모투자<br><small>10%이상주주</small></td>
+      <td><strong>0 → 36.2</strong><br><span class="up">▲36.2%p</span></td>
+      <td>임원·주요주주 소유상황 변동</td>
+    </tr>
+    <tr>
+      <td><strong>큐리오시스</strong><br><small>494120 · KOSDAQ</small></td>
+      <td>안희돈<br><small>부사장 · 비등기임원</small></td>
+      <td><strong>1.15 → 1.16</strong><br><span class="up">▲0.01%p</span></td>
+      <td>임원·주요주주 소유상황 변동</td>
+    </tr>
+    <tr>
+      <td><strong>진양화학</strong><br><small>051630 · KOSPI</small></td>
+      <td>진양홀딩스<br><small>사실상지배주주</small></td>
+      <td><strong>68.2 → 69.2</strong><br><span class="up">▲1%p</span></td>
+      <td>임원·주요주주 소유상황 변동</td>
+    </tr>
+    <tr>
+      <td><strong>휴마시스</strong><br><small>205470 · KOSDAQ</small></td>
+      <td>인콘<br><small>사실상지배주주</small></td>
+      <td><strong>8.66 → 9.01</strong><br><span class="up">▲0.35%p</span></td>
+      <td>임원·주요주주 소유상황 변동</td>
+    </tr>
+    <tr>
+      <td><strong>진양화학</strong><br><small>051630 · KOSPI</small></td>
+      <td>양준영<br><small>회장 · 등기임원</small></td>
+      <td><strong>0 → 0.75</strong><br><span class="up">▲0.75%p</span></td>
+      <td>임원·주요주주 소유상황 변동</td>
+    </tr>
+    <tr>
+      <td><strong>더코디</strong><br><small>224060 · KOSDAQ</small></td>
+      <td>노희성<br><small>이사 · 비등기임원</small></td>
+      <td><strong>0 → 0.07</strong><br><span class="up">▲0.07%p</span></td>
+      <td>임원·주요주주 소유상황 변동</td>
+    </tr>
+    <tr>
+      <td><strong>더코디</strong><br><small>224060 · KOSDAQ</small></td>
+      <td>양기식<br><small>상무이사 · 비등기임원</small></td>
+      <td><strong>0 → 0.08</strong><br><span class="up">▲0.08%p</span></td>
+      <td>임원·주요주주 소유상황 변동</td>
+    </tr>
+    <tr>
+      <td><strong>더코디</strong><br><small>224060 · KOSDAQ</small></td>
+      <td>배효찬<br><small>이사 · 비등기임원</small></td>
+      <td><strong>0 → 0.06</strong><br><span class="up">▲0.06%p</span></td>
+      <td>임원·주요주주 소유상황 변동</td>
+    </tr></tbody>
+        </table>
+        <div class="source">출처: DART 전자공시</div>
+      </div>
+    </foreignObject>
+  </svg>
