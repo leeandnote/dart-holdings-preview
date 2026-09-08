@@ -18,8 +18,9 @@ Set-Location $root
 $dartConfig = Join-Path $root "dart_config.local.ps1"
 if (Test-Path -LiteralPath $dartConfig) { . $dartConfig }
 
-$bundledNode = Join-Path $env:USERPROFILE ".cache\codex-runtimes\codex-primary-runtime\dependencies\node\bin\node.exe"
-$bundledPnpm = Join-Path $env:USERPROFILE ".cache\codex-runtimes\codex-primary-runtime\dependencies\bin\fallback\pnpm.cmd"
+$userHome = if ($env:USERPROFILE) { $env:USERPROFILE } else { $HOME }
+$bundledNode = Join-Path $userHome ".cache\codex-runtimes\codex-primary-runtime\dependencies\node\bin\node.exe"
+$bundledPnpm = Join-Path $userHome ".cache\codex-runtimes\codex-primary-runtime\dependencies\bin\fallback\pnpm.cmd"
 
 if (Test-Path -LiteralPath $bundledNode) {
   $node = $bundledNode
