@@ -1,0 +1,80 @@
+
+  <svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1920" viewBox="0 0 1080 1920">
+    <rect width="1080" height="1920" fill="#f8f8f7"/>
+    <foreignObject x="86" y="92" width="908" height="1720">
+      <div xmlns="http://www.w3.org/1999/xhtml" class="card">
+        <style>
+          .card{font-family:Pretendard,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#333}
+          .top{display:flex;align-items:center;justify-content:space-between;margin-bottom:58px}
+          .date{color:#ff4d0d;font-size:36px;font-weight:800;letter-spacing:-.02em}
+          .logo{color:#666;font-size:30px;font-weight:800;letter-spacing:-.04em}
+          h1{margin:0 0 8px;font-size:48px;line-height:1.18;letter-spacing:-.04em;color:#444}
+          h2{margin:0 0 62px;font-size:46px;line-height:1.15;letter-spacing:-.04em;color:#777}
+          table{width:100%;border-collapse:collapse;table-layout:fixed;background:white;border:1px solid #cfcfcf}
+          th,td{border:1px solid #cfcfcf;text-align:center;vertical-align:middle}
+          th{height:68px;background:#ecebea;color:#444;font-size:21px;font-weight:800}
+          td{height:112px;padding:10px 12px;font-size:20px;line-height:1.28;font-weight:650}
+          td:nth-child(1){width:24%}td:nth-child(2){width:29%}td:nth-child(3){width:22%}td:nth-child(4){width:25%}
+          small{display:block;margin-top:6px;color:#777;font-size:16px;font-weight:700;line-height:1.2}
+          .up{color:#ff3b30}.down{color:#1f6feb}.flat{color:#777}
+          .source{margin-top:38px;text-align:right;color:#aaa;font-size:15px;font-weight:700}
+        </style>
+        <div class="top"><div class="date">2026.09.01</div><div class="logo">LEE &amp; NOTE</div></div>
+        <h1>Daily Dart 전자공시 요약표</h1>
+        <h2>#오너특수관계</h2>
+        <table>
+          <thead><tr><th>종목</th><th>주주/제출인</th><th>직전→이번<br/><small>(단위:%)</small></th><th>보고사유</th></tr></thead>
+          <tbody>
+    <tr>
+      <td><strong>새빗켐</strong><br><small>107600 · KOSDAQ</small></td>
+      <td>박민규<br><small>오너·특수관계</small></td>
+      <td><strong>49.84 → 0</strong><br><span class="down">▼49.84%p</span></td>
+      <td>매수인 지위 이전 합의, 주식매매계약 종결 및 주식근질권설정계약 체결 - 보</td>
+    </tr>
+    <tr>
+      <td><strong>아티스트스튜디오</strong><br><small>200350 · KOSDAQ</small></td>
+      <td>아티스트컴퍼니<br><small>오너·특수관계</small></td>
+      <td><strong>34.43 → 34.43</strong><br><span class="flat">0%p</span></td>
+      <td>기 공시된 특별관계자 간 장외 주식양수도 계약 이행(잔금 지급 및 주식 인도</td>
+    </tr>
+    <tr>
+      <td><strong>성호전자</strong><br><small>043260 · KOSDAQ</small></td>
+      <td>서룡전자<br><small>오너·특수관계</small></td>
+      <td><strong>64.63 → 64.63</strong><br><span class="flat">0%p</span></td>
+      <td>특수관계인의 장내매수, 특수관계인과의 장외거래, 추가근질권 설정</td>
+    </tr>
+    <tr>
+      <td><strong>남선알미늄</strong><br><small>008350 · KOSPI</small></td>
+      <td>삼라<br><small>오너·특수관계</small></td>
+      <td><strong>30 → 30.9</strong><br><span class="up">▲0.9%p</span></td>
+      <td>특별관계자 변동</td>
+    </tr>
+    <tr>
+      <td><strong>에이치브이엠</strong><br><small>295310 · KOSDAQ</small></td>
+      <td>문승호<br><small>오너·특수관계</small></td>
+      <td><strong>35.17 → 35.04</strong><br><span class="down">▼0.13%p</span></td>
+      <td>특별관계자의 장내매수</td>
+    </tr>
+    <tr>
+      <td><strong>젬백스</strong><br><small>082270 · KOSDAQ</small></td>
+      <td>젬앤컴퍼니<br><small>오너·특수관계</small></td>
+      <td><strong>25.79 → 25.3</strong><br><span class="down">▼0.49%p</span></td>
+      <td>특별관계자 제3자배정 유상증자 신주취득 - 특별관계자 신규 질권설정</td>
+    </tr>
+    <tr>
+      <td><strong>비트컴퓨터</strong><br><small>032850 · KOSDAQ</small></td>
+      <td>조현정<br><small>오너·특수관계</small></td>
+      <td><strong>26.88 → 27.74</strong><br><span class="up">▲0.86%p</span></td>
+      <td>보고자 및 특별관계자의 장내 매수 보고자의 담보계약추가 및 기 계약 내용 변</td>
+    </tr>
+    <tr>
+      <td><strong>까뮤이앤씨</strong><br><small>013700 · KOSPI</small></td>
+      <td>베이스<br><small>오너·특수관계</small></td>
+      <td><strong>56.04 → 56.55</strong><br><span class="up">▲0.51%p</span></td>
+      <td>특별관계자 보유주식수 변동, 담보주식 계약 변경</td>
+    </tr></tbody>
+        </table>
+        <div class="source">출처: DART 전자공시</div>
+      </div>
+    </foreignObject>
+  </svg>

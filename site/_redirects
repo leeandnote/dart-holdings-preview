@@ -1,0 +1,12 @@
+/blog /blog/ 301
+/blog.html /blog/ 301
+/blog.js /blog/ 301
+/local-blog-source-compact.js /blog/ 301
+/prices.html / 302
+/institutions.html / 302
+/disclosure-signals.html / 302
+/earnings/quarterly / 302
+/earnings/turnaround / 302
+/earnings-quarterly.html / 302
+/earnings-turnaround.html / 302
+https://www.leeandnote.com/* https://leeandnote.com/:splat 301

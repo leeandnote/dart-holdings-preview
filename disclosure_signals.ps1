@@ -137,18 +137,138 @@ function Convert-ToNumber([string]$Value) {
 
 function Get-NumberAfter([string]$Text, [string[]]$Labels) {
   foreach ($label in $Labels) {
-    $idx = $Text.IndexOf($label, [StringComparison]::OrdinalIgnoreCase)
-    if ($idx -lt 0) { continue }
-    $chunk = $Text.Substring($idx, [Math]::Min(700, $Text.Length - $idx))
-    $matches = [regex]::Matches($chunk, "[-+]?\d[\d,]*(?:\.\d+)?")
-    foreach ($match in $matches) {
-      $value = Convert-ToNumber $match.Value
-      if ($null -ne $value) { return $value }
+    $idx = 0
+    while ($idx -lt $Text.Length) {
+      $found = $Text.IndexOf($label, $idx, [StringComparison]::OrdinalIgnoreCase)
+      if ($found -lt 0) { break }
+      $chunk = $Text.Substring($found + $label.Length, [Math]::Min(220, $Text.Length - ($found + $label.Length)))
+      $match = [regex]::Match($chunk, "[-+]?\d[\d,]*(?:\.\d+)?")
+      if ($match.Success) {
+        $value = Convert-ToNumber $match.Value
+        if ($null -ne $value) { return $value }
+      }
+      $idx = $found + $label.Length
     }
   }
   return $null
 }
 
+function Get-PrimaryContractText([string]$Text) {
+  if (-not $Text) { return "" }
+  $patterns = @(
+    "단일판매ㆍ공급계약 체결 1\. 판매",
+    "단일판매·공급계약 체결 1\. 판매",
+    "- 단일판매ㆍ공급계약 체결 1\. 판매",
+    "- 단일판매·공급계약 체결 1\. 판매"
+  )
+  foreach ($pattern in $patterns) {
+    $matches = [regex]::Matches($Text, $pattern)
+    if ($matches.Count -gt 0) {
+      $idx = $matches[$matches.Count - 1].Index
+      return $Text.Substring($idx)
+    }
+  }
+  $idx = $Text.LastIndexOf("2. 계약내역", [StringComparison]::OrdinalIgnoreCase)
+  if ($idx -ge 0) { return $Text.Substring($idx) }
+  return $Text
+}
+
+function Get-SaneContractAmount($Value) {
+  if ($null -eq $Value) { return $null }
+  $number = Convert-ToNumber $Value
+  if ($null -eq $number -or $number -le 0 -or $number -lt 1000000) { return $null }
+  return $number
+}
+
+function Get-SaneSalesRatio($Value) {
+  if ($null -eq $Value) { return $null }
+  $number = Convert-ToNumber $Value
+  if ($null -eq $number -or $number -lt 0 -or $number -gt 10000) { return $null }
+  return $number
+}
+
+function Get-VerifiedRecentSales($ContractAmount, $SalesRatio, $RawRecentSales) {
+  $recentSales = Get-SaneContractAmount $RawRecentSales
+  if ($ContractAmount -and $SalesRatio -and $SalesRatio -gt 0) {
+    $inferred = $ContractAmount / ($SalesRatio / 100)
+    if ($null -eq $recentSales) { return [math]::Round($inferred, 0) }
+    $gap = [math]::Abs($recentSales - $inferred) / [math]::Max($inferred, 1)
+    if ($gap -gt 0.15) { return [math]::Round($inferred, 0) }
+    return $recentSales
+  }
+  if (-not $ContractAmount) { return $null }
+  return $recentSales
+}
+
+function Normalize-FieldValue([string]$Value) {
+  if (-not $Value) { return "" }
+  $clean = $Value -replace "\s{2,}", " "
+  $clean = $clean.Trim(" `t`r`n-:ㆍ")
+  if ($clean -eq "-" -or $clean -eq "해당사항 없음") { return "" }
+  return $clean.Trim()
+}
+
+function Normalize-CounterpartyValue([string]$Value) {
+  $clean = Normalize-FieldValue $Value
+  if (-not $clean) { return "" }
+  if ($clean.Length -gt 80) { return "" }
+  if ($clean -match "재공시|사업개요|기타 투자판단|공시유보|협의") { return "" }
+  return $clean
+}
+
+function Get-TextBetweenLabels([string]$Text, [string[]]$StartLabels, [string[]]$EndLabels, [int]$MaxLength = 260) {
+  if (-not $Text) { return "" }
+  foreach ($label in $StartLabels) {
+    $idx = $Text.IndexOf($label, [StringComparison]::OrdinalIgnoreCase)
+    if ($idx -lt 0) { continue }
+    $start = $idx + $label.Length
+    $remaining = $Text.Substring($start, [Math]::Min($MaxLength, $Text.Length - $start))
+    $endAt = $remaining.Length
+    foreach ($endLabel in $EndLabels) {
+      $candidate = $remaining.IndexOf($endLabel, [StringComparison]::OrdinalIgnoreCase)
+      if ($candidate -ge 0 -and $candidate -lt $endAt) { $endAt = $candidate }
+    }
+    $value = Normalize-FieldValue $remaining.Substring(0, $endAt)
+    if ($value) { return $value }
+  }
+  return ""
+}
+
+function Get-FirstRegexGroup([string]$Text, [string]$Pattern) {
+  if (-not $Text) { return "" }
+  $match = [regex]::Match($Text, $Pattern)
+  if ($match.Success -and $match.Groups.Count -gt 1) {
+    return Normalize-FieldValue $match.Groups[1].Value
+  }
+  return ""
+}
+
+function Get-ContractFields([string]$Text) {
+  $content = Get-TextBetweenLabels $Text @("판매ㆍ공급계약 내용", "판매·공급계약 내용", "체결계약명", "계약명") @("2. 계약내역", "2. 계약 내용", "계약내역", "계약금액", "조건부 계약여부") 360
+  $counterparty = Normalize-CounterpartyValue (Get-TextBetweenLabels $Text @("계약상대방", "계약상대") @("- 최근", "- 주요사업", "- 회사와", "4. 판매", "5. 계약기간", "계약기간", "판매ㆍ공급지역", "판매·공급지역") 260)
+  $region = Get-TextBetweenLabels $Text @("판매ㆍ공급지역", "판매·공급지역", "공급지역") @("5. 계약기간", "6. 주요", "계약기간", "계약(수주)일자") 180
+  $startDate = Get-FirstRegexGroup $Text "계약기간\s*시작일\s*([0-9]{4}[-.][0-9]{2}[-.][0-9]{2})"
+  $endDate = Get-FirstRegexGroup $Text "계약기간\s*시작일\s*[0-9]{4}[-.][0-9]{2}[-.][0-9]{2}\s*종료일\s*([0-9]{4}[-.][0-9]{2}[-.][0-9]{2})"
+  if (-not $startDate) { $startDate = Get-FirstRegexGroup $Text "시작일\s*([0-9]{4}[-.][0-9]{2}[-.][0-9]{2})" }
+  if (-not $endDate) { $endDate = Get-FirstRegexGroup $Text "종료일\s*([0-9]{4}[-.][0-9]{2}[-.][0-9]{2})" }
+  $period = ""
+  if ($startDate -and $endDate) { $period = "$startDate ~ $endDate" }
+  elseif ($startDate) { $period = "$startDate ~" }
+  elseif ($endDate) { $period = "~ $endDate" }
+  else {
+    $relativePeriod = Get-FirstRegexGroup $Text "계약기간은\s*(.{2,80}?)(?:임|입니다|\.|\s-\s상기)"
+    if ($relativePeriod) { $period = $relativePeriod }
+  }
+
+  return [pscustomobject]@{
+    계약내용 = $content
+    계약상대방 = $counterparty
+    판매공급지역 = $region
+    계약기간 = $period
+    계약시작일 = $startDate
+    계약종료일 = $endDate
+  }
+}
 function Get-TurnaroundFlag([string]$Text) {
   if ($Text -match "흑자\s*전환|흑자전환") { return "흑자전환" }
   if ($Text -match "적자\s*전환|적자전환") { return "적자전환" }
@@ -165,11 +285,14 @@ function New-DisclosureRow($Item, [string]$Text) {
   $operatingProfit = $null
   $netProfit = $null
   $turnaround = ""
+  $contractFields = $null
 
   if ($type -eq "contract") {
-    $contractAmount = Get-NumberAfter $Text @("계약금액", "계약 금액", "총 계약금액")
-    $recentSales = Get-NumberAfter $Text @("최근매출액", "최근 매출액")
-    $salesRatio = Get-NumberAfter $Text @("매출액대비", "매출액 대비", "최근매출액대비", "최근 매출액 대비")
+    $primaryText = Get-PrimaryContractText $Text
+    $contractAmount = Get-SaneContractAmount (Get-NumberAfter $primaryText @("계약금액", "계약 금액", "총 계약금액"))
+    $salesRatio = Get-SaneSalesRatio (Get-NumberAfter $primaryText @("매출액대비", "매출액 대비", "최근매출액대비", "최근 매출액 대비"))
+    $recentSales = Get-VerifiedRecentSales $contractAmount $salesRatio (Get-NumberAfter $primaryText @("최근매출액", "최근 매출액"))
+    $contractFields = Get-ContractFields $primaryText
     if ($null -eq $salesRatio -and $contractAmount -and $recentSales -and $recentSales -ne 0) {
       $salesRatio = [math]::Round(($contractAmount / $recentSales) * 100, 2)
     }
@@ -191,6 +314,12 @@ function New-DisclosureRow($Item, [string]$Text) {
     계약금액 = $contractAmount
     최근매출액 = $recentSales
     매출대비비율 = $salesRatio
+    계약상대방 = $(if ($contractFields) { $contractFields.계약상대방 } else { "" })
+    계약기간 = $(if ($contractFields) { $contractFields.계약기간 } else { "" })
+    계약시작일 = $(if ($contractFields) { $contractFields.계약시작일 } else { "" })
+    계약종료일 = $(if ($contractFields) { $contractFields.계약종료일 } else { "" })
+    계약내용 = $(if ($contractFields) { $contractFields.계약내용 } else { "" })
+    판매공급지역 = $(if ($contractFields) { $contractFields.판매공급지역 } else { "" })
     매출액 = $sales
     영업이익 = $operatingProfit
     당기순이익 = $netProfit
@@ -254,3 +383,5 @@ $jsOut = Join-Path (Split-Path -Parent $JsonOut) "disclosure_signals.js"
 
 Write-Host "실적/계약 공시 데이터: $($rows.Count)건"
 Write-Host $JsonOut
+
+

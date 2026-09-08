@@ -3,7 +3,20 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>실적·계약 공시 큐레이션 | DART 지분변동 이슈</title>
+  <meta name="robots" content="noindex, nofollow">
+  
+  <meta name="google-adsense-account" content="ca-pub-5230074340613849">
+  <title>대형 수주·공급계약 | 리앤노트</title>
+  <meta name="description" content="DART 단일판매·공급계약 공시를 기반으로 매출 대비 계약 규모와 최근 대형 수주 후보를 정리합니다.">
+  <link rel="canonical" href="https://leeandnote.com/disclosure-signals.html">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="LEE&NOTE">
+  <meta property="og:title" content="대형 수주·공급계약 | 리앤노트">
+  <meta property="og:description" content="DART 단일판매·공급계약 공시를 기반으로 매출 대비 계약 규모와 최근 대형 수주 후보를 정리합니다.">
+  <meta property="og:url" content="https://leeandnote.com/disclosure-signals.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="대형 수주·공급계약 | 리앤노트">
+  <meta name="twitter:description" content="DART 단일판매·공급계약 공시를 기반으로 매출 대비 계약 규모와 최근 대형 수주 후보를 정리합니다.">
   <link rel="icon" href="assets/favicon.ico" sizes="any">
   <link rel="icon" type="image/png" href="assets/favicon-32.png" sizes="32x32">
   <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
@@ -16,91 +29,67 @@
       <img class="brandLogo" src="assets/leeandnote-logo.png" alt="LEE&NOTE">
     </a>
     <nav class="siteNav" aria-label="주요 카테고리">
-      <div class="navGroup active">
-        <a class="navLink" href="index.html"><span class="navIcon disclosureIcon"></span>공시데이터<span class="navArrow">▾</span></a>
-        <div class="navMenu" aria-label="공시데이터 하위 메뉴">
-          <a href="index.html">대량보유 스캐너</a>
-        </div>
-      </div>
-      <a class="navLink" href="blog.html"><span class="navIcon blogIcon"></span>블로그</a>
-      <a class="navLink" href="prices.html"><span class="navIcon priceIcon"></span>가격</a>
+      <a class="navLink" href="/"><span class="navIcon disclosureIcon"></span>5%보고</a>
+      <a class="navLink" href="/executives.html"><span class="navIcon disclosureIcon"></span>임원보고</a>
     </nav>
   </header>
 
   <main class="curationPage">
     <section class="pageHero">
       <div>
-        <p class="eyebrow">&#44228;&#50557; &#44277;&#49884; &middot; &#49892;&#51201; &#53556;&#50612;&#46972;&#50868;&#46300;</p>
-        <h1>&#49892;&#51201;&middot;&#44228;&#50557; &#44277;&#49884; &#53328;&#47112;&#51060;&#49496;</h1>
+        <p class="eyebrow">DART 수주·공급계약 모니터</p>
+        <h1>대형 수주·공급계약</h1>
         <p id="disclosurePeriod" class="muted">&#45936;&#51060;&#53552;&#47484; &#48520;&#47084;&#50724;&#45716; &#51473;</p>
       </div>
     </section>
 
-    <section class="curationHero">
-      <p class="eyebrow">Contract Momentum · Earnings Turnaround</p>
-      <h1>계약 모멘텀과 실적 턴어라운드는 따로 봅니다</h1>
-      <p>단일판매·공급계약은 매출 대비 계약 규모가 핵심이고, 영업실적 공시는 흑자전환·적자전환·영업이익 변화가 핵심입니다. 위에는 테마별 핵심 큐레이션, 아래에는 원자료 테이블을 배치했습니다.</p>
-    </section>
-
-    <section class="curationControls" aria-label="실적 계약 공시 필터">
-      <select id="signalType" class="filterSelect" aria-label="공시 테마">
-        <option value="all">전체 테마</option>
-        <option value="contract">단일판매·공급계약</option>
-        <option value="earnings">영업실적·턴어라운드</option>
-      </select>
-      <select id="signalMarket" class="filterSelect" aria-label="시장">
-        <option value="all">전체 시장</option>
-        <option value="KOSPI">KOSPI</option>
-        <option value="KOSDAQ">KOSDAQ</option>
-      </select>
-      <div class="periodChips" aria-label="조회 기간">
-        <button type="button" data-signal-period="1m">1개월</button>
-        <button type="button" data-signal-period="3m">3개월</button>
-        <button type="button" data-signal-period="6m" class="active">6개월</button>
-        <button type="button" data-signal-period="1y">1년</button>
-      </div>
-      <input id="signalFrom" class="dateInput" type="date" aria-label="시작일">
-      <input id="signalTo" class="dateInput" type="date" aria-label="종료일">
-      <input id="signalSearch" class="searchInput" type="search" placeholder="종목명, 보고서명 검색" aria-label="공시 검색">
-    </section>
-
-    <section id="signalSummary" class="insightPanel"></section>
-
     <section class="themeBlock contractTheme" aria-label="계약 공시 큐레이션">
-      <div class="themeHead">
+      <div class="themeHead contractDashboardHead">
         <div>
-          <p class="eyebrow">Contract Disclosure</p>
-          <h2>단일판매·공급계약체결</h2>
+          <p class="eyebrow">Contract Curation</p>
+          <h2>오늘(최근)의 슈퍼 수주 큐레이션</h2>
         </div>
-        <p>매출 대비 계약 규모, 계약금액 자체, 최근 계약 공시를 따로 봅니다.</p>
+        <p>매출 대비 규모, 계약금액, 최신성을 기준으로 핵심 계약 공시를 먼저 보여줍니다.</p>
       </div>
-      <div class="curationGrid three">
-        <article class="curationPanel">
-          <h2>#매출 대비 대형계약</h2>
-          <p>계약금액이 최근 매출액 대비 큰 공시입니다.</p>
-          <div id="contractRatioList" class="curationList"></div>
-        </article>
-        <article class="curationPanel">
-          <h2>#계약금액 규모</h2>
-          <p>계약금액 자체가 큰 단일판매·공급계약입니다.</p>
-          <div id="contractAmountList" class="curationList"></div>
-        </article>
-        <article class="curationPanel">
-          <h2>#최근 계약 공시</h2>
-          <p>필터 구간 내 최신 계약 공시입니다.</p>
-          <div id="recentContractList" class="curationList"></div>
-        </article>
-      </div>
+      <div id="contractHighlightGrid" class="contractHighlightGrid"></div>
       <section class="issueList signalTablePanel" aria-label="계약 공시 테이블">
         <div class="panelHead">
           <h2>계약 공시 테이블</h2>
           <p id="contractTableHint">계약 공시를 표로 정리합니다.</p>
         </div>
+        <div class="contractTableFilters" aria-label="계약 공시 테이블 필터">
+          <input id="contractTableSearch" class="searchInput" type="search" placeholder="종목, 계약상대, 계약내용 검색" aria-label="계약 공시 테이블 검색">
+          <select id="signalMarket" class="filterSelect" aria-label="시장">
+            <option value="all">전체 시장</option>
+            <option value="KOSPI">KOSPI</option>
+            <option value="KOSDAQ">KOSDAQ</option>
+          </select>
+          <select id="contractTierFilter" class="filterSelect" aria-label="수주 등급">
+            <option value="all">전체 등급</option>
+            <option value="super">슈퍼수주</option>
+            <option value="large">대형수주</option>
+            <option value="normal">일반수주</option>
+          </select>
+          <select id="contractRatioFilter" class="filterSelect" aria-label="매출액 대비">
+            <option value="all">매출대비 전체</option>
+            <option value="100">100% 이상</option>
+            <option value="30">30% 이상</option>
+            <option value="10">10% 이상</option>
+          </select>
+          <select id="contractSort" class="filterSelect" aria-label="정렬">
+            <option value="tier">등급/규모순</option>
+            <option value="ratio">매출대비 높은순</option>
+            <option value="amount">계약금액 큰순</option>
+            <option value="recent">최신 접수순</option>
+          </select>
+          <input id="signalFrom" class="dateInput" type="date" aria-label="시작일">
+          <input id="signalTo" class="dateInput" type="date" aria-label="종료일">
+        </div>
         <div id="contractTable"></div>
       </section>
     </section>
 
-    <section class="themeBlock earningsTheme" aria-label="실적 공시 큐레이션">
+    <section class="themeBlock earningsTheme hidden" aria-label="실적 공시 큐레이션">
       <div class="themeHead">
         <div>
           <p class="eyebrow">Earnings Disclosure</p>
@@ -145,7 +134,26 @@
     </footer>
   </main>
 
+  <script src="data/current_prices.js"></script>
   <script src="data/disclosure_signals.js"></script>
   <script src="disclosure-signals.js"></script>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

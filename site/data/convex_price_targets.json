@@ -1,0 +1,8732 @@
+[
+  {
+    "corpName": "동화약품",
+    "market": "",
+    "reportDate": "20260331",
+    "stockCode": "000020",
+    "sourceKinds": [
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "KR모터스",
+    "market": "KOSPI",
+    "reportDate": "20260904",
+    "stockCode": "000040",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "경방",
+    "market": "KOSPI",
+    "reportDate": "20260831",
+    "stockCode": "000050",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "삼양홀딩스",
+    "market": "KOSPI",
+    "reportDate": "20260828",
+    "stockCode": "000070",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "유한양행",
+    "market": "KOSPI",
+    "reportDate": "20260901",
+    "stockCode": "000100",
+    "sourceKinds": [
+      "contract"
+    ]
+  },
+  {
+    "corpName": "CJ대한통운",
+    "market": "KOSPI",
+    "reportDate": "20260901",
+    "stockCode": "000120",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "DL",
+    "market": "KOSPI",
+    "reportDate": "20260907",
+    "stockCode": "000210",
+    "sourceKinds": [
+      "5percent",
+      "executive",
+      "contract"
+    ]
+  },
+  {
+    "corpName": "삼천당제약",
+    "market": "KOSDAQ",
+    "reportDate": "20260814",
+    "stockCode": "000250",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "대신밸류리츠",
+    "market": "KOSPI",
+    "reportDate": "20260818",
+    "stockCode": "000300",
+    "sourceKinds": [
+      "existing",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "매드업",
+    "market": "KOSDAQ",
+    "reportDate": "20260814",
+    "stockCode": "000390",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "시알홀딩스",
+    "market": "KOSPI",
+    "reportDate": "20260901",
+    "stockCode": "000480",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "대동",
+    "market": "KOSPI",
+    "reportDate": "20260825",
+    "stockCode": "000490",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "동아쏘시오홀딩스",
+    "market": "KOSPI",
+    "reportDate": "20260902",
+    "stockCode": "000640",
+    "sourceKinds": [
+      "5percent",
+      "contract",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "SK하이닉스",
+    "market": "KOSPI",
+    "reportDate": "20260821",
+    "stockCode": "000660",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "현대건설",
+    "market": "KOSPI",
+    "reportDate": "20260901",
+    "stockCode": "000720",
+    "sourceKinds": [
+      "executive",
+      "contract"
+    ]
+  },
+  {
+    "corpName": "삼성화재해상보험",
+    "market": "KOSPI",
+    "reportDate": "20260819",
+    "stockCode": "000810",
+    "sourceKinds": [
+      "existing",
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "전방",
+    "market": "KOSPI",
+    "reportDate": "20260831",
+    "stockCode": "000950",
+    "sourceKinds": [
+      "existing",
+      "executive",
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "교보19호스팩",
+    "market": "KOSDAQ",
+    "reportDate": "20260902",
+    "stockCode": "000980",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "만호제강",
+    "market": "KOSPI",
+    "reportDate": "20260824",
+    "stockCode": "001080",
+    "sourceKinds": [
+      "executive",
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "금호전기",
+    "market": "KOSPI",
+    "reportDate": "20260903",
+    "stockCode": "001210",
+    "sourceKinds": [
+      "executive",
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "동국홀딩스",
+    "market": "KOSPI",
+    "reportDate": "20260907",
+    "stockCode": "001230",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "남광토건",
+    "market": "KOSPI",
+    "reportDate": "20260907",
+    "stockCode": "001260",
+    "sourceKinds": [
+      "contract"
+    ]
+  },
+  {
+    "corpName": "부국증권",
+    "market": "KOSPI",
+    "reportDate": "20260904",
+    "stockCode": "001270",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "상상인증권",
+    "market": "KOSPI",
+    "reportDate": "20260903",
+    "stockCode": "001290",
+    "sourceKinds": [
+      "executive",
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "PKC",
+    "market": "KOSPI",
+    "reportDate": "20260813",
+    "stockCode": "001340",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "삼성제약",
+    "market": "KOSPI",
+    "reportDate": "20260825",
+    "stockCode": "001360",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "KG케미칼",
+    "market": "KOSPI",
+    "reportDate": "20260814",
+    "stockCode": "001390",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "현대해상",
+    "market": "KOSPI",
+    "reportDate": "20260901",
+    "stockCode": "001450",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "현대차증권",
+    "market": "KOSPI",
+    "reportDate": "20260903",
+    "stockCode": "001500",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "동양",
+    "market": "KOSPI",
+    "reportDate": "20260903",
+    "stockCode": "001520",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "해치텍",
+    "market": "KOSDAQ",
+    "reportDate": "20260901",
+    "stockCode": "001550",
+    "sourceKinds": [
+      "executive",
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "신영증권",
+    "market": "KOSPI",
+    "reportDate": "20260908",
+    "stockCode": "001720",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "SK네트웍스",
+    "market": "KOSPI",
+    "reportDate": "20260901",
+    "stockCode": "001740",
+    "sourceKinds": [
+      "existing",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "코오롱",
+    "market": "KOSPI",
+    "reportDate": "20260908",
+    "stockCode": "002020",
+    "sourceKinds": [
+      "contract",
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "비비안",
+    "market": "KOSPI",
+    "reportDate": "20260824",
+    "stockCode": "002070",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "한화머시너리앤서비스홀딩스",
+    "market": "KOSPI",
+    "reportDate": "20260901",
+    "stockCode": "002200",
+    "sourceKinds": [
+      "executive",
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "넥센타이어",
+    "market": "KOSPI",
+    "reportDate": "20260820",
+    "stockCode": "002350",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "SH에너지화학",
+    "market": "KOSPI",
+    "reportDate": "20260828",
+    "stockCode": "002360",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "케이씨씨",
+    "market": "KOSPI",
+    "reportDate": "20260908",
+    "stockCode": "002380",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "한독",
+    "market": "KOSPI",
+    "reportDate": "20260820",
+    "stockCode": "002390",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "세기상사",
+    "market": "KOSPI",
+    "reportDate": "20260818",
+    "stockCode": "002420",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "HS화성",
+    "market": "KOSPI",
+    "reportDate": "20260903",
+    "stockCode": "002460",
+    "sourceKinds": [
+      "contract"
+    ]
+  },
+  {
+    "corpName": "오리엔트바이오",
+    "market": "KOSPI",
+    "reportDate": "20260904",
+    "stockCode": "002630",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "한탑",
+    "market": "KOSDAQ",
+    "reportDate": "20260908",
+    "stockCode": "002680",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "TCC스틸",
+    "market": "KOSPI",
+    "reportDate": "20260903",
+    "stockCode": "002710",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "국제약품",
+    "market": "",
+    "reportDate": "20260331",
+    "stockCode": "002720",
+    "sourceKinds": [
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "진흥기업",
+    "market": "KOSPI",
+    "reportDate": "20260908",
+    "stockCode": "002780",
+    "sourceKinds": [
+      "executive",
+      "5percent",
+      "contract"
+    ]
+  },
+  {
+    "corpName": "아모레퍼시픽홀딩스",
+    "market": "KOSPI",
+    "reportDate": "20260902",
+    "stockCode": "002790",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "미원상사",
+    "market": "KOSPI",
+    "reportDate": "20260825",
+    "stockCode": "002840",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "디와이에이",
+    "market": "KOSPI",
+    "reportDate": "20260903",
+    "stockCode": "002880",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "TYM",
+    "market": "KOSPI",
+    "reportDate": "20260821",
+    "stockCode": "002900",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "유성기업",
+    "market": "KOSPI",
+    "reportDate": "20260828",
+    "stockCode": "002920",
+    "sourceKinds": [
+      "executive",
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "한국쉘석유",
+    "market": "KOSPI",
+    "reportDate": "20260827",
+    "stockCode": "002960",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "금호건설",
+    "market": "KOSPI",
+    "reportDate": "20260908",
+    "stockCode": "002990",
+    "sourceKinds": [
+      "contract"
+    ]
+  },
+  {
+    "corpName": "혜인",
+    "market": "KOSPI",
+    "reportDate": "20260824",
+    "stockCode": "003010",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "세아제강지주",
+    "market": "KOSPI",
+    "reportDate": "20260828",
+    "stockCode": "003030",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "에이프로젠바이오로직스",
+    "market": "KOSPI",
+    "reportDate": "20260902",
+    "stockCode": "003060",
+    "sourceKinds": [
+      "5percent",
+      "executive-static",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "코오롱글로벌",
+    "market": "KOSPI",
+    "reportDate": "20260908",
+    "stockCode": "003070",
+    "sourceKinds": [
+      "contract"
+    ]
+  },
+  {
+    "corpName": "디아이",
+    "market": "KOSPI",
+    "reportDate": "20260907",
+    "stockCode": "003160",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "삼양식품",
+    "market": "KOSPI",
+    "reportDate": "20260901",
+    "stockCode": "003230",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "한일홀딩스",
+    "market": "KOSPI",
+    "reportDate": "20260827",
+    "stockCode": "003300",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "한국화장품제조",
+    "market": "KOSPI",
+    "reportDate": "20260828",
+    "stockCode": "003350",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "하림지주",
+    "market": "KOSDAQ",
+    "reportDate": "20260828",
+    "stockCode": "003380",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "유안타증권",
+    "market": "KOSPI",
+    "reportDate": "20260908",
+    "stockCode": "003470",
+    "sourceKinds": [
+      "existing",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "대신증권",
+    "market": "KOSPI",
+    "reportDate": "20260902",
+    "stockCode": "003540",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "HLB글로벌",
+    "market": "KOSPI",
+    "reportDate": "20260820",
+    "stockCode": "003580",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "포스코퓨처엠",
+    "market": "KOSPI",
+    "reportDate": "20260907",
+    "stockCode": "003670",
+    "sourceKinds": [
+      "existing",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "진양산업",
+    "market": "KOSPI",
+    "reportDate": "20260827",
+    "stockCode": "003780",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "사조대림",
+    "market": "KOSPI",
+    "reportDate": "20260904",
+    "stockCode": "003960",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "신흥",
+    "market": "KOSPI",
+    "reportDate": "20260902",
+    "stockCode": "004080",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "동방",
+    "market": "KOSPI",
+    "reportDate": "20260902",
+    "stockCode": "004140",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "한솔홀딩스",
+    "market": "KOSPI",
+    "reportDate": "20260813",
+    "stockCode": "004150",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "신세계",
+    "market": "KOSPI",
+    "reportDate": "20260831",
+    "stockCode": "004170",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "서울식품공업",
+    "market": "KOSPI",
+    "reportDate": "20260907",
+    "stockCode": "004410",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "삼일씨엔에스",
+    "market": "KOSPI",
+    "reportDate": "20260828",
+    "stockCode": "004440",
+    "sourceKinds": [
+      "contract"
+    ]
+  },
+  {
+    "corpName": "세방전지",
+    "market": "KOSPI",
+    "reportDate": "20260904",
+    "stockCode": "004490",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "현대비앤지스틸",
+    "market": "KOSPI",
+    "reportDate": "20260903",
+    "stockCode": "004560",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "한솔테크닉스",
+    "market": "KOSPI",
+    "reportDate": "20260907",
+    "stockCode": "004710",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "써니전자",
+    "market": "KOSPI",
+    "reportDate": "20260901",
+    "stockCode": "004770",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "효성",
+    "market": "",
+    "reportDate": "20260331",
+    "stockCode": "004800",
+    "sourceKinds": [
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "DRB동일",
+    "market": "KOSPI",
+    "reportDate": "20260813",
+    "stockCode": "004840",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "한신공영",
+    "market": "KOSPI",
+    "reportDate": "20260831",
+    "stockCode": "004960",
+    "sourceKinds": [
+      "contract"
+    ]
+  },
+  {
+    "corpName": "성신양회",
+    "market": "KOSPI",
+    "reportDate": "20260813",
+    "stockCode": "004980",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "휴스틸",
+    "market": "KOSPI",
+    "reportDate": "20260825",
+    "stockCode": "005010",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "코스모신소재",
+    "market": "KOSPI",
+    "reportDate": "20260904",
+    "stockCode": "005070",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "현대자동차",
+    "market": "KOSPI",
+    "reportDate": "20260824",
+    "stockCode": "005380",
+    "sourceKinds": [
+      "existing",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "코스모화학",
+    "market": "KOSPI",
+    "reportDate": "20260904",
+    "stockCode": "005420",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "POSCO홀딩스",
+    "market": "KOSPI",
+    "reportDate": "20260903",
+    "stockCode": "005490",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "삼진제약",
+    "market": "KOSPI",
+    "reportDate": "20260902",
+    "stockCode": "005500",
+    "sourceKinds": [
+      "executive",
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "푸드웰",
+    "market": "KOSDAQ",
+    "reportDate": "20260826",
+    "stockCode": "005670",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "원림",
+    "market": "KOSPI",
+    "reportDate": "20260824",
+    "stockCode": "005820",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "에스엘",
+    "market": "KOSPI",
+    "reportDate": "20260824",
+    "stockCode": "005850",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "대한해운",
+    "market": "KOSPI",
+    "reportDate": "20260901",
+    "stockCode": "005880",
+    "sourceKinds": [
+      "contract",
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "삼성전자",
+    "market": "KOSPI",
+    "reportDate": "20260831",
+    "stockCode": "005930",
+    "sourceKinds": [
+      "executive",
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "이수화학",
+    "market": "KOSPI",
+    "reportDate": "20260904",
+    "stockCode": "005950",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "동부건설",
+    "market": "KOSPI",
+    "reportDate": "20260814",
+    "stockCode": "005960",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "국영지앤엠",
+    "market": "KOSDAQ",
+    "reportDate": "20260828",
+    "stockCode": "006050",
+    "sourceKinds": [
+      "executive",
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "사조오양",
+    "market": "KOSPI",
+    "reportDate": "20260904",
+    "stockCode": "006090",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "SK디스커버리",
+    "market": "KOSPI",
+    "reportDate": "20260828",
+    "stockCode": "006120",
+    "sourceKinds": [
+      "5percent",
+      "contract"
+    ]
+  },
+  {
+    "corpName": "LS",
+    "market": "KOSPI",
+    "reportDate": "20260904",
+    "stockCode": "006260",
+    "sourceKinds": [
+      "contract",
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "대원전선",
+    "market": "KOSPI",
+    "reportDate": "20260903",
+    "stockCode": "006340",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "대구백화점",
+    "market": "KOSPI",
+    "reportDate": "20260826",
+    "stockCode": "006370",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "삼성SDI",
+    "market": "KOSPI",
+    "reportDate": "20260826",
+    "stockCode": "006400",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "대림통상",
+    "market": "KOSPI",
+    "reportDate": "20260904",
+    "stockCode": "006570",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "동구바이오제약",
+    "market": "KOSDAQ",
+    "reportDate": "20260902",
+    "stockCode": "006620",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "서부T&D",
+    "market": "KOSDAQ",
+    "reportDate": "20260904",
+    "stockCode": "006730",
+    "sourceKinds": [
+      "executive",
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "블루산업개발",
+    "market": "KOSPI",
+    "reportDate": "20260813",
+    "stockCode": "006740",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "AK홀딩스",
+    "market": "KOSPI",
+    "reportDate": "20260907",
+    "stockCode": "006840",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "보성파워텍",
+    "market": "KOSDAQ",
+    "reportDate": "20260824",
+    "stockCode": "006910",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "일신석재",
+    "market": "KOSPI",
+    "reportDate": "20260902",
+    "stockCode": "007110",
+    "sourceKinds": [
+      "executive",
+      "contract"
+    ]
+  },
+  {
+    "corpName": "한국특강",
+    "market": "KOSPI",
+    "reportDate": "20260901",
+    "stockCode": "007280",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "푸른저축은행",
+    "market": "KOSDAQ",
+    "reportDate": "20260901",
+    "stockCode": "007330",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "DN오토모티브",
+    "market": "KOSPI",
+    "reportDate": "20260814",
+    "stockCode": "007340",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "에이프로젠",
+    "market": "KOSPI",
+    "reportDate": "20260828",
+    "stockCode": "007460",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "와이엠",
+    "market": "KOSDAQ",
+    "reportDate": "20260825",
+    "stockCode": "007530",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "선도전기",
+    "market": "KOSPI",
+    "reportDate": "20260831",
+    "stockCode": "007610",
+    "sourceKinds": [
+      "contract"
+    ]
+  },
+  {
+    "corpName": "이수페타시스",
+    "market": "KOSPI",
+    "reportDate": "20260904",
+    "stockCode": "007660",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "엠엑스로보틱스",
+    "market": "KOSDAQ",
+    "reportDate": "20260827",
+    "stockCode": "007820",
+    "sourceKinds": [
+      "executive",
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "사조동아원",
+    "market": "KOSPI",
+    "reportDate": "20260902",
+    "stockCode": "008040",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "원풍물산",
+    "market": "KOSDAQ",
+    "reportDate": "20260824",
+    "stockCode": "008290",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "남선알미늄",
+    "market": "KOSPI",
+    "reportDate": "20260901",
+    "stockCode": "008350",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "원풍",
+    "market": "KOSDAQ",
+    "reportDate": "20260904",
+    "stockCode": "008370",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "부스타",
+    "market": "KOSDAQ",
+    "reportDate": "20260821",
+    "stockCode": "008470",
+    "sourceKinds": [
+      "executive",
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "서흥",
+    "market": "KOSPI",
+    "reportDate": "20260824",
+    "stockCode": "008490",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "호텔신라",
+    "market": "KOSPI",
+    "reportDate": "20260908",
+    "stockCode": "008770",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "금비",
+    "market": "KOSPI",
+    "reportDate": "20260904",
+    "stockCode": "008870",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "한미사이언스",
+    "market": "KOSPI",
+    "reportDate": "20260901",
+    "stockCode": "008930",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "삼성전기",
+    "market": "KOSPI",
+    "reportDate": "20260904",
+    "stockCode": "009150",
+    "sourceKinds": [
+      "contract",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "대양금속",
+    "market": "KOSPI",
+    "reportDate": "20260828",
+    "stockCode": "009190",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "한샘",
+    "market": "KOSPI",
+    "reportDate": "20260824",
+    "stockCode": "009240",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "신원",
+    "market": "KOSPI",
+    "reportDate": "20260821",
+    "stockCode": "009270",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "아진전자부품",
+    "market": "KOSPI",
+    "reportDate": "20260908",
+    "stockCode": "009320",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "태영건설",
+    "market": "KOSPI",
+    "reportDate": "20260828",
+    "stockCode": "009410",
+    "sourceKinds": [
+      "contract"
+    ]
+  },
+  {
+    "corpName": "HD한국조선해양",
+    "market": "KOSPI",
+    "reportDate": "20260908",
+    "stockCode": "009540",
+    "sourceKinds": [
+      "contract",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "삼보산업",
+    "market": "KOSDAQ",
+    "reportDate": "20260908",
+    "stockCode": "009620",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "이렘",
+    "market": "KOSDAQ",
+    "reportDate": "20260825",
+    "stockCode": "009730",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "플레이그램",
+    "market": "KOSPI",
+    "reportDate": "20260904",
+    "stockCode": "009810",
+    "sourceKinds": [
+      "executive",
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "한화솔루션",
+    "market": "KOSPI",
+    "reportDate": "20260828",
+    "stockCode": "009830",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "삼성중공업",
+    "market": "KOSPI",
+    "reportDate": "20260831",
+    "stockCode": "010140",
+    "sourceKinds": [
+      "contract"
+    ]
+  },
+  {
+    "corpName": "우진아이엔에스",
+    "market": "KOSPI",
+    "reportDate": "20260907",
+    "stockCode": "010400",
+    "sourceKinds": [
+      "contract",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "에스엠벡셀",
+    "market": "KOSPI",
+    "reportDate": "20260907",
+    "stockCode": "010580",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "진양폴리우레탄",
+    "market": "KOSPI",
+    "reportDate": "20260827",
+    "stockCode": "010640",
+    "sourceKinds": [
+      "executive",
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "아이에스동서",
+    "market": "KOSPI",
+    "reportDate": "20260831",
+    "stockCode": "010780",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive",
+      "executive-static",
+      "contract"
+    ]
+  },
+  {
+    "corpName": "S-Oil",
+    "market": "KOSPI",
+    "reportDate": "20260826",
+    "stockCode": "010950",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "삼호개발",
+    "market": "KOSPI",
+    "reportDate": "20260908",
+    "stockCode": "010960",
+    "sourceKinds": [
+      "contract"
+    ]
+  },
+  {
+    "corpName": "경동제약",
+    "market": "KOSDAQ",
+    "reportDate": "20260831",
+    "stockCode": "011040",
+    "sourceKinds": [
+      "existing",
+      "executive",
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "에넥스",
+    "market": "KOSPI",
+    "reportDate": "20260902",
+    "stockCode": "011090",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "HMM",
+    "market": "KOSPI",
+    "stockCode": "011200",
+    "reportDate": "20260908",
+    "sourceKind": "contract",
+    "sourceKinds": [
+      "contract"
+    ]
+  },
+  {
+    "corpName": "우성머티리얼스",
+    "market": "KOSPI",
+    "reportDate": "20260907",
+    "stockCode": "011300",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "유니크",
+    "market": "KOSDAQ",
+    "reportDate": "20260828",
+    "stockCode": "011320",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "서한",
+    "market": "KOSDAQ",
+    "reportDate": "20260908",
+    "stockCode": "011370",
+    "sourceKinds": [
+      "executive-static",
+      "contract"
+    ]
+  },
+  {
+    "corpName": "세보엠이씨",
+    "market": "KOSDAQ",
+    "reportDate": "20260904",
+    "stockCode": "011560",
+    "sourceKinds": [
+      "contract"
+    ]
+  },
+  {
+    "corpName": "와이투솔루션",
+    "market": "KOSPI",
+    "reportDate": "20260819",
+    "stockCode": "011690",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "SKC",
+    "market": "KOSPI",
+    "reportDate": "20260827",
+    "stockCode": "011790",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "DB",
+    "market": "KOSPI",
+    "reportDate": "20260828",
+    "stockCode": "012030",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "영흥",
+    "market": "KOSPI",
+    "reportDate": "20260904",
+    "stockCode": "012160",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "아센디오",
+    "market": "KOSPI",
+    "reportDate": "20260903",
+    "stockCode": "012170",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static",
+      "contract"
+    ]
+  },
+  {
+    "corpName": "계양전기",
+    "market": "KOSPI",
+    "reportDate": "20260819",
+    "stockCode": "012200",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "삼미금속",
+    "market": "KOSDAQ",
+    "reportDate": "20260901",
+    "stockCode": "012210",
+    "sourceKinds": [
+      "contract"
+    ]
+  },
+  {
+    "corpName": "영화금속",
+    "market": "KOSPI",
+    "reportDate": "20260902",
+    "stockCode": "012280",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "한화에어로스페이스",
+    "market": "KOSPI",
+    "reportDate": "20260831",
+    "stockCode": "012450",
+    "sourceKinds": [
+      "existing",
+      "executive",
+      "contract"
+    ]
+  },
+  {
+    "corpName": "HDC",
+    "market": "KOSPI",
+    "reportDate": "20260901",
+    "stockCode": "012630",
+    "sourceKinds": [
+      "5percent",
+      "contract"
+    ]
+  },
+  {
+    "corpName": "리드코프",
+    "market": "KOSDAQ",
+    "reportDate": "20260825",
+    "stockCode": "012700",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "에스원",
+    "market": "KOSPI",
+    "reportDate": "20260818",
+    "stockCode": "012750",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "하이록코리아",
+    "market": "KOSDAQ",
+    "reportDate": "20260818",
+    "stockCode": "013030",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "아진산업",
+    "market": "KOSDAQ",
+    "reportDate": "20260826",
+    "stockCode": "013310",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "일성건설",
+    "market": "KOSPI",
+    "reportDate": "20260901",
+    "stockCode": "013360",
+    "sourceKinds": [
+      "contract"
+    ]
+  },
+  {
+    "corpName": "화승코퍼레이션",
+    "market": "KOSPI",
+    "reportDate": "20260901",
+    "stockCode": "013520",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "까뮤이앤씨",
+    "market": "KOSPI",
+    "reportDate": "20260904",
+    "stockCode": "013700",
+    "sourceKinds": [
+      "5percent",
+      "contract"
+    ]
+  },
+  {
+    "corpName": "아가방컴퍼니",
+    "market": "KOSDAQ",
+    "reportDate": "20260818",
+    "stockCode": "013990",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "메디앙스",
+    "market": "KOSDAQ",
+    "reportDate": "20260824",
+    "stockCode": "014100",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "대영포장",
+    "market": "KOSPI",
+    "reportDate": "20260824",
+    "stockCode": "014160",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "금강공업",
+    "market": "KOSPI",
+    "reportDate": "20260812",
+    "stockCode": "014280",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "부방",
+    "market": "KOSDAQ",
+    "reportDate": "20260902",
+    "stockCode": "014470",
+    "sourceKinds": [
+      "existing",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "사조씨푸드",
+    "market": "KOSPI",
+    "reportDate": "20260904",
+    "stockCode": "014710",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "HL D&I",
+    "market": "KOSPI",
+    "reportDate": "20260902",
+    "stockCode": "014790",
+    "sourceKinds": [
+      "contract"
+    ]
+  },
+  {
+    "corpName": "유니드",
+    "market": "KOSPI",
+    "reportDate": "20260825",
+    "stockCode": "014830",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "인디에프",
+    "market": "KOSPI",
+    "reportDate": "20260824",
+    "stockCode": "014990",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "INVENI",
+    "market": "KOSPI",
+    "reportDate": "20260901",
+    "stockCode": "015360",
+    "sourceKinds": [
+      "executive",
+      "executive-static",
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "대현",
+    "market": "KOSPI",
+    "reportDate": "20260831",
+    "stockCode": "016090",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "한세예스24홀딩스",
+    "market": "KOSPI",
+    "reportDate": "20260826",
+    "stockCode": "016450",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "DB증권",
+    "market": "KOSPI",
+    "reportDate": "20260908",
+    "stockCode": "016610",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "카스",
+    "market": "KOSDAQ",
+    "reportDate": "20260826",
+    "stockCode": "016920",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "명문제약",
+    "market": "KOSPI",
+    "reportDate": "20260907",
+    "stockCode": "017180",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "우신시스템",
+    "market": "KOSPI",
+    "reportDate": "20260907",
+    "stockCode": "017370",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "세명전기",
+    "market": "KOSDAQ",
+    "reportDate": "20260827",
+    "stockCode": "017510",
+    "sourceKinds": [
+      "contract"
+    ]
+  },
+  {
+    "corpName": "SK텔레콤",
+    "market": "KOSPI",
+    "reportDate": "20260901",
+    "stockCode": "017670",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "풀무원",
+    "market": "KOSPI",
+    "reportDate": "20260813",
+    "stockCode": "017810",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "한국알콜",
+    "market": "KOSDAQ",
+    "reportDate": "20260903",
+    "stockCode": "017890",
+    "sourceKinds": [
+      "executive",
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "E1",
+    "market": "KOSPI",
+    "reportDate": "20260827",
+    "stockCode": "017940",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "유니슨",
+    "market": "KOSDAQ",
+    "reportDate": "20260907",
+    "stockCode": "018000",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static",
+      "contract",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "삼성에스디에스",
+    "market": "KOSPI",
+    "reportDate": "20260826",
+    "stockCode": "018260",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "브이티",
+    "market": "KOSDAQ",
+    "reportDate": "20260828",
+    "stockCode": "018290",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "우진비앤지",
+    "market": "KOSDAQ",
+    "reportDate": "20260825",
+    "stockCode": "018620",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "베뉴지",
+    "market": "KOSDAQ",
+    "reportDate": "20260818",
+    "stockCode": "019010",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "와이지-원",
+    "market": "KOSDAQ",
+    "reportDate": "20260908",
+    "stockCode": "019210",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "GMI벤처",
+    "market": "KOSDAQ",
+    "reportDate": "20260814",
+    "stockCode": "019570",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "글로본",
+    "market": "KOSDAQ",
+    "reportDate": "20260825",
+    "stockCode": "019660",
+    "sourceKinds": [
+      "contract"
+    ]
+  },
+  {
+    "corpName": "대교",
+    "market": "KOSPI",
+    "reportDate": "20260827",
+    "stockCode": "019680",
+    "sourceKinds": [
+      "executive",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "서연탑메탈",
+    "market": "KOSDAQ",
+    "reportDate": "20260818",
+    "stockCode": "019770",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "에너토크",
+    "market": "KOSDAQ",
+    "reportDate": "20260820",
+    "stockCode": "019990",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "키다리스튜디오",
+    "market": "KOSPI",
+    "reportDate": "20260903",
+    "stockCode": "020120",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "대신정보통신",
+    "market": "KOSDAQ",
+    "reportDate": "20260908",
+    "stockCode": "020180",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "대동금속",
+    "market": "KOSDAQ",
+    "reportDate": "20260901",
+    "stockCode": "020400",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "아시아나항공",
+    "market": "KOSPI",
+    "reportDate": "20260908",
+    "stockCode": "020560",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "대호특수강",
+    "market": "KOSDAQ",
+    "reportDate": "20260813",
+    "stockCode": "021040",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "코웨이",
+    "market": "KOSPI",
+    "reportDate": "20260908",
+    "stockCode": "021240",
+    "sourceKinds": [
+      "executive",
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "KCC건설",
+    "market": "KOSDAQ",
+    "reportDate": "20260901",
+    "stockCode": "021320",
+    "sourceKinds": [
+      "contract"
+    ]
+  },
+  {
+    "corpName": "메이슨캐피탈",
+    "market": "KOSDAQ",
+    "reportDate": "20260820",
+    "stockCode": "021880",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "포스코DX",
+    "market": "KOSPI",
+    "reportDate": "20260907",
+    "stockCode": "022100",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "제이스코홀딩스",
+    "market": "KOSDAQ",
+    "reportDate": "20260814",
+    "stockCode": "023440",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "롯데쇼핑",
+    "market": "KOSPI",
+    "reportDate": "20260901",
+    "stockCode": "023530",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "다우기술",
+    "market": "KOSPI",
+    "reportDate": "20260819",
+    "stockCode": "023590",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "한국캐피탈",
+    "market": "KOSDAQ",
+    "reportDate": "20260901",
+    "stockCode": "023760",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "플레이위드",
+    "market": "KOSDAQ",
+    "reportDate": "20260903",
+    "stockCode": "023770",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "대한약품",
+    "market": "KOSDAQ",
+    "reportDate": "20260831",
+    "stockCode": "023910",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "에쓰씨엔지니어링",
+    "market": "KOSPI",
+    "reportDate": "20260826",
+    "stockCode": "023960",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "콜마홀딩스",
+    "market": "KOSPI",
+    "reportDate": "20260826",
+    "stockCode": "024720",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "한일단조",
+    "market": "KOSDAQ",
+    "reportDate": "20260818",
+    "stockCode": "024740",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "유성티엔에스",
+    "market": "KOSDAQ",
+    "reportDate": "20260821",
+    "stockCode": "024800",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "HLB이노베이션",
+    "market": "KOSDAQ",
+    "reportDate": "20260908",
+    "stockCode": "024850",
+    "sourceKinds": [
+      "executive",
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "케이피에프",
+    "market": "KOSDAQ",
+    "reportDate": "20260824",
+    "stockCode": "024880",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "디와이덕양",
+    "market": "KOSPI",
+    "reportDate": "20260831",
+    "stockCode": "024900",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "미래산업",
+    "market": "KOSPI",
+    "reportDate": "20260828",
+    "stockCode": "025560",
+    "sourceKinds": [
+      "5percent",
+      "contract"
+    ]
+  },
+  {
+    "corpName": "차AI헬스케어",
+    "market": "KOSPI",
+    "reportDate": "20260814",
+    "stockCode": "025620",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "한국주강",
+    "market": "KOSPI",
+    "reportDate": "20260820",
+    "stockCode": "025890",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "광진실업",
+    "market": "KOSDAQ",
+    "reportDate": "20260821",
+    "stockCode": "026910",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "코리아나",
+    "market": "KOSDAQ",
+    "reportDate": "20260904",
+    "stockCode": "027050",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "BGF",
+    "market": "KOSPI",
+    "reportDate": "20260828",
+    "stockCode": "027410",
+    "sourceKinds": [
+      "executive-static",
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "상보",
+    "market": "KOSDAQ",
+    "reportDate": "20260903",
+    "stockCode": "027580",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "마니커",
+    "market": "KOSPI",
+    "reportDate": "20260901",
+    "stockCode": "027740",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "삼성E&A",
+    "market": "KOSPI",
+    "reportDate": "20260831",
+    "stockCode": "028050",
+    "sourceKinds": [
+      "contract"
+    ]
+  },
+  {
+    "corpName": "동아지질",
+    "market": "KOSPI",
+    "reportDate": "20260901",
+    "stockCode": "028100",
+    "sourceKinds": [
+      "contract"
+    ]
+  },
+  {
+    "corpName": "삼성물산",
+    "market": "KOSPI",
+    "reportDate": "20260831",
+    "stockCode": "028260",
+    "sourceKinds": [
+      "contract"
+    ]
+  },
+  {
+    "corpName": "HLB",
+    "market": "KOSDAQ",
+    "reportDate": "20260907",
+    "stockCode": "028300",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "팬오션",
+    "market": "KOSPI",
+    "reportDate": "20260820",
+    "stockCode": "028670",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "케이씨",
+    "market": "KOSPI",
+    "reportDate": "20260831",
+    "stockCode": "029460",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "원익홀딩스",
+    "market": "KOSDAQ",
+    "reportDate": "20260904",
+    "stockCode": "030530",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "동원수산",
+    "market": "KOSPI",
+    "reportDate": "20260828",
+    "stockCode": "030720",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "서울보증보험",
+    "market": "KOSPI",
+    "reportDate": "20260825",
+    "stockCode": "031210",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "아이티센씨티에스",
+    "market": "KOSPI",
+    "reportDate": "20260903",
+    "stockCode": "031820",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "피에스케이홀딩스",
+    "market": "KOSDAQ",
+    "reportDate": "20260902",
+    "stockCode": "031980",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "아즈텍WB",
+    "market": "KOSDAQ",
+    "reportDate": "20260908",
+    "stockCode": "032080",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "롯데관광개발",
+    "market": "KOSPI",
+    "reportDate": "20260904",
+    "stockCode": "032350",
+    "sourceKinds": [
+      "executive",
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "TJ미디어",
+    "market": "KOSDAQ",
+    "reportDate": "20260821",
+    "stockCode": "032540",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "피델릭스",
+    "market": "KOSDAQ",
+    "reportDate": "20260827",
+    "stockCode": "032580",
+    "sourceKinds": [
+      "contract"
+    ]
+  },
+  {
+    "corpName": "소프트센",
+    "market": "KOSDAQ",
+    "reportDate": "20260814",
+    "stockCode": "032680",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "엠젠솔루션",
+    "market": "KOSDAQ",
+    "reportDate": "20260907",
+    "stockCode": "032790",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "우리기술",
+    "market": "",
+    "reportDate": "20260331",
+    "stockCode": "032820",
+    "sourceKinds": [
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "삼성생명",
+    "market": "KOSPI",
+    "reportDate": "20260907",
+    "stockCode": "032830",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "비트컴퓨터",
+    "market": "KOSDAQ",
+    "reportDate": "20260901",
+    "stockCode": "032850",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "더라미",
+    "market": "KOSDAQ",
+    "reportDate": "20260908",
+    "stockCode": "032860",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "엠케이전자",
+    "market": "KOSDAQ",
+    "reportDate": "20260904",
+    "stockCode": "033160",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "시그네틱스",
+    "market": "KOSDAQ",
+    "reportDate": "20260907",
+    "stockCode": "033170",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "인성정보",
+    "market": "KOSDAQ",
+    "reportDate": "20260902",
+    "stockCode": "033230",
+    "sourceKinds": [
+      "executive",
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "체시스",
+    "market": "",
+    "reportDate": "20260331",
+    "stockCode": "033250",
+    "sourceKinds": [
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "유나이티드",
+    "market": "",
+    "reportDate": "20260331",
+    "stockCode": "033270",
+    "sourceKinds": [
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "로젠",
+    "market": "KOSDAQ",
+    "reportDate": "20260820",
+    "stockCode": "033290",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "엠투엔",
+    "market": "KOSDAQ",
+    "reportDate": "20260825",
+    "stockCode": "033310",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "파라텍",
+    "market": "KOSDAQ",
+    "reportDate": "20260901",
+    "stockCode": "033540",
+    "sourceKinds": [
+      "executive",
+      "contract",
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "케이티앤지",
+    "market": "KOSPI",
+    "reportDate": "20260907",
+    "stockCode": "033780",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "무학",
+    "market": "KOSPI",
+    "reportDate": "20260828",
+    "stockCode": "033920",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "두산에너빌리티",
+    "market": "KOSPI",
+    "reportDate": "20260901",
+    "stockCode": "034020",
+    "sourceKinds": [
+      "contract"
+    ]
+  },
+  {
+    "corpName": "LG디스플레이",
+    "market": "KOSPI",
+    "reportDate": "20260907",
+    "stockCode": "034220",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "파라다이스",
+    "market": "KOSPI",
+    "reportDate": "20260825",
+    "stockCode": "034230",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "NICE",
+    "market": "KOSPI",
+    "reportDate": "20260903",
+    "stockCode": "034310",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "SK",
+    "market": "KOSPI",
+    "reportDate": "20260828",
+    "stockCode": "034730",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "한국토지신탁",
+    "market": "KOSPI",
+    "reportDate": "20260904",
+    "stockCode": "034830",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "백산",
+    "market": "KOSPI",
+    "reportDate": "20260812",
+    "stockCode": "035150",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "프럼파스트",
+    "market": "KOSDAQ",
+    "reportDate": "20260902",
+    "stockCode": "035200",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "솔본",
+    "market": "KOSDAQ",
+    "reportDate": "20260824",
+    "stockCode": "035610",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "서희건설",
+    "market": "KOSDAQ",
+    "reportDate": "20260826",
+    "stockCode": "035890",
+    "sourceKinds": [
+      "contract"
+    ]
+  },
+  {
+    "corpName": "케이티알파",
+    "market": "KOSDAQ",
+    "reportDate": "20260821",
+    "stockCode": "036030",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "서울평가정보",
+    "market": "KOSDAQ",
+    "reportDate": "20260907",
+    "stockCode": "036120",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "금화피에스시",
+    "market": "KOSDAQ",
+    "reportDate": "20260904",
+    "stockCode": "036190",
+    "sourceKinds": [
+      "contract"
+    ]
+  },
+  {
+    "corpName": "유니셈",
+    "market": "KOSDAQ",
+    "reportDate": "20260908",
+    "stockCode": "036200",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "SNT홀딩스",
+    "market": "KOSPI",
+    "reportDate": "20260902",
+    "stockCode": "036530",
+    "sourceKinds": [
+      "contract"
+    ]
+  },
+  {
+    "corpName": "팜스코",
+    "market": "KOSPI",
+    "reportDate": "20260820",
+    "stockCode": "036580",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "감성코퍼레이션",
+    "market": "KOSDAQ",
+    "reportDate": "20260907",
+    "stockCode": "036620",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "세종텔레콤",
+    "market": "KOSDAQ",
+    "reportDate": "20260831",
+    "stockCode": "036630",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "솔브레인홀딩스",
+    "market": "KOSDAQ",
+    "reportDate": "20260901",
+    "stockCode": "036830",
+    "sourceKinds": [
+      "executive",
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "진성티이씨",
+    "market": "KOSDAQ",
+    "reportDate": "20260826",
+    "stockCode": "036890",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "EG",
+    "market": "KOSDAQ",
+    "stockCode": "037370",
+    "reportDate": "20260908",
+    "sourceKind": "contract",
+    "sourceKinds": [
+      "contract"
+    ]
+  },
+  {
+    "corpName": "우리엔터프라이즈",
+    "market": "KOSDAQ",
+    "reportDate": "20260820",
+    "stockCode": "037400",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "쎄니트",
+    "market": "KOSDAQ",
+    "reportDate": "20260826",
+    "stockCode": "037760",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "루멘스",
+    "market": "KOSDAQ",
+    "reportDate": "20260902",
+    "stockCode": "038060",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "바이오스마트",
+    "market": "KOSDAQ",
+    "reportDate": "20260812",
+    "stockCode": "038460",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "케이바이오랩스",
+    "market": "KOSDAQ",
+    "reportDate": "20260904",
+    "stockCode": "038530",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "상상인",
+    "market": "KOSDAQ",
+    "reportDate": "20260827",
+    "stockCode": "038540",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "에스넷",
+    "market": "KOSDAQ",
+    "reportDate": "20260902",
+    "stockCode": "038680",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "에코심플렉스",
+    "market": "KOSDAQ",
+    "reportDate": "20260827",
+    "stockCode": "038870",
+    "sourceKinds": [
+      "executive",
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "아이에이",
+    "market": "KOSDAQ",
+    "reportDate": "20260904",
+    "stockCode": "038880",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "현대에이치티",
+    "market": "KOSDAQ",
+    "reportDate": "20260824",
+    "stockCode": "039010",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "이오테크닉스",
+    "market": "KOSDAQ",
+    "reportDate": "20260901",
+    "stockCode": "039030",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "하나투어",
+    "market": "KOSPI",
+    "reportDate": "20260901",
+    "stockCode": "039130",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "오스코텍",
+    "market": "KOSDAQ",
+    "reportDate": "20260901",
+    "stockCode": "039200",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "한국경제TV",
+    "market": "KOSDAQ",
+    "reportDate": "20260901",
+    "stockCode": "039340",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "키움증권",
+    "market": "KOSPI",
+    "reportDate": "20260907",
+    "stockCode": "039490",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "크레오에스지",
+    "market": "KOSDAQ",
+    "reportDate": "20260825",
+    "stockCode": "040350",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "아이씨디",
+    "market": "KOSDAQ",
+    "reportDate": "20260907",
+    "stockCode": "040910",
+    "sourceKinds": [
+      "executive-static",
+      "contract"
+    ]
+  },
+  {
+    "corpName": "우리기술투자",
+    "market": "KOSDAQ",
+    "reportDate": "20260901",
+    "stockCode": "041190",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "에스엠",
+    "market": "KOSDAQ",
+    "reportDate": "20260819",
+    "stockCode": "041510",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "이엘씨",
+    "market": "KOSDAQ",
+    "reportDate": "20260827",
+    "stockCode": "041520",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "인바디",
+    "market": "KOSDAQ",
+    "reportDate": "20260812",
+    "stockCode": "041830",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "에스씨디",
+    "market": "KOSDAQ",
+    "reportDate": "20260827",
+    "stockCode": "042110",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "한스바이오메드",
+    "market": "KOSDAQ",
+    "reportDate": "20260903",
+    "stockCode": "042520",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "한화오션",
+    "market": "KOSPI",
+    "reportDate": "20260903",
+    "stockCode": "042660",
+    "sourceKinds": [
+      "contract"
+    ]
+  },
+  {
+    "corpName": "바텍",
+    "market": "KOSDAQ",
+    "reportDate": "20260907",
+    "stockCode": "043150",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "성호전자",
+    "market": "KOSDAQ",
+    "reportDate": "20260901",
+    "stockCode": "043260",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "웰킵스하이텍",
+    "market": "KOSDAQ",
+    "reportDate": "20260826",
+    "stockCode": "043590",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "코스리거글로벌",
+    "market": "KOSDAQ",
+    "reportDate": "20260904",
+    "stockCode": "043710",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "자연과환경",
+    "market": "KOSDAQ",
+    "reportDate": "20260819",
+    "stockCode": "043910",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "주연테크",
+    "market": "KOSPI",
+    "reportDate": "20260828",
+    "stockCode": "044380",
+    "sourceKinds": [
+      "executive",
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "KSS해운",
+    "market": "KOSPI",
+    "reportDate": "20260908",
+    "stockCode": "044450",
+    "sourceKinds": [
+      "executive",
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "빌리언스",
+    "market": "KOSDAQ",
+    "reportDate": "20260904",
+    "stockCode": "044480",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "한양이엔지",
+    "market": "KOSDAQ",
+    "reportDate": "20260908",
+    "stockCode": "045100",
+    "sourceKinds": [
+      "contract",
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "대아티아이",
+    "market": "KOSDAQ",
+    "reportDate": "20260828",
+    "stockCode": "045390",
+    "sourceKinds": [
+      "contract"
+    ]
+  },
+  {
+    "corpName": "정원엔시스",
+    "market": "KOSDAQ",
+    "reportDate": "20260902",
+    "stockCode": "045510",
+    "sourceKinds": [
+      "existing",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "크린앤사이언스",
+    "market": "KOSDAQ",
+    "reportDate": "20260814",
+    "stockCode": "045520",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "에이텍",
+    "market": "KOSDAQ",
+    "reportDate": "20260902",
+    "stockCode": "045660",
+    "sourceKinds": [
+      "executive",
+      "contract",
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "코아시아",
+    "market": "KOSDAQ",
+    "reportDate": "20260828",
+    "stockCode": "045970",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "HLB파나진",
+    "market": "KOSDAQ",
+    "reportDate": "20260827",
+    "stockCode": "046210",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "백금T&A",
+    "market": "KOSDAQ",
+    "reportDate": "20260825",
+    "stockCode": "046310",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "삼화네트웍스",
+    "market": "KOSDAQ",
+    "reportDate": "20260901",
+    "stockCode": "046390",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "contract"
+    ]
+  },
+  {
+    "corpName": "우원개발",
+    "market": "KOSDAQ",
+    "reportDate": "20260907",
+    "stockCode": "046940",
+    "sourceKinds": [
+      "contract"
+    ]
+  },
+  {
+    "corpName": "대우건설",
+    "market": "KOSPI",
+    "reportDate": "20260901",
+    "stockCode": "047040",
+    "sourceKinds": [
+      "contract"
+    ]
+  },
+  {
+    "corpName": "포스코인터내셔널",
+    "market": "KOSPI",
+    "reportDate": "20260907",
+    "stockCode": "047050",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "한빛소프트",
+    "market": "KOSDAQ",
+    "reportDate": "20260902",
+    "stockCode": "047080",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "파워로직스",
+    "market": "KOSDAQ",
+    "reportDate": "20260826",
+    "stockCode": "047310",
+    "sourceKinds": [
+      "executive",
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "유니온머티리얼",
+    "market": "KOSPI",
+    "reportDate": "20260826",
+    "stockCode": "047400",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "이스트소프트",
+    "market": "KOSDAQ",
+    "reportDate": "20260819",
+    "stockCode": "047560",
+    "sourceKinds": [
+      "existing",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "한국항공우주",
+    "market": "KOSPI",
+    "reportDate": "20260903",
+    "stockCode": "047810",
+    "sourceKinds": [
+      "executive",
+      "contract",
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "HLB제약",
+    "market": "KOSDAQ",
+    "reportDate": "20260903",
+    "stockCode": "047920",
+    "sourceKinds": [
+      "executive",
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "현대바이오",
+    "market": "KOSDAQ",
+    "reportDate": "20260908",
+    "stockCode": "048410",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "대동스틸",
+    "market": "KOSDAQ",
+    "reportDate": "20260828",
+    "stockCode": "048470",
+    "sourceKinds": [
+      "executive",
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "인트론바이오",
+    "market": "KOSDAQ",
+    "reportDate": "20260827",
+    "stockCode": "048530",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "파인디앤씨",
+    "market": "KOSDAQ",
+    "reportDate": "20260824",
+    "stockCode": "049120",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "오픈베이스",
+    "market": "KOSDAQ",
+    "reportDate": "20260902",
+    "stockCode": "049480",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "재영솔루텍",
+    "market": "KOSDAQ",
+    "reportDate": "20260819",
+    "stockCode": "049630",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "우진플라임",
+    "market": "KOSPI",
+    "reportDate": "20260827",
+    "stockCode": "049800",
+    "sourceKinds": [
+      "existing",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "캠시스",
+    "market": "KOSDAQ",
+    "reportDate": "20260818",
+    "stockCode": "050110",
+    "sourceKinds": [
+      "existing",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "ES큐브",
+    "market": "KOSDAQ",
+    "reportDate": "20260827",
+    "stockCode": "050120",
+    "sourceKinds": [
+      "executive",
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "수산아이앤티",
+    "market": "KOSDAQ",
+    "reportDate": "20260819",
+    "stockCode": "050960",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "지어소프트",
+    "market": "KOSDAQ",
+    "reportDate": "20260903",
+    "stockCode": "051160",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "토비스",
+    "market": "KOSDAQ",
+    "reportDate": "20260903",
+    "stockCode": "051360",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "나라엠앤디",
+    "market": "KOSDAQ",
+    "reportDate": "20260907",
+    "stockCode": "051490",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "진양화학",
+    "market": "KOSPI",
+    "reportDate": "20260904",
+    "stockCode": "051630",
+    "sourceKinds": [
+      "existing",
+      "executive",
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "큐로홀딩스",
+    "market": "KOSDAQ",
+    "reportDate": "20260907",
+    "stockCode": "051780",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "아모텍",
+    "market": "KOSDAQ",
+    "reportDate": "20260819",
+    "stockCode": "052710",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "KX하이텍",
+    "market": "KOSDAQ",
+    "reportDate": "20260908",
+    "stockCode": "052900",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "웹케시",
+    "market": "KOSDAQ",
+    "reportDate": "20260821",
+    "stockCode": "053580",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "한미글로벌",
+    "market": "KOSPI",
+    "reportDate": "20260902",
+    "stockCode": "053690",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "경남제약",
+    "market": "KOSDAQ",
+    "reportDate": "20260820",
+    "stockCode": "053950",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "삼진엘앤디",
+    "market": "KOSDAQ",
+    "reportDate": "20260907",
+    "stockCode": "054090",
+    "sourceKinds": [
+      "existing",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "비츠로시스",
+    "market": "KOSDAQ",
+    "reportDate": "20260831",
+    "stockCode": "054220",
+    "sourceKinds": [
+      "5percent",
+      "contract"
+    ]
+  },
+  {
+    "corpName": "팬스타엔터프라이즈",
+    "market": "KOSDAQ",
+    "reportDate": "20260901",
+    "stockCode": "054300",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "APS",
+    "market": "KOSDAQ",
+    "reportDate": "20260824",
+    "stockCode": "054620",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "키이스트",
+    "market": "KOSDAQ",
+    "reportDate": "20260826",
+    "stockCode": "054780",
+    "sourceKinds": [
+      "contract"
+    ]
+  },
+  {
+    "corpName": "유신",
+    "market": "KOSDAQ",
+    "reportDate": "20260831",
+    "stockCode": "054930",
+    "sourceKinds": [
+      "contract"
+    ]
+  },
+  {
+    "corpName": "신한지주",
+    "market": "KOSPI",
+    "reportDate": "20260902",
+    "stockCode": "055550",
+    "sourceKinds": [
+      "executive-static",
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "SFA",
+    "market": "KOSDAQ",
+    "reportDate": "20260819",
+    "stockCode": "056190",
+    "sourceKinds": [
+      "existing",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "CNT85",
+    "market": "KOSDAQ",
+    "reportDate": "20260831",
+    "stockCode": "056730",
+    "sourceKinds": [
+      "contract"
+    ]
+  },
+  {
+    "corpName": "옴니시스템",
+    "market": "KOSDAQ",
+    "reportDate": "20260818",
+    "stockCode": "057540",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "한주에이알티",
+    "market": "KOSDAQ",
+    "reportDate": "20260908",
+    "stockCode": "058450",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "세아홀딩스",
+    "market": "KOSPI",
+    "reportDate": "20260907",
+    "stockCode": "058650",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "다스코",
+    "market": "KOSPI",
+    "reportDate": "20260904",
+    "stockCode": "058730",
+    "sourceKinds": [
+      "contract",
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "미코",
+    "market": "KOSDAQ",
+    "reportDate": "20260903",
+    "stockCode": "059090",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "메타바이오메드",
+    "market": "KOSDAQ",
+    "reportDate": "20260825",
+    "stockCode": "059210",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "인선이엔티",
+    "market": "KOSDAQ",
+    "reportDate": "20260821",
+    "stockCode": "060150",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "제이케이시냅스",
+    "market": "KOSDAQ",
+    "reportDate": "20260818",
+    "stockCode": "060230",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "3S",
+    "market": "KOSDAQ",
+    "reportDate": "20260903",
+    "stockCode": "060310",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "LS마린솔루션",
+    "market": "KOSDAQ",
+    "reportDate": "20260831",
+    "stockCode": "060370",
+    "sourceKinds": [
+      "contract"
+    ]
+  },
+  {
+    "corpName": "에스에이티",
+    "market": "KOSDAQ",
+    "reportDate": "20260908",
+    "stockCode": "060540",
+    "sourceKinds": [
+      "executive",
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "드림어스컴퍼니",
+    "market": "KOSDAQ",
+    "reportDate": "20260901",
+    "stockCode": "060570",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "에이전트AI",
+    "market": "KOSDAQ",
+    "reportDate": "20260831",
+    "stockCode": "060900",
+    "sourceKinds": [
+      "5percent",
+      "executive",
+      "contract"
+    ]
+  },
+  {
+    "corpName": "HL홀딩스",
+    "market": "KOSPI",
+    "reportDate": "20260902",
+    "stockCode": "060980",
+    "sourceKinds": [
+      "contract"
+    ]
+  },
+  {
+    "corpName": "LB세미콘",
+    "market": "KOSDAQ",
+    "reportDate": "20260819",
+    "stockCode": "061970",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "산일전기",
+    "market": "KOSPI",
+    "reportDate": "20260813",
+    "stockCode": "062040",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "한국첨단소재",
+    "market": "KOSDAQ",
+    "reportDate": "20260902",
+    "stockCode": "062970",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "서울옥션",
+    "market": "KOSDAQ",
+    "reportDate": "20260903",
+    "stockCode": "063170",
+    "sourceKinds": [
+      "executive",
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "이엘피",
+    "market": "KOSDAQ",
+    "reportDate": "20260825",
+    "stockCode": "063760",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "인텍플러스",
+    "market": "KOSDAQ",
+    "reportDate": "20260901",
+    "stockCode": "064290",
+    "sourceKinds": [
+      "5percent",
+      "contract"
+    ]
+  },
+  {
+    "corpName": "지엔코",
+    "market": "KOSDAQ",
+    "reportDate": "20260908",
+    "stockCode": "065060",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "탑엔지니어링",
+    "market": "KOSDAQ",
+    "reportDate": "20260825",
+    "stockCode": "065130",
+    "sourceKinds": [
+      "executive",
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "위세아이텍",
+    "market": "KOSDAQ",
+    "reportDate": "20260828",
+    "stockCode": "065370",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "하이퍼코퍼레이션",
+    "market": "KOSDAQ",
+    "reportDate": "20260902",
+    "stockCode": "065650",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "서호전기",
+    "market": "KOSDAQ",
+    "reportDate": "20260828",
+    "stockCode": "065710",
+    "sourceKinds": [
+      "contract"
+    ]
+  },
+  {
+    "corpName": "웰크론",
+    "market": "KOSDAQ",
+    "reportDate": "20260828",
+    "stockCode": "065950",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "엘앤에프",
+    "market": "KOSPI",
+    "reportDate": "20260826",
+    "stockCode": "066970",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "한성크린텍",
+    "market": "KOSDAQ",
+    "reportDate": "20260901",
+    "stockCode": "066980",
+    "sourceKinds": [
+      "contract"
+    ]
+  },
+  {
+    "corpName": "조이시티",
+    "market": "KOSDAQ",
+    "reportDate": "20260818",
+    "stockCode": "067000",
+    "sourceKinds": [
+      "existing",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "대화제약",
+    "market": "KOSDAQ",
+    "reportDate": "20260820",
+    "stockCode": "067080",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "SOOP",
+    "market": "KOSDAQ",
+    "reportDate": "20260813",
+    "stockCode": "067160",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "오텍",
+    "market": "KOSDAQ",
+    "reportDate": "20260901",
+    "stockCode": "067170",
+    "sourceKinds": [
+      "existing",
+      "executive",
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "하나마이크론",
+    "market": "KOSDAQ",
+    "reportDate": "20260827",
+    "stockCode": "067310",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "도이치모터스",
+    "market": "KOSDAQ",
+    "reportDate": "20260824",
+    "stockCode": "067990",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "셀트리온",
+    "market": "KOSPI",
+    "reportDate": "20260828",
+    "stockCode": "068270",
+    "sourceKinds": [
+      "executive",
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "DMS",
+    "market": "KOSDAQ",
+    "reportDate": "20260831",
+    "stockCode": "068790",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "유아이디",
+    "market": "KOSDAQ",
+    "reportDate": "20260826",
+    "stockCode": "069330",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "빛과전자",
+    "market": "KOSDAQ",
+    "reportDate": "20260904",
+    "stockCode": "069540",
+    "sourceKinds": [
+      "executive-static",
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "대웅제약",
+    "market": "KOSPI",
+    "reportDate": "20260821",
+    "stockCode": "069620",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "한세엠케이",
+    "market": "KOSPI",
+    "reportDate": "20260907",
+    "stockCode": "069640",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "현대백화점",
+    "market": "KOSPI",
+    "reportDate": "20260831",
+    "stockCode": "069960",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "인피니트헬스케어",
+    "market": "KOSDAQ",
+    "reportDate": "20260901",
+    "stockCode": "071200",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "코아스",
+    "market": "KOSPI",
+    "reportDate": "20260904",
+    "stockCode": "071950",
+    "sourceKinds": [
+      "executive-static",
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "HD현대마린엔진",
+    "market": "KOSPI",
+    "reportDate": "20260831",
+    "stockCode": "071970",
+    "sourceKinds": [
+      "contract"
+    ]
+  },
+  {
+    "corpName": "에이치시티",
+    "market": "KOSDAQ",
+    "reportDate": "20260831",
+    "stockCode": "072990",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "금호타이어",
+    "market": "KOSPI",
+    "reportDate": "20260813",
+    "stockCode": "073240",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "LIG아큐버",
+    "market": "KOSDAQ",
+    "reportDate": "20260903",
+    "stockCode": "073490",
+    "sourceKinds": [
+      "contract"
+    ]
+  },
+  {
+    "corpName": "동국알앤에스",
+    "market": "KOSDAQ",
+    "reportDate": "20260907",
+    "stockCode": "075970",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "웰크론한텍",
+    "market": "KOSDAQ",
+    "reportDate": "20260908",
+    "stockCode": "076080",
+    "sourceKinds": [
+      "executive",
+      "5percent",
+      "contract"
+    ]
+  },
+  {
+    "corpName": "컴투스",
+    "market": "KOSDAQ",
+    "reportDate": "20260904",
+    "stockCode": "078340",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "GS",
+    "market": "KOSPI",
+    "reportDate": "20260826",
+    "stockCode": "078930",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "LIG디펜스앤에어로스페이스",
+    "market": "KOSPI",
+    "reportDate": "20260901",
+    "stockCode": "079550",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "APS이노베이션",
+    "market": "KOSDAQ",
+    "reportDate": "20260907",
+    "stockCode": "079810",
+    "sourceKinds": [
+      "contract",
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "가비아",
+    "market": "KOSDAQ",
+    "reportDate": "20260813",
+    "stockCode": "079940",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "투비소프트",
+    "market": "KOSDAQ",
+    "reportDate": "20260901",
+    "stockCode": "079970",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "이상네트웍스",
+    "market": "KOSDAQ",
+    "reportDate": "20260819",
+    "stockCode": "080010",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "모다이노칩",
+    "market": "KOSDAQ",
+    "reportDate": "20260821",
+    "stockCode": "080420",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "젬백스",
+    "market": "KOSDAQ",
+    "reportDate": "20260901",
+    "stockCode": "082270",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "동양생명",
+    "market": "KOSPI",
+    "reportDate": "20260818",
+    "stockCode": "082640",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "한화엔진",
+    "market": "KOSPI",
+    "reportDate": "20260828",
+    "stockCode": "082740",
+    "sourceKinds": [
+      "contract"
+    ]
+  },
+  {
+    "corpName": "비보존 제약",
+    "market": "KOSDAQ",
+    "reportDate": "20260821",
+    "stockCode": "082800",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "비츠로셀",
+    "market": "KOSDAQ",
+    "reportDate": "20260907",
+    "stockCode": "082920",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "GST",
+    "market": "KOSDAQ",
+    "reportDate": "20260824",
+    "stockCode": "083450",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "이엠앤아이",
+    "market": "KOSDAQ",
+    "reportDate": "20260904",
+    "stockCode": "083470",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "인콘",
+    "market": "KOSDAQ",
+    "reportDate": "20260904",
+    "stockCode": "083640",
+    "sourceKinds": [
+      "5percent",
+      "executive",
+      "contract"
+    ]
+  },
+  {
+    "corpName": "비에이치아이",
+    "market": "KOSDAQ",
+    "reportDate": "20260902",
+    "stockCode": "083650",
+    "sourceKinds": [
+      "contract"
+    ]
+  },
+  {
+    "corpName": "CSA 코스믹",
+    "market": "KOSDAQ",
+    "reportDate": "20260903",
+    "stockCode": "083660",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "CG인바이츠",
+    "market": "KOSDAQ",
+    "reportDate": "20260907",
+    "stockCode": "083790",
+    "sourceKinds": [
+      "5percent",
+      "contract"
+    ]
+  },
+  {
+    "corpName": "아바코",
+    "market": "KOSDAQ",
+    "reportDate": "20260827",
+    "stockCode": "083930",
+    "sourceKinds": [
+      "executive",
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "수성웹툰",
+    "market": "KOSDAQ",
+    "reportDate": "20260908",
+    "stockCode": "084180",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "유진테크",
+    "market": "KOSDAQ",
+    "reportDate": "20260827",
+    "stockCode": "084370",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "이월드",
+    "market": "KOSPI",
+    "reportDate": "20260904",
+    "stockCode": "084680",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "팅크웨어",
+    "market": "KOSDAQ",
+    "reportDate": "20260831",
+    "stockCode": "084730",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "아이티엠반도체",
+    "market": "KOSDAQ",
+    "reportDate": "20260903",
+    "stockCode": "084850",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "티비에이치글로벌",
+    "market": "KOSPI",
+    "reportDate": "20260907",
+    "stockCode": "084870",
+    "sourceKinds": [
+      "executive",
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "차바이오텍",
+    "market": "KOSDAQ",
+    "reportDate": "20260903",
+    "stockCode": "085660",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "바이오톡스텍",
+    "market": "KOSDAQ",
+    "reportDate": "20260907",
+    "stockCode": "086040",
+    "sourceKinds": [
+      "executive",
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "에코프로",
+    "market": "KOSDAQ",
+    "reportDate": "20260908",
+    "stockCode": "086520",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "하나금융지주",
+    "market": "KOSPI",
+    "reportDate": "20260825",
+    "stockCode": "086790",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "메디톡스",
+    "market": "KOSDAQ",
+    "reportDate": "20260828",
+    "stockCode": "086900",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "유라클",
+    "market": "KOSDAQ",
+    "reportDate": "20260820",
+    "stockCode": "088340",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "이녹스",
+    "market": "KOSDAQ",
+    "reportDate": "20260828",
+    "stockCode": "088390",
+    "sourceKinds": [
+      "contract"
+    ]
+  },
+  {
+    "corpName": "테크윙",
+    "market": "KOSDAQ",
+    "reportDate": "20260907",
+    "stockCode": "089030",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "넥스턴앤롤코리아",
+    "market": "KOSDAQ",
+    "reportDate": "20260904",
+    "stockCode": "089140",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "KT나스미디어",
+    "market": "KOSDAQ",
+    "reportDate": "20260902",
+    "stockCode": "089600",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "유비벨록스",
+    "market": "KOSDAQ",
+    "reportDate": "20260831",
+    "stockCode": "089850",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "롯데렌탈",
+    "market": "KOSPI",
+    "reportDate": "20260818",
+    "stockCode": "089860",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "브이엠",
+    "market": "KOSDAQ",
+    "reportDate": "20260908",
+    "stockCode": "089970",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "상아프론테크",
+    "market": "KOSDAQ",
+    "reportDate": "20260901",
+    "stockCode": "089980",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "평화산업",
+    "market": "KOSPI",
+    "reportDate": "20260901",
+    "stockCode": "090080",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "덕신이피씨",
+    "market": "KOSDAQ",
+    "reportDate": "20260908",
+    "stockCode": "090410",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "아모레퍼시픽",
+    "market": "KOSPI",
+    "reportDate": "20260902",
+    "stockCode": "090430",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "비에이치",
+    "market": "",
+    "reportDate": "20260331",
+    "stockCode": "090460",
+    "sourceKinds": [
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "제이스로보틱스",
+    "market": "KOSDAQ",
+    "reportDate": "20260902",
+    "stockCode": "090470",
+    "sourceKinds": [
+      "contract"
+    ]
+  },
+  {
+    "corpName": "현대이지웰",
+    "market": "KOSDAQ",
+    "reportDate": "20260813",
+    "stockCode": "090850",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "이엠텍",
+    "market": "KOSDAQ",
+    "reportDate": "20260826",
+    "stockCode": "091120",
+    "sourceKinds": [
+      "existing",
+      "executive",
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "한울소재과학",
+    "market": "KOSDAQ",
+    "reportDate": "20260812",
+    "stockCode": "091440",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "파트론",
+    "market": "KOSDAQ",
+    "reportDate": "20260901",
+    "stockCode": "091700",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "트리니티항공",
+    "market": "KOSPI",
+    "reportDate": "20260908",
+    "stockCode": "091810",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "아미코젠",
+    "market": "KOSDAQ",
+    "reportDate": "20260903",
+    "stockCode": "092040",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "엑시콘",
+    "market": "KOSDAQ",
+    "reportDate": "20260904",
+    "stockCode": "092870",
+    "sourceKinds": [
+      "contract"
+    ]
+  },
+  {
+    "corpName": "후성",
+    "market": "KOSPI",
+    "reportDate": "20260828",
+    "stockCode": "093370",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "매커스",
+    "market": "KOSDAQ",
+    "reportDate": "20260903",
+    "stockCode": "093520",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "동운아나텍",
+    "market": "KOSDAQ",
+    "reportDate": "20260824",
+    "stockCode": "094170",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "일진파워",
+    "market": "KOSDAQ",
+    "reportDate": "20260902",
+    "stockCode": "094820",
+    "sourceKinds": [
+      "contract"
+    ]
+  },
+  {
+    "corpName": "웨이브일렉트로",
+    "market": "KOSDAQ",
+    "reportDate": "20260820",
+    "stockCode": "095270",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "AJ네트웍스",
+    "market": "KOSPI",
+    "reportDate": "20260828",
+    "stockCode": "095570",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "크레버스",
+    "market": "KOSDAQ",
+    "reportDate": "20260903",
+    "stockCode": "096240",
+    "sourceKinds": [
+      "executive",
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "와이즈넛",
+    "market": "KOSDAQ",
+    "reportDate": "20260901",
+    "stockCode": "096250",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "씨젠",
+    "market": "KOSDAQ",
+    "reportDate": "20260826",
+    "stockCode": "096530",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "HJ중공업",
+    "market": "KOSPI",
+    "reportDate": "20260902",
+    "stockCode": "097230",
+    "sourceKinds": [
+      "contract",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "윈팩",
+    "market": "KOSDAQ",
+    "reportDate": "20260821",
+    "stockCode": "097800",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "한텍",
+    "market": "KOSDAQ",
+    "reportDate": "20260904",
+    "stockCode": "098070",
+    "sourceKinds": [
+      "executive",
+      "contract"
+    ]
+  },
+  {
+    "corpName": "고영",
+    "market": "KOSDAQ",
+    "reportDate": "20260908",
+    "stockCode": "098460",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "SK오션플랜트",
+    "market": "KOSPI",
+    "reportDate": "20260907",
+    "stockCode": "100090",
+    "sourceKinds": [
+      "5percent",
+      "contract"
+    ]
+  },
+  {
+    "corpName": "미래에셋벤처투자",
+    "market": "KOSDAQ",
+    "reportDate": "20260908",
+    "stockCode": "100790",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "SNT에너지",
+    "market": "KOSPI",
+    "reportDate": "20260902",
+    "stockCode": "100840",
+    "sourceKinds": [
+      "contract"
+    ]
+  },
+  {
+    "corpName": "인바이오젠",
+    "market": "KOSPI",
+    "reportDate": "20260820",
+    "stockCode": "101140",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "우림피티에스",
+    "market": "KOSDAQ",
+    "reportDate": "20260902",
+    "stockCode": "101170",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "에코앤드림",
+    "market": "KOSDAQ",
+    "reportDate": "20260820",
+    "stockCode": "101360",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "한국정밀기계",
+    "market": "KOSDAQ",
+    "reportDate": "20260907",
+    "stockCode": "101680",
+    "sourceKinds": [
+      "existing",
+      "executive",
+      "5percent",
+      "contract"
+    ]
+  },
+  {
+    "corpName": "우양에이치씨",
+    "market": "KOSDAQ",
+    "reportDate": "20260831",
+    "stockCode": "101970",
+    "sourceKinds": [
+      "contract"
+    ]
+  },
+  {
+    "corpName": "어보브반도체",
+    "market": "KOSDAQ",
+    "reportDate": "20260825",
+    "stockCode": "102120",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "케이옥션",
+    "market": "KOSDAQ",
+    "reportDate": "20260821",
+    "stockCode": "102370",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "에스앤더블류",
+    "market": "KOSDAQ",
+    "reportDate": "20260902",
+    "stockCode": "103230",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "디에스엠",
+    "market": "KOSDAQ",
+    "reportDate": "20260825",
+    "stockCode": "104040",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "티케이케미칼",
+    "market": "",
+    "reportDate": "20260331",
+    "stockCode": "104480",
+    "sourceKinds": [
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "노랑풍선",
+    "market": "KOSDAQ",
+    "reportDate": "20260831",
+    "stockCode": "104620",
+    "sourceKinds": [
+      "executive",
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "케이엔더블유",
+    "market": "KOSDAQ",
+    "reportDate": "20260820",
+    "stockCode": "105330",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "엣지파운드리",
+    "market": "KOSDAQ",
+    "reportDate": "20260903",
+    "stockCode": "105550",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "한세실업",
+    "market": "KOSPI",
+    "reportDate": "20260904",
+    "stockCode": "105630",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "디케이락",
+    "market": "KOSDAQ",
+    "reportDate": "20260812",
+    "stockCode": "105740",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "우진",
+    "market": "KOSPI",
+    "reportDate": "20260826",
+    "stockCode": "105840",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "하이텍팜",
+    "market": "KOSDAQ",
+    "reportDate": "20260812",
+    "stockCode": "106190",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "미원홀딩스",
+    "market": "KOSPI",
+    "reportDate": "20260827",
+    "stockCode": "107590",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "새빗켐",
+    "market": "KOSDAQ",
+    "reportDate": "20260901",
+    "stockCode": "107600",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "한중엔시에스",
+    "market": "KOSDAQ",
+    "reportDate": "20260819",
+    "stockCode": "107640",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "톱텍",
+    "market": "KOSDAQ",
+    "reportDate": "20260904",
+    "stockCode": "108230",
+    "sourceKinds": [
+      "contract"
+    ]
+  },
+  {
+    "corpName": "로보티즈",
+    "market": "KOSDAQ",
+    "reportDate": "20260908",
+    "stockCode": "108490",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "주성코퍼레이션",
+    "market": "KOSPI",
+    "reportDate": "20260827",
+    "stockCode": "109070",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "에스와이",
+    "market": "KOSDAQ",
+    "reportDate": "20260828",
+    "stockCode": "109610",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "디에스케이",
+    "market": "",
+    "reportDate": "20260331",
+    "stockCode": "109740",
+    "sourceKinds": [
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "전진바이오팜",
+    "market": "KOSDAQ",
+    "reportDate": "20260821",
+    "stockCode": "110020",
+    "sourceKinds": [
+      "5percent",
+      "executive",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "위메이드",
+    "market": "KOSDAQ",
+    "reportDate": "20260818",
+    "stockCode": "112040",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "씨에스윈드",
+    "market": "KOSPI",
+    "reportDate": "20260907",
+    "stockCode": "112610",
+    "sourceKinds": [
+      "5percent",
+      "contract"
+    ]
+  },
+  {
+    "corpName": "디젠스",
+    "market": "KOSDAQ",
+    "reportDate": "20260907",
+    "stockCode": "113810",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "강원에너지",
+    "market": "KOSDAQ",
+    "reportDate": "20260828",
+    "stockCode": "114190",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static",
+      "contract"
+    ]
+  },
+  {
+    "corpName": "우리넷",
+    "market": "KOSDAQ",
+    "reportDate": "20260818",
+    "stockCode": "115440",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "HLB테라퓨틱스",
+    "market": "KOSDAQ",
+    "reportDate": "20260904",
+    "stockCode": "115450",
+    "sourceKinds": [
+      "contract",
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "씨엔플러스",
+    "market": "KOSDAQ",
+    "reportDate": "20260831",
+    "stockCode": "115530",
+    "sourceKinds": [
+      "contract"
+    ]
+  },
+  {
+    "corpName": "스타플렉스",
+    "market": "KOSDAQ",
+    "reportDate": "20260828",
+    "stockCode": "115570",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "지엔씨에너지",
+    "market": "KOSDAQ",
+    "reportDate": "20260831",
+    "stockCode": "119850",
+    "sourceKinds": [
+      "contract"
+    ]
+  },
+  {
+    "corpName": "코오롱인더",
+    "market": "KOSPI",
+    "reportDate": "20260907",
+    "stockCode": "120110",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "골프존홀딩스",
+    "market": "KOSDAQ",
+    "reportDate": "20260812",
+    "stockCode": "121440",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "제노레이",
+    "market": "KOSDAQ",
+    "reportDate": "20260828",
+    "stockCode": "122310",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "삼기",
+    "market": "KOSDAQ",
+    "reportDate": "20260825",
+    "stockCode": "122350",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "예스티",
+    "market": "KOSDAQ",
+    "reportDate": "20260825",
+    "stockCode": "122640",
+    "sourceKinds": [
+      "contract"
+    ]
+  },
+  {
+    "corpName": "알톤",
+    "market": "KOSDAQ",
+    "reportDate": "20260828",
+    "stockCode": "123750",
+    "sourceKinds": [
+      "contract"
+    ]
+  },
+  {
+    "corpName": "뉴온",
+    "market": "KOSDAQ",
+    "reportDate": "20260904",
+    "stockCode": "123840",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "아나패스",
+    "market": "KOSDAQ",
+    "reportDate": "20260908",
+    "stockCode": "123860",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "태웅로직스",
+    "market": "KOSDAQ",
+    "reportDate": "20260813",
+    "stockCode": "124560",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "비나텍",
+    "market": "KOSDAQ",
+    "reportDate": "20260907",
+    "stockCode": "126340",
+    "sourceKinds": [
+      "5percent",
+      "contract"
+    ]
+  },
+  {
+    "corpName": "BGF에코머티리얼즈",
+    "market": "",
+    "reportDate": "20260331",
+    "stockCode": "126600",
+    "sourceKinds": [
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "하이비젼시스템",
+    "market": "",
+    "reportDate": "20260331",
+    "stockCode": "126700",
+    "sourceKinds": [
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "수산인더스트리",
+    "market": "KOSPI",
+    "reportDate": "20260901",
+    "stockCode": "126720",
+    "sourceKinds": [
+      "contract"
+    ]
+  },
+  {
+    "corpName": "코칩",
+    "market": "KOSDAQ",
+    "reportDate": "20260825",
+    "stockCode": "126730",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "제이에스링크",
+    "market": "KOSDAQ",
+    "reportDate": "20260831",
+    "stockCode": "127120",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "대성산업",
+    "market": "KOSPI",
+    "reportDate": "20260820",
+    "stockCode": "128820",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "한미약품",
+    "market": "KOSPI",
+    "reportDate": "20260908",
+    "stockCode": "128940",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "대성하이텍",
+    "market": "KOSDAQ",
+    "reportDate": "20260831",
+    "stockCode": "129920",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "한전산업",
+    "market": "KOSPI",
+    "reportDate": "20260826",
+    "stockCode": "130660",
+    "sourceKinds": [
+      "contract"
+    ]
+  },
+  {
+    "corpName": "대한과학",
+    "market": "KOSDAQ",
+    "reportDate": "20260813",
+    "stockCode": "131220",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "두산테스나",
+    "market": "KOSDAQ",
+    "reportDate": "20260904",
+    "stockCode": "131970",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "탑코미디어",
+    "market": "KOSDAQ",
+    "reportDate": "20260903",
+    "stockCode": "134580",
+    "sourceKinds": [
+      "executive",
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "원일티엔아이",
+    "market": "KOSDAQ",
+    "reportDate": "20260828",
+    "stockCode": "136150",
+    "sourceKinds": [
+      "contract"
+    ]
+  },
+  {
+    "corpName": "에스디바이오센서",
+    "market": "KOSPI",
+    "reportDate": "20260820",
+    "stockCode": "137310",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "피엔티",
+    "market": "KOSDAQ",
+    "reportDate": "20260902",
+    "stockCode": "137400",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "메리츠금융지주",
+    "market": "KOSPI",
+    "reportDate": "20260904",
+    "stockCode": "138040",
+    "sourceKinds": [
+      "executive",
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "신진에스엠",
+    "market": "KOSDAQ",
+    "reportDate": "20260828",
+    "stockCode": "138070",
+    "sourceKinds": [
+      "5percent",
+      "executive",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "오이솔루션",
+    "market": "KOSDAQ",
+    "reportDate": "20260902",
+    "stockCode": "138080",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "파크시스템스",
+    "market": "KOSDAQ",
+    "reportDate": "20260903",
+    "stockCode": "140860",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "모아라이프플러스",
+    "market": "KOSDAQ",
+    "reportDate": "20260902",
+    "stockCode": "142760",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "아이디스",
+    "market": "KOSDAQ",
+    "reportDate": "20260908",
+    "stockCode": "143160",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "영우디에스피",
+    "market": "KOSDAQ",
+    "reportDate": "20260821",
+    "stockCode": "143540",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "휴젤",
+    "market": "KOSDAQ",
+    "reportDate": "20260821",
+    "stockCode": "145020",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "노브랜드",
+    "market": "KOSDAQ",
+    "reportDate": "20260901",
+    "stockCode": "145170",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "세경하이테크",
+    "market": "KOSDAQ",
+    "reportDate": "20260826",
+    "stockCode": "148150",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "비큐AI",
+    "market": "KOSDAQ",
+    "reportDate": "20260825",
+    "stockCode": "148780",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "파수AI",
+    "market": "KOSDAQ",
+    "reportDate": "20260902",
+    "stockCode": "150900",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "네이블",
+    "market": "KOSDAQ",
+    "reportDate": "20260831",
+    "stockCode": "153460",
+    "sourceKinds": [
+      "contract"
+    ]
+  },
+  {
+    "corpName": "다산솔루에타",
+    "market": "KOSDAQ",
+    "reportDate": "20260904",
+    "stockCode": "154040",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "엘앤케이바이오",
+    "market": "KOSDAQ",
+    "reportDate": "20260820",
+    "stockCode": "156100",
+    "sourceKinds": [
+      "executive",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "아스플로",
+    "market": "KOSDAQ",
+    "reportDate": "20260825",
+    "stockCode": "159010",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static",
+      "contract"
+    ]
+  },
+  {
+    "corpName": "하이젠알앤엠",
+    "market": "KOSDAQ",
+    "reportDate": "20260907",
+    "stockCode": "160190",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "필옵틱스",
+    "market": "KOSDAQ",
+    "reportDate": "20260828",
+    "stockCode": "161580",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "한국콜마",
+    "market": "KOSPI",
+    "reportDate": "20260825",
+    "stockCode": "161890",
+    "sourceKinds": [
+      "executive",
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "신스틸",
+    "market": "KOSDAQ",
+    "reportDate": "20260814",
+    "stockCode": "162300",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "핑거",
+    "market": "KOSDAQ",
+    "reportDate": "20260828",
+    "stockCode": "163730",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "코아스템켐온",
+    "market": "KOSDAQ",
+    "reportDate": "20260903",
+    "stockCode": "166480",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "엠브레인",
+    "market": "KOSDAQ",
+    "reportDate": "20260818",
+    "stockCode": "169330",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "에프엔씨엔터",
+    "market": "KOSDAQ",
+    "reportDate": "20260825",
+    "stockCode": "173940",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "앱클론",
+    "market": "KOSDAQ",
+    "reportDate": "20260831",
+    "stockCode": "174900",
+    "sourceKinds": [
+      "contract"
+    ]
+  },
+  {
+    "corpName": "아이큐어",
+    "market": "KOSDAQ",
+    "reportDate": "20260904",
+    "stockCode": "175250",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "듀켐바이오",
+    "market": "KOSDAQ",
+    "reportDate": "20260831",
+    "stockCode": "176750",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "파버나인",
+    "market": "KOSDAQ",
+    "reportDate": "20260901",
+    "stockCode": "177830",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "서진시스템",
+    "market": "KOSDAQ",
+    "reportDate": "20260907",
+    "stockCode": "178320",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "일월지엠엘",
+    "market": "KOSDAQ",
+    "reportDate": "20260901",
+    "stockCode": "178780",
+    "sourceKinds": [
+      "existing",
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "유티아이",
+    "market": "KOSDAQ",
+    "reportDate": "20260818",
+    "stockCode": "179900",
+    "sourceKinds": [
+      "existing",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "DXVX",
+    "market": "KOSDAQ",
+    "reportDate": "20260821",
+    "stockCode": "180400",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "한진칼",
+    "market": "",
+    "reportDate": "20260331",
+    "stockCode": "180640",
+    "sourceKinds": [
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "NHN",
+    "market": "KOSPI",
+    "reportDate": "20260901",
+    "stockCode": "181710",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "코미코",
+    "market": "KOSDAQ",
+    "reportDate": "20260903",
+    "stockCode": "183300",
+    "sourceKinds": [
+      "executive",
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "종근당",
+    "market": "KOSPI",
+    "reportDate": "20260831",
+    "stockCode": "185750",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "디티앤씨",
+    "market": "KOSDAQ",
+    "reportDate": "20260827",
+    "stockCode": "187220",
+    "sourceKinds": [
+      "executive",
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "페니트리움바이오",
+    "market": "KOSDAQ",
+    "reportDate": "20260904",
+    "stockCode": "187660",
+    "sourceKinds": [
+      "executive",
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "바이오포트",
+    "market": "KOSDAQ",
+    "reportDate": "20260831",
+    "stockCode": "188040",
+    "sourceKinds": [
+      "executive",
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "세니젠",
+    "market": "KOSDAQ",
+    "reportDate": "20260821",
+    "stockCode": "188260",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "인텔리안테크",
+    "market": "KOSDAQ",
+    "reportDate": "20260831",
+    "stockCode": "189300",
+    "sourceKinds": [
+      "contract"
+    ]
+  },
+  {
+    "corpName": "씨이랩",
+    "market": "KOSDAQ",
+    "reportDate": "20260826",
+    "stockCode": "189330",
+    "sourceKinds": [
+      "contract"
+    ]
+  },
+  {
+    "corpName": "흥국에프엔비",
+    "market": "KOSDAQ",
+    "reportDate": "20260902",
+    "stockCode": "189980",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "슈피겐코리아",
+    "market": "KOSDAQ",
+    "reportDate": "20260821",
+    "stockCode": "192440",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "코스맥스",
+    "market": "KOSPI",
+    "reportDate": "20260903",
+    "stockCode": "192820",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "링크드",
+    "market": "KOSDAQ",
+    "reportDate": "20260828",
+    "stockCode": "193250",
+    "sourceKinds": [
+      "executive",
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "데브시스터즈",
+    "market": "KOSDAQ",
+    "reportDate": "20260826",
+    "stockCode": "194480",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "노바렉스",
+    "market": "KOSDAQ",
+    "reportDate": "20260827",
+    "stockCode": "194700",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "HLB펩",
+    "market": "KOSDAQ",
+    "reportDate": "20260820",
+    "stockCode": "196300",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "강동씨앤엘",
+    "market": "KOSDAQ",
+    "reportDate": "20260908",
+    "stockCode": "198440",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "뱅크웨어글로벌",
+    "market": "KOSDAQ",
+    "reportDate": "20260813",
+    "stockCode": "199480",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "툴젠",
+    "market": "KOSDAQ",
+    "reportDate": "20260908",
+    "stockCode": "199800",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "아티스트스튜디오",
+    "market": "KOSDAQ",
+    "reportDate": "20260901",
+    "stockCode": "200350",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "에이비온",
+    "market": "KOSDAQ",
+    "reportDate": "20260818",
+    "stockCode": "203400",
+    "sourceKinds": [
+      "existing",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "유니온바이오메트릭스",
+    "market": "KOSDAQ",
+    "reportDate": "20260827",
+    "stockCode": "203450",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "드림시큐리티",
+    "market": "KOSDAQ",
+    "reportDate": "20260902",
+    "stockCode": "203650",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "제이앤티씨",
+    "market": "KOSDAQ",
+    "reportDate": "20260903",
+    "stockCode": "204270",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "글로벌텍스프리",
+    "market": "KOSDAQ",
+    "reportDate": "20260908",
+    "stockCode": "204620",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "엑셈",
+    "market": "KOSDAQ",
+    "reportDate": "20260907",
+    "stockCode": "205100",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "휴마시스",
+    "market": "KOSDAQ",
+    "reportDate": "20260904",
+    "stockCode": "205470",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "넥써쓰",
+    "market": "KOSDAQ",
+    "reportDate": "20260821",
+    "stockCode": "205500",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "베노티앤알",
+    "market": "KOSDAQ",
+    "reportDate": "20260903",
+    "stockCode": "206400",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "지란지교시큐리티",
+    "market": "KOSDAQ",
+    "reportDate": "20260814",
+    "stockCode": "208350",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "다산디엠씨",
+    "market": "KOSDAQ",
+    "reportDate": "20260901",
+    "stockCode": "208860",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "SK디앤디",
+    "market": "KOSPI",
+    "reportDate": "20260828",
+    "stockCode": "210980",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static",
+      "contract"
+    ]
+  },
+  {
+    "corpName": "인카금융서비스",
+    "market": "KOSDAQ",
+    "reportDate": "20260831",
+    "stockCode": "211050",
+    "sourceKinds": [
+      "existing",
+      "executive",
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "아이에스티이",
+    "market": "KOSDAQ",
+    "reportDate": "20260901",
+    "stockCode": "212710",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "클래시스",
+    "market": "KOSDAQ",
+    "reportDate": "20260903",
+    "stockCode": "214150",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "FSN",
+    "market": "KOSDAQ",
+    "reportDate": "20260902",
+    "stockCode": "214270",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "이노션",
+    "market": "KOSPI",
+    "reportDate": "20260901",
+    "stockCode": "214320",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "금호에이치티",
+    "market": "KOSPI",
+    "reportDate": "20260828",
+    "stockCode": "214330",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "토니모리",
+    "market": "KOSPI",
+    "reportDate": "20260903",
+    "stockCode": "214420",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "아이쓰리시스템",
+    "market": "KOSDAQ",
+    "reportDate": "20260828",
+    "stockCode": "214430",
+    "sourceKinds": [
+      "contract"
+    ]
+  },
+  {
+    "corpName": "메가스터디교육",
+    "market": "KOSDAQ",
+    "reportDate": "20260907",
+    "stockCode": "215200",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "제테마",
+    "market": "KOSDAQ",
+    "reportDate": "20260904",
+    "stockCode": "216080",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "제너셈",
+    "market": "KOSDAQ",
+    "reportDate": "20260907",
+    "stockCode": "217190",
+    "sourceKinds": [
+      "contract"
+    ]
+  },
+  {
+    "corpName": "싸이토젠",
+    "market": "KOSDAQ",
+    "reportDate": "20260902",
+    "stockCode": "217330",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "티엠씨",
+    "market": "KOSPI",
+    "reportDate": "20260824",
+    "stockCode": "217590",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "RFHIC",
+    "market": "KOSDAQ",
+    "reportDate": "20260908",
+    "stockCode": "218410",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "퓨쳐켐",
+    "market": "KOSDAQ",
+    "reportDate": "20260824",
+    "stockCode": "220100",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "SFA넥셀",
+    "market": "KOSDAQ",
+    "reportDate": "20260820",
+    "stockCode": "222080",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "쎄노텍",
+    "market": "KOSDAQ",
+    "reportDate": "20260818",
+    "stockCode": "222420",
+    "sourceKinds": [
+      "existing",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "심텍",
+    "market": "KOSDAQ",
+    "reportDate": "20260901",
+    "stockCode": "222800",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "한국맥널티",
+    "market": "KOSDAQ",
+    "reportDate": "20260824",
+    "stockCode": "222980",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "사토시홀딩스",
+    "market": "KOSDAQ",
+    "reportDate": "20260903",
+    "stockCode": "223310",
+    "sourceKinds": [
+      "executive-static",
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "더코디",
+    "market": "KOSDAQ",
+    "reportDate": "20260904",
+    "stockCode": "224060",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "에이텍모빌리티",
+    "market": "KOSDAQ",
+    "reportDate": "20260825",
+    "stockCode": "224110",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "제놀루션",
+    "market": "KOSDAQ",
+    "reportDate": "20260908",
+    "stockCode": "225220",
+    "sourceKinds": [
+      "executive",
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "패션플랫폼",
+    "market": "KOSDAQ",
+    "reportDate": "20260828",
+    "stockCode": "225590",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "본느",
+    "market": "KOSDAQ",
+    "reportDate": "20260824",
+    "stockCode": "226340",
+    "sourceKinds": [
+      "existing",
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "오스테오닉",
+    "market": "KOSDAQ",
+    "reportDate": "20260904",
+    "stockCode": "226400",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "올릭스",
+    "market": "KOSDAQ",
+    "reportDate": "20260901",
+    "stockCode": "226950",
+    "sourceKinds": [
+      "executive",
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "아우딘퓨쳐스",
+    "market": "KOSDAQ",
+    "reportDate": "20260828",
+    "stockCode": "227610",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "엔투텍",
+    "market": "KOSDAQ",
+    "reportDate": "20260907",
+    "stockCode": "227950",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "레이",
+    "market": "KOSDAQ",
+    "reportDate": "20260818",
+    "stockCode": "228670",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "와이씨",
+    "market": "KOSDAQ",
+    "reportDate": "20260827",
+    "stockCode": "232140",
+    "sourceKinds": [
+      "contract"
+    ]
+  },
+  {
+    "corpName": "에스트래픽",
+    "market": "KOSDAQ",
+    "reportDate": "20260908",
+    "stockCode": "234300",
+    "sourceKinds": [
+      "contract",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "슈프리마",
+    "market": "KOSDAQ",
+    "reportDate": "20260825",
+    "stockCode": "236200",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "엔비티",
+    "market": "KOSDAQ",
+    "reportDate": "20260903",
+    "stockCode": "236810",
+    "sourceKinds": [
+      "existing",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "힘스",
+    "market": "KOSDAQ",
+    "reportDate": "20260820",
+    "stockCode": "238490",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "이스트에이드",
+    "market": "KOSDAQ",
+    "reportDate": "20260825",
+    "stockCode": "239340",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "유진테크놀로지",
+    "market": "KOSDAQ",
+    "reportDate": "20260826",
+    "stockCode": "240600",
+    "sourceKinds": [
+      "contract"
+    ]
+  },
+  {
+    "corpName": "DSC인베스트먼트",
+    "market": "KOSDAQ",
+    "reportDate": "20260827",
+    "stockCode": "241520",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "코스메카코리아",
+    "market": "KOSDAQ",
+    "reportDate": "20260902",
+    "stockCode": "241710",
+    "sourceKinds": [
+      "executive",
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "메카로",
+    "market": "KOSDAQ",
+    "reportDate": "20260908",
+    "stockCode": "241770",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "티앤알바이오팹",
+    "market": "KOSDAQ",
+    "reportDate": "20260819",
+    "stockCode": "246710",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "SCL사이언스",
+    "market": "KOSDAQ",
+    "reportDate": "20260818",
+    "stockCode": "246960",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "에코프로비엠",
+    "market": "KOSDAQ",
+    "reportDate": "20260908",
+    "stockCode": "247540",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "나노씨엠에스",
+    "market": "KOSDAQ",
+    "reportDate": "20260901",
+    "stockCode": "247660",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "솔루엠",
+    "market": "KOSPI",
+    "reportDate": "20260828",
+    "stockCode": "248070",
+    "sourceKinds": [
+      "executive",
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "예선테크",
+    "market": "KOSDAQ",
+    "reportDate": "20260821",
+    "stockCode": "250930",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "넷마블",
+    "market": "KOSPI",
+    "reportDate": "20260828",
+    "stockCode": "251270",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "안지오랩",
+    "market": "",
+    "reportDate": "20260812",
+    "stockCode": "251280",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "와이엠티",
+    "market": "KOSDAQ",
+    "reportDate": "20260904",
+    "stockCode": "251370",
+    "sourceKinds": [
+      "executive",
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "세화피앤씨",
+    "market": "KOSDAQ",
+    "reportDate": "20260907",
+    "stockCode": "252500",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "네오셈",
+    "market": "KOSDAQ",
+    "reportDate": "20260831",
+    "stockCode": "253590",
+    "sourceKinds": [
+      "5percent",
+      "contract"
+    ]
+  },
+  {
+    "corpName": "자비스",
+    "market": "KOSDAQ",
+    "reportDate": "20260903",
+    "stockCode": "254120",
+    "sourceKinds": [
+      "executive",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "SG",
+    "market": "KOSDAQ",
+    "reportDate": "20260821",
+    "stockCode": "255220",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "야스",
+    "market": "",
+    "reportDate": "20260331",
+    "stockCode": "255440",
+    "sourceKinds": [
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "피엔티엠에스",
+    "market": "KOSDAQ",
+    "reportDate": "20260908",
+    "stockCode": "257370",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "실리콘투",
+    "market": "KOSDAQ",
+    "reportDate": "20260908",
+    "stockCode": "257720",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "소프트캠프",
+    "market": "KOSDAQ",
+    "reportDate": "20260812",
+    "stockCode": "258790",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "씨티케이",
+    "market": "KOSDAQ",
+    "reportDate": "20260903",
+    "stockCode": "260930",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "덴티스",
+    "market": "KOSDAQ",
+    "reportDate": "20260907",
+    "stockCode": "261200",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "이지스",
+    "market": "KOSDAQ",
+    "reportDate": "20260904",
+    "stockCode": "261520",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "디케이앤디",
+    "market": "KOSDAQ",
+    "reportDate": "20260903",
+    "stockCode": "263020",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "씨앤지하이테크",
+    "market": "KOSDAQ",
+    "reportDate": "20260908",
+    "stockCode": "264660",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "HD현대",
+    "market": "KOSPI",
+    "reportDate": "20260908",
+    "stockCode": "267250",
+    "sourceKinds": [
+      "contract",
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "HD현대일렉트릭",
+    "market": "KOSPI",
+    "reportDate": "20260827",
+    "stockCode": "267260",
+    "sourceKinds": [
+      "executive-static",
+      "contract"
+    ]
+  },
+  {
+    "corpName": "나인테크",
+    "market": "KOSDAQ",
+    "reportDate": "20260828",
+    "stockCode": "267320",
+    "sourceKinds": [
+      "contract"
+    ]
+  },
+  {
+    "corpName": "아시아나IDT",
+    "market": "KOSPI",
+    "reportDate": "20260903",
+    "stockCode": "267850",
+    "sourceKinds": [
+      "contract"
+    ]
+  },
+  {
+    "corpName": "시스웍",
+    "market": "KOSDAQ",
+    "reportDate": "20260824",
+    "stockCode": "269620",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "앱튼",
+    "market": "KOSDAQ",
+    "reportDate": "20260828",
+    "stockCode": "270520",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "오리온",
+    "market": "KOSPI",
+    "reportDate": "20260901",
+    "stockCode": "271560",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "케이엔제이",
+    "market": "",
+    "reportDate": "20260331",
+    "stockCode": "272110",
+    "sourceKinds": [
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "이녹스첨단소재",
+    "market": "KOSDAQ",
+    "reportDate": "20260902",
+    "stockCode": "272290",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "에스에스알",
+    "market": "KOSDAQ",
+    "reportDate": "20260908",
+    "stockCode": "275630",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "티에스아이",
+    "market": "KOSDAQ",
+    "reportDate": "20260903",
+    "stockCode": "277880",
+    "sourceKinds": [
+      "contract"
+    ]
+  },
+  {
+    "corpName": "천보",
+    "market": "KOSDAQ",
+    "reportDate": "20260831",
+    "stockCode": "278280",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "HLB바이오스텝",
+    "market": "KOSDAQ",
+    "reportDate": "20260828",
+    "stockCode": "278650",
+    "sourceKinds": [
+      "executive",
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "미디어젠",
+    "market": "KOSDAQ",
+    "reportDate": "20260831",
+    "stockCode": "279600",
+    "sourceKinds": [
+      "contract"
+    ]
+  },
+  {
+    "corpName": "BGF리테일",
+    "market": "",
+    "reportDate": "20260331",
+    "stockCode": "282330",
+    "sourceKinds": [
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "기도산업",
+    "market": "KOSDAQ",
+    "reportDate": "20260825",
+    "stockCode": "282620",
+    "sourceKinds": [
+      "executive",
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "금양그린파워",
+    "market": "KOSDAQ",
+    "reportDate": "20260908",
+    "stockCode": "282720",
+    "sourceKinds": [
+      "contract",
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "코윈테크",
+    "market": "KOSDAQ",
+    "reportDate": "20260827",
+    "stockCode": "282880",
+    "sourceKinds": [
+      "contract"
+    ]
+  },
+  {
+    "corpName": "나노실리칸첨단소재",
+    "market": "KOSDAQ",
+    "reportDate": "20260908",
+    "stockCode": "286750",
+    "sourceKinds": [
+      "executive-static",
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "모아데이타",
+    "market": "KOSDAQ",
+    "reportDate": "20260907",
+    "stockCode": "288980",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "SV인베스트먼트",
+    "market": "KOSDAQ",
+    "reportDate": "20260818",
+    "stockCode": "289080",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "DH오토리드",
+    "market": "KOSDAQ",
+    "reportDate": "20260908",
+    "stockCode": "290120",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "푸드나무",
+    "market": "KOSDAQ",
+    "reportDate": "20260902",
+    "stockCode": "290720",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "츌립앤사이언스",
+    "market": "KOSDAQ",
+    "reportDate": "20260820",
+    "stockCode": "291650",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "하나제약",
+    "market": "KOSPI",
+    "reportDate": "20260827",
+    "stockCode": "293480",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "카카오게임즈",
+    "market": "KOSDAQ",
+    "reportDate": "20260825",
+    "stockCode": "293490",
+    "sourceKinds": [
+      "executive",
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "신한알파리츠",
+    "market": "KOSPI",
+    "reportDate": "20260903",
+    "stockCode": "293940",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "서남",
+    "market": "KOSDAQ",
+    "reportDate": "20260904",
+    "stockCode": "294630",
+    "sourceKinds": [
+      "contract"
+    ]
+  },
+  {
+    "corpName": "IPARK현대산업개발",
+    "market": "KOSPI",
+    "reportDate": "20260901",
+    "stockCode": "294870",
+    "sourceKinds": [
+      "contract"
+    ]
+  },
+  {
+    "corpName": "에이치브이엠",
+    "market": "KOSDAQ",
+    "reportDate": "20260901",
+    "stockCode": "295310",
+    "sourceKinds": [
+      "executive-static",
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "이노에이엑스",
+    "market": "KOSDAQ",
+    "reportDate": "20260825",
+    "stockCode": "296640",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "아틀라스링크",
+    "market": "KOSDAQ",
+    "reportDate": "20260907",
+    "stockCode": "297570",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "효성티앤씨",
+    "market": "KOSPI",
+    "reportDate": "20260901",
+    "stockCode": "298020",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "HS효성첨단소재",
+    "market": "KOSPI",
+    "reportDate": "20260901",
+    "stockCode": "298050",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "에이비엘바이오",
+    "market": "KOSDAQ",
+    "reportDate": "20260904",
+    "stockCode": "298380",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "더네이쳐홀딩스",
+    "market": "KOSDAQ",
+    "reportDate": "20260901",
+    "stockCode": "298540",
+    "sourceKinds": [
+      "executive",
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "플리토",
+    "market": "KOSDAQ",
+    "reportDate": "20260902",
+    "stockCode": "300080",
+    "sourceKinds": [
+      "executive",
+      "contract"
+    ]
+  },
+  {
+    "corpName": "한일시멘트",
+    "market": "KOSPI",
+    "reportDate": "20260831",
+    "stockCode": "300720",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "이노메트리",
+    "market": "KOSDAQ",
+    "reportDate": "20260904",
+    "stockCode": "302430",
+    "sourceKinds": [
+      "contract"
+    ]
+  },
+  {
+    "corpName": "리메드",
+    "market": "KOSDAQ",
+    "reportDate": "20260826",
+    "stockCode": "302550",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "이노뎁",
+    "market": "KOSDAQ",
+    "reportDate": "20260827",
+    "stockCode": "303530",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "에스바이오메딕스",
+    "market": "KOSDAQ",
+    "reportDate": "20260831",
+    "stockCode": "304360",
+    "sourceKinds": [
+      "executive",
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "에스제이그룹",
+    "market": "KOSDAQ",
+    "reportDate": "20260908",
+    "stockCode": "306040",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "아이엘",
+    "market": "KOSDAQ",
+    "reportDate": "20260825",
+    "stockCode": "307180",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "국전",
+    "market": "KOSDAQ",
+    "reportDate": "20260903",
+    "stockCode": "307750",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "비투엔",
+    "market": "KOSDAQ",
+    "reportDate": "20260821",
+    "stockCode": "307870",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "보로노이",
+    "market": "KOSDAQ",
+    "reportDate": "20260831",
+    "stockCode": "310210",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "지놈앤컴퍼니",
+    "market": "KOSDAQ",
+    "reportDate": "20260821",
+    "stockCode": "314130",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "바이오다인",
+    "market": "KOSDAQ",
+    "reportDate": "20260814",
+    "stockCode": "314930",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "우리금융지주",
+    "market": "KOSPI",
+    "reportDate": "20260902",
+    "stockCode": "316140",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "TS트릴리온",
+    "market": "KOSDAQ",
+    "reportDate": "20260901",
+    "stockCode": "317240",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "자이에스앤디",
+    "market": "KOSPI",
+    "reportDate": "20260908",
+    "stockCode": "317400",
+    "sourceKinds": [
+      "contract"
+    ]
+  },
+  {
+    "corpName": "KBG",
+    "market": "KOSDAQ",
+    "reportDate": "20260901",
+    "stockCode": "318000",
+    "sourceKinds": [
+      "existing",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "한울반도체",
+    "market": "KOSDAQ",
+    "reportDate": "20260813",
+    "stockCode": "320000",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "센서뷰",
+    "market": "KOSDAQ",
+    "reportDate": "20260901",
+    "stockCode": "321370",
+    "sourceKinds": [
+      "executive",
+      "5percent",
+      "contract"
+    ]
+  },
+  {
+    "corpName": "코퍼스코리아",
+    "market": "KOSDAQ",
+    "reportDate": "20260825",
+    "stockCode": "322780",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "태성",
+    "market": "KOSDAQ",
+    "reportDate": "20260828",
+    "stockCode": "323280",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "에스케이바이오팜",
+    "market": "KOSPI",
+    "reportDate": "20260831",
+    "stockCode": "326030",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "HD현대중공업",
+    "market": "KOSPI",
+    "reportDate": "20260908",
+    "stockCode": "329180",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "롯데리츠",
+    "market": "KOSPI",
+    "reportDate": "20260903",
+    "stockCode": "330590",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "포커스에이아이",
+    "market": "KOSDAQ",
+    "reportDate": "20260908",
+    "stockCode": "331380",
+    "sourceKinds": [
+      "executive",
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "밸로프",
+    "market": "KOSDAQ",
+    "reportDate": "20260908",
+    "stockCode": "331520",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "셀레믹스",
+    "market": "KOSDAQ",
+    "reportDate": "20260903",
+    "stockCode": "331920",
+    "sourceKinds": [
+      "contract",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "누보",
+    "market": "KOSDAQ",
+    "reportDate": "20260908",
+    "stockCode": "332290",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "PS일렉트로닉스",
+    "market": "KOSDAQ",
+    "reportDate": "20260818",
+    "stockCode": "332570",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "이지스밸류플러스리츠",
+    "market": "KOSPI",
+    "reportDate": "20260903",
+    "stockCode": "334890",
+    "sourceKinds": [
+      "existing",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "윙스풋",
+    "market": "KOSDAQ",
+    "reportDate": "20260908",
+    "stockCode": "335870",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "두산퓨얼셀",
+    "market": "KOSPI",
+    "reportDate": "20260904",
+    "stockCode": "336260",
+    "sourceKinds": [
+      "contract"
+    ]
+  },
+  {
+    "corpName": "솔루스첨단소재",
+    "market": "KOSPI",
+    "reportDate": "20260824",
+    "stockCode": "336370",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "원텍",
+    "market": "KOSDAQ",
+    "reportDate": "20260814",
+    "stockCode": "336570",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "뷰노",
+    "market": "KOSDAQ",
+    "reportDate": "20260904",
+    "stockCode": "338220",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "교촌에프앤비",
+    "market": "KOSPI",
+    "reportDate": "20260904",
+    "stockCode": "339770",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "다보링크",
+    "market": "KOSDAQ",
+    "reportDate": "20260903",
+    "stockCode": "340360",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "성원에너텍",
+    "market": "KOSDAQ",
+    "reportDate": "20260814",
+    "stockCode": "340930",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "이노진",
+    "market": "KOSDAQ",
+    "reportDate": "20260825",
+    "stockCode": "344860",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "스피어",
+    "market": "KOSDAQ",
+    "reportDate": "20260907",
+    "stockCode": "347700",
+    "sourceKinds": [
+      "contract",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "핌스",
+    "market": "KOSDAQ",
+    "reportDate": "20260831",
+    "stockCode": "347770",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "디앤디파마텍",
+    "market": "KOSDAQ",
+    "reportDate": "20260908",
+    "stockCode": "347850",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "알체라",
+    "market": "KOSDAQ",
+    "reportDate": "20260907",
+    "stockCode": "347860",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "뉴로메카",
+    "market": "KOSDAQ",
+    "reportDate": "20260901",
+    "stockCode": "348340",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "엔켐",
+    "market": "KOSDAQ",
+    "reportDate": "20260819",
+    "stockCode": "348370",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "넥사다이내믹스",
+    "market": "KOSDAQ",
+    "reportDate": "20260907",
+    "stockCode": "351320",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "이삭엔지니어링",
+    "market": "KOSDAQ",
+    "reportDate": "20260828",
+    "stockCode": "351330",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "씨앤투스",
+    "market": "KOSDAQ",
+    "reportDate": "20260908",
+    "stockCode": "352700",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "하이브",
+    "market": "KOSPI",
+    "reportDate": "20260904",
+    "stockCode": "352820",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "오비고",
+    "market": "KOSDAQ",
+    "reportDate": "20260831",
+    "stockCode": "352910",
+    "sourceKinds": [
+      "executive",
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "인바이오",
+    "market": "KOSDAQ",
+    "reportDate": "20260826",
+    "stockCode": "352940",
+    "sourceKinds": [
+      "existing",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "휴럼",
+    "market": "KOSDAQ",
+    "reportDate": "20260901",
+    "stockCode": "353190",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "오토앤",
+    "market": "KOSDAQ",
+    "reportDate": "20260826",
+    "stockCode": "353590",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "엔젠바이오",
+    "market": "KOSDAQ",
+    "reportDate": "20260814",
+    "stockCode": "354200",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "크라우드웍스",
+    "market": "KOSDAQ",
+    "reportDate": "20260902",
+    "stockCode": "355390",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "티엘비",
+    "market": "KOSDAQ",
+    "reportDate": "20260827",
+    "stockCode": "356860",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "코람코라이프인프라리츠",
+    "market": "KOSPI",
+    "reportDate": "20260903",
+    "stockCode": "357120",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "미래에셋맵스리츠",
+    "market": "KOSPI",
+    "reportDate": "20260903",
+    "stockCode": "357250",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "SKAI",
+    "market": "KOSDAQ",
+    "reportDate": "20260814",
+    "stockCode": "357880",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "지아이이노베이션",
+    "market": "KOSDAQ",
+    "reportDate": "20260904",
+    "stockCode": "358570",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "제노코",
+    "market": "KOSDAQ",
+    "reportDate": "20260826",
+    "stockCode": "361390",
+    "sourceKinds": [
+      "contract"
+    ]
+  },
+  {
+    "corpName": "삼영에스앤씨",
+    "market": "KOSDAQ",
+    "reportDate": "20260902",
+    "stockCode": "361670",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "청담글로벌",
+    "market": "KOSDAQ",
+    "reportDate": "20260904",
+    "stockCode": "362320",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "드림인사이트",
+    "market": "KOSDAQ",
+    "reportDate": "20260821",
+    "stockCode": "362990",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "모비데이즈",
+    "market": "KOSDAQ",
+    "reportDate": "20260820",
+    "stockCode": "363260",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "에스와이스틸텍",
+    "market": "KOSDAQ",
+    "reportDate": "20260902",
+    "stockCode": "365330",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "성일하이텍",
+    "market": "KOSDAQ",
+    "reportDate": "20260826",
+    "stockCode": "365340",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "ESR켄달스퀘어리츠",
+    "market": "KOSPI",
+    "reportDate": "20260903",
+    "stockCode": "365550",
+    "sourceKinds": [
+      "executive",
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "레몬헬스케어",
+    "market": "KOSDAQ",
+    "reportDate": "20260812",
+    "stockCode": "365660",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "나인앤컴퍼니",
+    "market": "KOSDAQ",
+    "reportDate": "20260812",
+    "stockCode": "366030",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "플래티어",
+    "market": "KOSDAQ",
+    "reportDate": "20260831",
+    "stockCode": "367000",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "아이씨에이치",
+    "market": "KOSDAQ",
+    "reportDate": "20260901",
+    "stockCode": "368600",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "파이버프로",
+    "market": "KOSDAQ",
+    "reportDate": "20260901",
+    "stockCode": "368770",
+    "sourceKinds": [
+      "contract"
+    ]
+  },
+  {
+    "corpName": "오에스피",
+    "market": "KOSDAQ",
+    "reportDate": "20260901",
+    "stockCode": "368970",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "풍원정밀",
+    "market": "KOSDAQ",
+    "reportDate": "20260901",
+    "stockCode": "371950",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "아이티아이즈",
+    "market": "KOSDAQ",
+    "reportDate": "20260902",
+    "stockCode": "372800",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "DL이앤씨",
+    "market": "KOSPI",
+    "reportDate": "20260907",
+    "stockCode": "375500",
+    "sourceKinds": [
+      "contract",
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "피코그램",
+    "market": "",
+    "reportDate": "20260331",
+    "stockCode": "376180",
+    "sourceKinds": [
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "HEM파마",
+    "market": "KOSDAQ",
+    "reportDate": "20260904",
+    "stockCode": "376270",
+    "sourceKinds": [
+      "5percent",
+      "executive",
+      "contract"
+    ]
+  },
+  {
+    "corpName": "디어유",
+    "market": "KOSDAQ",
+    "reportDate": "20260907",
+    "stockCode": "376300",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "노을",
+    "market": "KOSDAQ",
+    "reportDate": "20260819",
+    "stockCode": "376930",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "원티드랩",
+    "market": "KOSDAQ",
+    "reportDate": "20260812",
+    "stockCode": "376980",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "디앤디플랫폼리츠",
+    "market": "KOSPI",
+    "reportDate": "20260903",
+    "stockCode": "377190",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "프롬바이오",
+    "market": "KOSDAQ",
+    "reportDate": "20260819",
+    "stockCode": "377220",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "카카오페이",
+    "market": "KOSPI",
+    "reportDate": "20260821",
+    "stockCode": "377300",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "리파인",
+    "market": "KOSDAQ",
+    "reportDate": "20260901",
+    "stockCode": "377450",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "필에너지",
+    "market": "KOSDAQ",
+    "reportDate": "20260831",
+    "stockCode": "378340",
+    "sourceKinds": [
+      "contract"
+    ]
+  },
+  {
+    "corpName": "옵티코어",
+    "market": "KOSDAQ",
+    "reportDate": "20260819",
+    "stockCode": "380540",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "케이카",
+    "market": "KOSPI",
+    "reportDate": "20260907",
+    "stockCode": "381970",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "지아이텍",
+    "market": "KOSDAQ",
+    "reportDate": "20260902",
+    "stockCode": "382480",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "지앤비에스 에코",
+    "market": "KOSDAQ",
+    "reportDate": "20260819",
+    "stockCode": "382800",
+    "sourceKinds": [
+      "existing",
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "에코프로에이치엔",
+    "market": "KOSDAQ",
+    "reportDate": "20260901",
+    "stockCode": "383310",
+    "sourceKinds": [
+      "contract"
+    ]
+  },
+  {
+    "corpName": "스카이랩스",
+    "market": "KOSDAQ",
+    "reportDate": "20260907",
+    "stockCode": "386380",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "지에프씨생명과학",
+    "market": "KOSDAQ",
+    "reportDate": "20260904",
+    "stockCode": "388610",
+    "sourceKinds": [
+      "5percent",
+      "executive",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "자람테크놀로지",
+    "market": "KOSDAQ",
+    "reportDate": "20260831",
+    "stockCode": "389020",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "대명에너지",
+    "market": "KOSDAQ",
+    "stockCode": "389260",
+    "reportDate": "20260908",
+    "sourceKind": "contract",
+    "sourceKinds": [
+      "contract"
+    ]
+  },
+  {
+    "corpName": "유디엠텍",
+    "market": "KOSDAQ",
+    "reportDate": "20260828",
+    "stockCode": "389680",
+    "sourceKinds": [
+      "contract"
+    ]
+  },
+  {
+    "corpName": "토마토시스템",
+    "market": "KOSDAQ",
+    "reportDate": "20260826",
+    "stockCode": "393210",
+    "sourceKinds": [
+      "5percent",
+      "contract"
+    ]
+  },
+  {
+    "corpName": "대진첨단소재",
+    "market": "KOSDAQ",
+    "reportDate": "20260903",
+    "stockCode": "393970",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "오픈엣지테크놀로지",
+    "market": "KOSDAQ",
+    "reportDate": "20260828",
+    "stockCode": "394280",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "SK리츠",
+    "market": "KOSPI",
+    "reportDate": "20260903",
+    "stockCode": "395400",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "HT로보틱스",
+    "market": "KOSDAQ",
+    "reportDate": "20260904",
+    "stockCode": "396300",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "미래에셋글로벌리츠",
+    "market": "KOSPI",
+    "reportDate": "20260903",
+    "stockCode": "396690",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "에이프릴바이오",
+    "market": "KOSDAQ",
+    "reportDate": "20260828",
+    "stockCode": "397030",
+    "sourceKinds": [
+      "executive",
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "애드포러스",
+    "market": "KOSDAQ",
+    "reportDate": "20260904",
+    "stockCode": "397810",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "에스지헬스케어",
+    "market": "KOSDAQ",
+    "reportDate": "20260826",
+    "stockCode": "398120",
+    "sourceKinds": [
+      "contract"
+    ]
+  },
+  {
+    "corpName": "가온칩스",
+    "market": "KOSDAQ",
+    "reportDate": "20260826",
+    "stockCode": "399720",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "코난테크놀로지",
+    "market": "KOSDAQ",
+    "reportDate": "20260901",
+    "stockCode": "402030",
+    "sourceKinds": [
+      "executive",
+      "contract"
+    ]
+  },
+  {
+    "corpName": "SK스퀘어",
+    "market": "KOSPI",
+    "reportDate": "20260812",
+    "stockCode": "402340",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "더핑크퐁컴퍼니",
+    "market": "KOSDAQ",
+    "reportDate": "20260819",
+    "stockCode": "403850",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "신한서부티엔디리츠",
+    "market": "KOSPI",
+    "reportDate": "20260903",
+    "stockCode": "404990",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "꿈비",
+    "market": "KOSDAQ",
+    "reportDate": "20260904",
+    "stockCode": "407400",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "스튜디오삼익",
+    "market": "KOSDAQ",
+    "reportDate": "20260901",
+    "stockCode": "415380",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "니어스랩",
+    "market": "KOSDAQ",
+    "reportDate": "20260902",
+    "stockCode": "417030",
+    "sourceKinds": [
+      "executive",
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "핑거스토리",
+    "market": "KOSDAQ",
+    "reportDate": "20260831",
+    "stockCode": "417180",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "코람코더원리츠",
+    "market": "KOSPI",
+    "reportDate": "20260903",
+    "stockCode": "417310",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "오브젠",
+    "market": "KOSDAQ",
+    "reportDate": "20260903",
+    "stockCode": "417860",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "라온텍",
+    "market": "KOSDAQ",
+    "reportDate": "20260904",
+    "stockCode": "418420",
+    "sourceKinds": [
+      "5percent",
+      "executive",
+      "contract"
+    ]
+  },
+  {
+    "corpName": "KT밀리의서재",
+    "market": "",
+    "reportDate": "20260331",
+    "stockCode": "418470",
+    "sourceKinds": [
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "E8",
+    "market": "KOSDAQ",
+    "reportDate": "20260831",
+    "stockCode": "418620",
+    "sourceKinds": [
+      "executive",
+      "contract"
+    ]
+  },
+  {
+    "corpName": "비스토스",
+    "market": "KOSDAQ",
+    "reportDate": "20260820",
+    "stockCode": "419540",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "제이투케이바이오",
+    "market": "KOSDAQ",
+    "reportDate": "20260826",
+    "stockCode": "420570",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "스마트레이더시스템",
+    "market": "KOSDAQ",
+    "reportDate": "20260825",
+    "stockCode": "424960",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "시지트로닉스",
+    "market": "KOSDAQ",
+    "reportDate": "20260907",
+    "stockCode": "429270",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "에르코스",
+    "market": "KOSDAQ",
+    "reportDate": "20260902",
+    "stockCode": "435570",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "버넥트",
+    "market": "KOSDAQ",
+    "reportDate": "20260831",
+    "stockCode": "438700",
+    "sourceKinds": [
+      "5percent",
+      "contract"
+    ]
+  },
+  {
+    "corpName": "코스모로보틱스",
+    "market": "KOSDAQ",
+    "reportDate": "20260813",
+    "stockCode": "439960",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "파두",
+    "market": "KOSDAQ",
+    "reportDate": "20260826",
+    "stockCode": "440110",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "파인엠텍",
+    "market": "KOSDAQ",
+    "reportDate": "20260818",
+    "stockCode": "441270",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "에이직랜드",
+    "market": "KOSDAQ",
+    "reportDate": "20260825",
+    "stockCode": "445090",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "퓨릿",
+    "market": "KOSDAQ",
+    "reportDate": "20260901",
+    "stockCode": "445180",
+    "sourceKinds": [
+      "executive",
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "유니드비티플러스",
+    "market": "KOSPI",
+    "reportDate": "20260825",
+    "stockCode": "446070",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "에코아이",
+    "market": "KOSDAQ",
+    "reportDate": "20260828",
+    "stockCode": "448280",
+    "sourceKinds": [
+      "executive",
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "삼성FN리츠",
+    "market": "KOSPI",
+    "reportDate": "20260903",
+    "stockCode": "448730",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "한국피아이엠",
+    "market": "KOSDAQ",
+    "reportDate": "20260904",
+    "stockCode": "448900",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "에코프로머티",
+    "market": "KOSPI",
+    "reportDate": "20260813",
+    "stockCode": "450080",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "아이엠티",
+    "market": "KOSDAQ",
+    "reportDate": "20260907",
+    "stockCode": "451220",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "한화리츠",
+    "market": "KOSPI",
+    "reportDate": "20260903",
+    "stockCode": "451800",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "제이엔비",
+    "market": "KOSDAQ",
+    "reportDate": "20260824",
+    "stockCode": "452160",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "현대그린푸드",
+    "market": "KOSPI",
+    "reportDate": "20260831",
+    "stockCode": "453340",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "그리드위즈",
+    "market": "KOSDAQ",
+    "reportDate": "20260908",
+    "stockCode": "453450",
+    "sourceKinds": [
+      "executive-static",
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "두산로보틱스",
+    "market": "KOSPI",
+    "reportDate": "20260904",
+    "stockCode": "454910",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "케이지에이",
+    "market": "KOSDAQ",
+    "reportDate": "20260818",
+    "stockCode": "455180",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "이엔셀",
+    "market": "KOSDAQ",
+    "reportDate": "20260827",
+    "stockCode": "456070",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "지투지바이오",
+    "market": "KOSDAQ",
+    "reportDate": "20260821",
+    "stockCode": "456160",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "우진엔텍",
+    "market": "KOSDAQ",
+    "reportDate": "20260901",
+    "stockCode": "457550",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "벡트",
+    "market": "KOSDAQ",
+    "reportDate": "20260813",
+    "stockCode": "457600",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "씨어스",
+    "market": "KOSDAQ",
+    "reportDate": "20260814",
+    "stockCode": "458870",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "나우로보틱스",
+    "market": "KOSDAQ",
+    "reportDate": "20260907",
+    "stockCode": "459510",
+    "sourceKinds": [
+      "contract"
+    ]
+  },
+  {
+    "corpName": "에스엠씨지",
+    "market": "KOSDAQ",
+    "reportDate": "20260907",
+    "stockCode": "460870",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "아이스크림미디어",
+    "market": "KOSDAQ",
+    "reportDate": "20260827",
+    "stockCode": "461300",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "에스오에스랩",
+    "market": "KOSDAQ",
+    "reportDate": "20260902",
+    "stockCode": "464080",
+    "sourceKinds": [
+      "contract",
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "쿼드메디슨",
+    "market": "KOSDAQ",
+    "reportDate": "20260831",
+    "stockCode": "464490",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "닷밀",
+    "market": "KOSDAQ",
+    "reportDate": "20260827",
+    "stockCode": "464580",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "교보15호스팩",
+    "market": "KOSDAQ",
+    "reportDate": "20260827",
+    "stockCode": "465320",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "인스피언",
+    "market": "KOSDAQ",
+    "reportDate": "20260902",
+    "stockCode": "465480",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "클로봇",
+    "market": "KOSDAQ",
+    "reportDate": "20260828",
+    "stockCode": "466100",
+    "sourceKinds": [
+      "executive",
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "프로티나",
+    "market": "KOSDAQ",
+    "reportDate": "20260825",
+    "stockCode": "468530",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "아이비젼웍스",
+    "market": "KOSDAQ",
+    "reportDate": "20260902",
+    "stockCode": "469750",
+    "sourceKinds": [
+      "contract"
+    ]
+  },
+  {
+    "corpName": "하나31호스팩",
+    "market": "KOSDAQ",
+    "reportDate": "20260827",
+    "stockCode": "469900",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "대신밸런스제17호스팩",
+    "market": "KOSDAQ",
+    "reportDate": "20260827",
+    "stockCode": "471050",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "신영스팩10호",
+    "market": "KOSDAQ",
+    "reportDate": "20260903",
+    "stockCode": "472220",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "폰드그룹",
+    "market": "KOSDAQ",
+    "reportDate": "20260825",
+    "stockCode": "472850",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "RF시스템즈",
+    "market": "KOSDAQ",
+    "reportDate": "20260828",
+    "stockCode": "474610",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "링크솔루션",
+    "market": "KOSDAQ",
+    "reportDate": "20260831",
+    "stockCode": "474650",
+    "sourceKinds": [
+      "contract"
+    ]
+  },
+  {
+    "corpName": "신한제12호스팩",
+    "market": "KOSDAQ",
+    "reportDate": "20260903",
+    "stockCode": "474660",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "스트라드비젼",
+    "market": "KOSDAQ",
+    "reportDate": "20260825",
+    "stockCode": "475040",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "SK이터닉스",
+    "market": "KOSPI",
+    "reportDate": "20260814",
+    "stockCode": "475150",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "키스트론",
+    "market": "KOSDAQ",
+    "reportDate": "20260814",
+    "stockCode": "475430",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "미트박스",
+    "market": "KOSDAQ",
+    "reportDate": "20260819",
+    "stockCode": "475460",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "더본코리아",
+    "market": "KOSPI",
+    "reportDate": "20260828",
+    "stockCode": "475560",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "M83",
+    "market": "KOSDAQ",
+    "reportDate": "20260828",
+    "stockCode": "476080",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "마키나락스",
+    "market": "KOSDAQ",
+    "reportDate": "20260826",
+    "stockCode": "477850",
+    "sourceKinds": [
+      "contract"
+    ]
+  },
+  {
+    "corpName": "나라스페이스테크놀로지",
+    "market": "KOSDAQ",
+    "reportDate": "20260904",
+    "stockCode": "478340",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "씨케이솔루션",
+    "market": "KOSPI",
+    "reportDate": "20260831",
+    "stockCode": "480370",
+    "sourceKinds": [
+      "contract"
+    ]
+  },
+  {
+    "corpName": "딜리셔스",
+    "market": "KOSDAQ",
+    "reportDate": "20260820",
+    "stockCode": "483350",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "달바글로벌",
+    "market": "KOSPI",
+    "reportDate": "20260826",
+    "stockCode": "483650",
+    "sourceKinds": [
+      "executive",
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "티엑스알로보틱스",
+    "market": "KOSDAQ",
+    "reportDate": "20260820",
+    "stockCode": "484810",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "노타",
+    "market": "KOSDAQ",
+    "reportDate": "20260825",
+    "stockCode": "486990",
+    "sourceKinds": [
+      "contract"
+    ]
+  },
+  {
+    "corpName": "케이앤에스아이앤씨",
+    "market": "KOSDAQ",
+    "reportDate": "20260821",
+    "stockCode": "487400",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "키움제11호스팩",
+    "market": "KOSDAQ",
+    "reportDate": "20260825",
+    "stockCode": "489480",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "디비금융제13호스팩",
+    "market": "KOSDAQ",
+    "reportDate": "20260821",
+    "stockCode": "489730",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "한화비전",
+    "market": "KOSPI",
+    "reportDate": "20260831",
+    "stockCode": "489790",
+    "sourceKinds": [
+      "executive"
+    ]
+  },
+  {
+    "corpName": "세미파이브",
+    "market": "KOSDAQ",
+    "reportDate": "20260908",
+    "stockCode": "490470",
+    "sourceKinds": [
+      "executive",
+      "contract"
+    ]
+  },
+  {
+    "corpName": "지에프아이",
+    "market": "KOSDAQ",
+    "reportDate": "20260902",
+    "stockCode": "493330",
+    "sourceKinds": [
+      "contract",
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "큐리오시스",
+    "market": "KOSDAQ",
+    "reportDate": "20260904",
+    "stockCode": "494120",
+    "sourceKinds": [
+      "existing",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "딥커머스",
+    "market": "KOSDAQ",
+    "reportDate": "20260904",
+    "stockCode": "900110",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "씨엑스아이",
+    "market": "KOSDAQ",
+    "reportDate": "20260831",
+    "stockCode": "900120",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "헝셩그룹",
+    "market": "KOSDAQ",
+    "reportDate": "20260904",
+    "stockCode": "900270",
+    "sourceKinds": [
+      "executive-static",
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "윙입푸드",
+    "market": "KOSDAQ",
+    "reportDate": "20260813",
+    "stockCode": "900340",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive-static"
+    ]
+  },
+  {
+    "corpName": "프레스티지바이오파마",
+    "market": "KOSPI",
+    "reportDate": "20260901",
+    "stockCode": "950210",
+    "sourceKinds": [
+      "existing",
+      "5percent",
+      "executive",
+      "executive-static",
+      "contract"
+    ]
+  },
+  {
+    "corpName": "네오이뮨텍",
+    "market": "KOSDAQ",
+    "reportDate": "20260904",
+    "stockCode": "950220",
+    "sourceKinds": [
+      "5percent"
+    ]
+  },
+  {
+    "corpName": "테라뷰",
+    "market": "KOSDAQ",
+    "reportDate": "20260901",
+    "stockCode": "950250",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  },
+  {
+    "corpName": "인제니아테라퓨틱스",
+    "market": "KOSDAQ",
+    "reportDate": "20260825",
+    "stockCode": "950260",
+    "sourceKinds": [
+      "5percent",
+      "executive"
+    ]
+  }
+]

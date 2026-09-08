@@ -1,8 +1,7 @@
-import fs from "node:fs";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
+const fs = require("fs");
+const path = require("path");
 
-const root = path.dirname(fileURLToPath(import.meta.url));
+const root = __dirname;
 const dataDir = path.join(root, "site", "data");
 const latestPath = path.join(dataDir, "latest.json");
 const priceDir = path.join(dataDir, "prices");
@@ -12,8 +11,6 @@ const pricesIndexPath = path.join(dataDir, "prices.js");
 const range = process.argv.includes("--range") ? process.argv[process.argv.indexOf("--range") + 1] : "1mo";
 const concurrency = Number(process.argv.includes("--concurrency") ? process.argv[process.argv.indexOf("--concurrency") + 1] : 24);
 const maxStocks = Number(process.argv.includes("--max") ? process.argv[process.argv.indexOf("--max") + 1] : 0);
-const recentDays = Number(process.argv.includes("--recent-days") ? process.argv[process.argv.indexOf("--recent-days") + 1] : 0);
-const timeoutMs = Number(process.argv.includes("--timeout-ms") ? process.argv[process.argv.indexOf("--timeout-ms") + 1] : 10000);
 const cutoff = getKoreaTodayDate();
 const cutoffKey = cutoff.toISOString().slice(0, 10);
 
@@ -32,18 +29,6 @@ function readJson(file) {
   return JSON.parse(fs.readFileSync(file, "utf8").replace(/^\uFEFF/, ""));
 }
 
-function readWindowObject(file) {
-  if (!fs.existsSync(file)) return {};
-  const text = fs.readFileSync(file, "utf8").replace(/^\uFEFF/, "");
-  const match = text.match(/=\s*(\{.*\});?\s*$/s);
-  if (!match) return {};
-  try {
-    return JSON.parse(match[1]);
-  } catch {
-    return {};
-  }
-}
-
 function suffix(market) {
   return market === "KOSDAQ" ? "KQ" : "KS";
 }
@@ -54,14 +39,7 @@ function rowValue(row, key, fallback = "") {
 
 function stockTargets(rows) {
   const map = new Map();
-  const recentCutoff = recentDays > 0 ? new Date(cutoff.getTime() - recentDays * 24 * 60 * 60 * 1000) : null;
   for (const row of rows) {
-    if (recentCutoff) {
-      const receiptDate = rowDate(rowValue(row, "접수일"));
-      const obligationDate = rowDate(rowValue(row, "보고의무발생일") || rowValue(row, "보고의무발생일자") || rowValue(row, "변동일"));
-      const isRecent = (receiptDate && receiptDate >= recentCutoff) || (obligationDate && obligationDate >= recentCutoff);
-      if (!isRecent) continue;
-    }
     const market = rowValue(row, "시장");
     const code = rowValue(row, "종목코드");
     const name = rowValue(row, "종목명");
@@ -70,12 +48,6 @@ function stockTargets(rows) {
   }
   const targets = [...map.values()].sort((a, b) => `${a.market}${a.code}`.localeCompare(`${b.market}${b.code}`));
   return maxStocks > 0 ? targets.slice(0, maxStocks) : targets;
-}
-
-function rowDate(value) {
-  const digits = String(value || "").replace(/\D/g, "");
-  if (digits.length !== 8) return null;
-  return new Date(`${digits.slice(0, 4)}-${digits.slice(4, 6)}-${digits.slice(6, 8)}T00:00:00Z`);
 }
 
 function parseChunk(code) {
@@ -104,21 +76,9 @@ function mergeCandles(oldItems, newItems) {
 
 async function fetchCandles(stock) {
   const url = `https://query1.finance.yahoo.com/v8/finance/chart/${stock.symbol}?range=${range}&interval=1d&events=history&includeAdjustedClose=true`;
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), timeoutMs);
-  let data;
-  try {
-    const res = await fetch(url, { headers: { "user-agent": "Mozilla/5.0" }, signal: controller.signal });
-    if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
-    data = await res.json();
-  } catch (error) {
-    if (error?.name === "AbortError") {
-      throw new Error(`Yahoo timeout after ${timeoutMs}ms`);
-    }
-    throw error;
-  } finally {
-    clearTimeout(timer);
-  }
+  const res = await fetch(url, { headers: { "user-agent": "Mozilla/5.0" } });
+  if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+  const data = await res.json();
   const result = data?.chart?.result?.[0];
   const timestamps = result?.timestamp || [];
   const quote = result?.indicators?.quote?.[0];
@@ -185,7 +145,7 @@ async function main() {
   fs.mkdirSync(priceDir, { recursive: true });
   const latest = readJson(latestPath);
   const targets = stockTargets(latest.rows || []);
-  const currentPrices = readWindowObject(currentPricesPath);
+  const currentPrices = {};
   const mergedPrices = new Map();
   const errors = [];
 
@@ -240,7 +200,7 @@ async function main() {
     })}; window.__PRICE_CHUNKS__ = window.__PRICE_CHUNKS__ || {};`,
     "utf8"
   );
-  console.log(`Recent price cache done: ${targets.length} refreshed / ${Object.keys(currentPrices).length} cached stocks, ${errors.length} errors, cutoff ${cutoffKey}`);
+  console.log(`Recent price cache done: ${Object.keys(currentPrices).length} stocks, ${errors.length} errors, cutoff ${cutoffKey}`);
 }
 
 main().catch((error) => {

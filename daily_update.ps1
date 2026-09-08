@@ -1,20 +1,12 @@
-﻿param(
+param(
   [string]$ApiKey = $env:DART_API_KEY,
-  [string]$BgnDe = "",
-  [string]$HistoryBgnDe = (Get-Date).AddYears(-1).ToString('yyyyMMdd'),
+  [string]$BgnDe = (Get-Date).AddYears(-1).ToString('yyyyMMdd'),
   [string]$EndDe = (Get-Date).ToString('yyyyMMdd'),
   [string]$DisclosureBgnDe = (Get-Date).AddMonths(-6).ToString('yyyyMMdd'),
   [string]$PriceRange = "1y",
   [int]$PriceSleepMs = 120,
-  [int]$RefreshLookbackDays = 0,
-  [int]$ObligationMaxRows = 80,
-  [int]$PriceRecentDays = 30,
-  [switch]$FullRefresh,
-  [switch]$RefreshDisclosureSignals,
-  [switch]$RefreshShareholders,
-  [switch]$RefreshLogos,
-  [switch]$SendTelegram,
-  [switch]$SkipTelegram
+  [switch]$SkipTelegram,
+  [switch]$UseConvexTelegram
 )
 
 $ErrorActionPreference = "Stop"
@@ -35,15 +27,6 @@ $env:DART_API_KEY = $ApiKey
 
 function Normalize-UpdateDate([string]$Value) {
   return ([string]$Value).Replace("-", "").Trim()
-}
-
-function Get-KstNowString() {
-  try {
-    $tz = [TimeZoneInfo]::FindSystemTimeZoneById("Korea Standard Time")
-  } catch {
-    $tz = [TimeZoneInfo]::FindSystemTimeZoneById("Asia/Seoul")
-  }
-  return [TimeZoneInfo]::ConvertTimeFromUtc([DateTime]::UtcNow, $tz).ToString("yyyy-MM-dd HH:mm:ss")
 }
 
 function Split-DateRangeForDartList([string]$Bgn, [string]$End) {
@@ -96,17 +79,12 @@ function Write-MergedLatestData([array]$ChunkFiles, [string]$Bgn, [string]$End) 
       $rowsByReceipt[$key] = $row
     }
   }
-  $normalizedBgn = Normalize-UpdateDate $Bgn
-  $rows = @($rowsByReceipt.Values | Where-Object {
-    $receiptDate = [string](Get-JsonPropertyValue $_ @("접수일"))
-    -not $receiptDate -or $receiptDate -ge $normalizedBgn
-  } | Sort-Object @{ Expression = { Get-JsonPropertyValue $_ @("접수일") }; Descending = $true }, @{ Expression = { Get-JsonPropertyValue $_ @("종목명") }; Descending = $false }, @{ Expression = { Get-JsonPropertyValue $_ @("접수번호") }; Descending = $true })
+  $rows = @($rowsByReceipt.Values | Sort-Object @{ Expression = { Get-JsonPropertyValue $_ @("접수일") }; Descending = $true }, @{ Expression = { Get-JsonPropertyValue $_ @("종목명") }; Descending = $false }, @{ Expression = { Get-JsonPropertyValue $_ @("접수번호") }; Descending = $true })
   $corps = @($corpsByCode.Values | Sort-Object @{ Expression = { Get-JsonPropertyValue $_ @("name") }; Descending = $false })
   $latestJson = Join-Path $root "site\data\latest.json"
   New-Item -ItemType Directory -Force -Path (Split-Path -Parent $latestJson) | Out-Null
   $payload = [pscustomobject]@{
-    generatedAt = Get-KstNowString
-    generatedAtUtc = (Get-Date).ToUniversalTime().ToString("o")
+    generatedAt = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss")
     scope = "KOSPI/KOSDAQ 최근 1년 전체"
     query = @()
     bgnDe = (Normalize-UpdateDate $Bgn)
@@ -120,94 +98,51 @@ function Write-MergedLatestData([array]$ChunkFiles, [string]$Bgn, [string]$End) 
   Write-Host "Merged DART holdings cache: $($rows.Count) rows / $($corps.Count) stocks"
 }
 
-function Get-LatestReceiptDate([string]$LatestJsonPath) {
-  if (-not (Test-Path -LiteralPath $LatestJsonPath)) { return "" }
-  try {
-    $payload = Get-Content -LiteralPath $LatestJsonPath -Raw -Encoding UTF8 | ConvertFrom-Json
-    return [string](@($payload.rows | ForEach-Object { Get-JsonPropertyValue $_ @("접수일") } | Where-Object { $_ } | Sort-Object -Descending | Select-Object -First 1))
-  } catch {
-    return ""
-  }
-}
-
-$latestJson = Join-Path $root "site\data\latest.json"
-$historyBgn = Normalize-UpdateDate $HistoryBgnDe
-if (-not $BgnDe) {
-  if ($FullRefresh -or -not (Test-Path -LiteralPath $latestJson)) {
-    $BgnDe = $historyBgn
-  } else {
-    $latestReceipt = Get-LatestReceiptDate -LatestJsonPath $latestJson
-    if ($latestReceipt -match '^\d{8}$') {
-      if ($RefreshLookbackDays -le 0) {
-        $endNormalized = Normalize-UpdateDate $EndDe
-        if ($latestReceipt -lt $endNormalized) {
-          $startDate = [datetime]::ParseExact($latestReceipt, "yyyyMMdd", $null).AddDays(1)
-          $BgnDe = $startDate.ToString("yyyyMMdd")
-          Write-Host "Fast catch-up mode: checking missed receipt dates from $BgnDe to $endNormalized."
-        } else {
-          $BgnDe = $endNormalized
-          Write-Host "Fast daily mode: checking today's receipt date ($BgnDe)."
-        }
-      } else {
-        $startDate = [datetime]::ParseExact($latestReceipt, "yyyyMMdd", $null).AddDays(-1 * $RefreshLookbackDays)
-      $historyStart = [datetime]::ParseExact($historyBgn, "yyyyMMdd", $null)
-      if ($startDate -lt $historyStart) { $startDate = $historyStart }
-      $BgnDe = $startDate.ToString("yyyyMMdd")
-      }
-    } else {
-      $BgnDe = $historyBgn
-    }
-  }
-}
-
 Write-Host "DART holdings update: $BgnDe ~ $EndDe"
 $holdingRanges = Split-DateRangeForDartList -Bgn $BgnDe -End $EndDe
-$chunkDir = Join-Path $root ".cache\holding_chunks"
-New-Item -ItemType Directory -Force -Path $chunkDir | Out-Null
-$chunkFiles = @()
-if ((Test-Path -LiteralPath $latestJson) -and -not $FullRefresh) {
-  $chunkFiles += $latestJson
+if ($holdingRanges.Count -le 1) {
+  & (Join-Path $root "major_holdings.ps1") -BgnDe $BgnDe -EndDe $EndDe -ApiKey $ApiKey
+} else {
+  $chunkDir = Join-Path $root ".cache\holding_chunks"
+  New-Item -ItemType Directory -Force -Path $chunkDir | Out-Null
+  $chunkFiles = @()
+  $index = 0
+  foreach ($range in $holdingRanges) {
+    $index += 1
+    $jsonOut = Join-Path $chunkDir "latest_$($range.Bgn)_$($range.End).json"
+    $csvOut = Join-Path $chunkDir "major_holdings_$($range.Bgn)_$($range.End).csv"
+    Write-Host "DART holdings chunk $index/$($holdingRanges.Count): $($range.Bgn) ~ $($range.End)"
+    & (Join-Path $root "major_holdings.ps1") -BgnDe $range.Bgn -EndDe $range.End -ApiKey $ApiKey -JsonOut $jsonOut -Out $csvOut
+    $chunkFiles += $jsonOut
+  }
+  Write-MergedLatestData -ChunkFiles $chunkFiles -Bgn $BgnDe -End $EndDe
 }
-$index = 0
-foreach ($range in $holdingRanges) {
-  $index += 1
-  $jsonOut = Join-Path $chunkDir "latest_$($range.Bgn)_$($range.End).json"
-  $csvOut = Join-Path $chunkDir "major_holdings_$($range.Bgn)_$($range.End).csv"
-  Write-Host "DART holdings chunk $index/$($holdingRanges.Count): $($range.Bgn) ~ $($range.End)"
-  & (Join-Path $root "major_holdings.ps1") -BgnDe $range.Bgn -EndDe $range.End -ApiKey $ApiKey -JsonOut $jsonOut -Out $csvOut
-  $chunkFiles += $jsonOut
-}
-Write-MergedLatestData -ChunkFiles $chunkFiles -Bgn $historyBgn -End $EndDe
 
 Write-Host "DART obligation-date enrichment"
-$obligationArgs = @{
-  ApiKey = $ApiKey
-}
-if (-not $FullRefresh -and $ObligationMaxRows -gt 0) {
-  $obligationArgs.MaxRows = $ObligationMaxRows
-}
-& (Join-Path $root "enrich_obligation_dates.ps1") @obligationArgs
+& (Join-Path $root "enrich_obligation_dates.ps1") -ApiKey $ApiKey
 
-if ($RefreshDisclosureSignals -or $FullRefresh) {
-  Write-Host "DART earnings and contract disclosure signals: $DisclosureBgnDe ~ $EndDe"
-  & (Join-Path $root "disclosure_signals.ps1") -BgnDe $DisclosureBgnDe -EndDe $EndDe -ApiKey $ApiKey -MaxSearchPages 20 -MaxCandidates 120 -MaxDocuments 25
-} else {
-  Write-Host "Skipping disclosure signal refresh for fast daily update."
-}
+Write-Host "DART earnings and contract disclosure signals: $DisclosureBgnDe ~ $EndDe"
+& (Join-Path $root "disclosure_signals.ps1") -BgnDe $DisclosureBgnDe -EndDe $EndDe -ApiKey $ApiKey -MaxSearchPages 20 -MaxCandidates 120 -MaxDocuments 25
 
-if ($RefreshShareholders -or $FullRefresh) {
-  Write-Host "DART regular-report shareholder snapshot"
-  & (Join-Path $root "shareholder_snapshot.ps1") -ApiKey $ApiKey -MaxStocks 180
+Write-Host "Price target sync: holdings, executives, contracts"
+$syncTargetsJs = Join-Path $root "sync_convex_price_targets.mjs"
+$bundledNode = Join-Path $env:USERPROFILE ".cache\codex-runtimes\codex-primary-runtime\dependencies\node\bin\node.exe"
+$nodePathForTargets = $null
+if (Test-Path -LiteralPath $bundledNode) {
+  $nodePathForTargets = $bundledNode
 } else {
-  Write-Host "Skipping shareholder snapshot refresh for fast daily update."
+  $nodeCommandForTargets = Get-Command node -ErrorAction SilentlyContinue
+  if ($nodeCommandForTargets) { $nodePathForTargets = $nodeCommandForTargets.Source }
+}
+if ($nodePathForTargets -and (Test-Path -LiteralPath $syncTargetsJs)) {
+  & $nodePathForTargets $syncTargetsJs --days 30
 }
 
-if ($RefreshLogos -or $FullRefresh) {
-  Write-Host "DART company homepage favicon cache"
-  & (Join-Path $root "company_logos.ps1") -ApiKey $ApiKey -MaxStocks 260
-} else {
-  Write-Host "Skipping company logo refresh for fast daily update."
-}
+Write-Host "DART regular-report shareholder snapshot"
+& (Join-Path $root "shareholder_snapshot.ps1") -ApiKey $ApiKey -MaxStocks 180
+
+Write-Host "DART company homepage favicon cache"
+& (Join-Path $root "company_logos.ps1") -ApiKey $ApiKey -MaxStocks 260
 
 Write-Host "Price cache update: recent daily closes"
 $recentPriceJs = Join-Path $root "update_recent_prices.js"
@@ -220,7 +155,7 @@ if (Test-Path -LiteralPath $bundledNode) {
   if ($nodeCommand) { $nodePath = $nodeCommand.Source }
 }
 if ($nodePath -and (Test-Path -LiteralPath $recentPriceJs)) {
-  & $nodePath $recentPriceJs --concurrency 32 --recent-days $PriceRecentDays --timeout-ms 9000
+  & $nodePath $recentPriceJs --concurrency 32
 } else {
   Write-Host "Node not found. Falling back to slower PowerShell price updater."
   & (Join-Path $root "update_prices.ps1") -Range $PriceRange -Interval "1d" -SleepMs $PriceSleepMs
@@ -229,16 +164,15 @@ if ($nodePath -and (Test-Path -LiteralPath $recentPriceJs)) {
 Write-Host "Daily update complete."
 Write-Host "Important: current close is based on the latest available price cache date, independent of receipt-date filters."
 
-if ($SendTelegram -and -not $SkipTelegram) {
-  $telegramScript = Join-Path $root "telegram_notify.ps1"
-  if (Test-Path -LiteralPath $telegramScript) {
-    Write-Host "Telegram daily disclosure notification"
-    & $telegramScript
-  }
-  $telegramImageScript = Join-Path $root "telegram_brief_image.ps1"
-  if (Test-Path -LiteralPath $telegramImageScript) {
-    Write-Host "Telegram daily disclosure image"
-    & $telegramImageScript
+if (-not $SkipTelegram) {
+  $contractsTelegramJs = Join-Path $root "send_contracts_telegram.mjs"
+  if ($nodePath -and (Test-Path -LiteralPath $contractsTelegramJs)) {
+    Write-Host "Telegram notification: contracts summary"
+    & $nodePath $contractsTelegramJs $EndDe
+  } else {
+    Write-Host "Contracts Telegram notification skipped: Node or script not found."
   }
 }
+
+
 

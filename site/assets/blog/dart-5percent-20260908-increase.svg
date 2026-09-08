@@ -1,0 +1,80 @@
+
+  <svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1920" viewBox="0 0 1080 1920">
+    <rect width="1080" height="1920" fill="#f8f8f7"/>
+    <foreignObject x="86" y="92" width="908" height="1720">
+      <div xmlns="http://www.w3.org/1999/xhtml" class="card">
+        <style>
+          .card{font-family:Pretendard,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#333}
+          .top{display:flex;align-items:center;justify-content:space-between;margin-bottom:58px}
+          .date{color:#ff4d0d;font-size:36px;font-weight:800;letter-spacing:-.02em}
+          .logo{color:#666;font-size:30px;font-weight:800;letter-spacing:-.04em}
+          h1{margin:0 0 8px;font-size:48px;line-height:1.18;letter-spacing:-.04em;color:#444}
+          h2{margin:0 0 62px;font-size:46px;line-height:1.15;letter-spacing:-.04em;color:#777}
+          table{width:100%;border-collapse:collapse;table-layout:fixed;background:white;border:1px solid #cfcfcf}
+          th,td{border:1px solid #cfcfcf;text-align:center;vertical-align:middle}
+          th{height:68px;background:#ecebea;color:#444;font-size:21px;font-weight:800}
+          td{height:112px;padding:10px 12px;font-size:20px;line-height:1.28;font-weight:650}
+          td:nth-child(1){width:24%}td:nth-child(2){width:29%}td:nth-child(3){width:22%}td:nth-child(4){width:25%}
+          small{display:block;margin-top:6px;color:#777;font-size:16px;font-weight:700;line-height:1.2}
+          .up{color:#ff3b30}.down{color:#1f6feb}.flat{color:#777}
+          .source{margin-top:38px;text-align:right;color:#aaa;font-size:15px;font-weight:700}
+        </style>
+        <div class="top"><div class="date">2026.09.08</div><div class="logo">LEE &amp; NOTE</div></div>
+        <h1>Daily Dart 전자공시 요약표</h1>
+        <h2>#지분율증가</h2>
+        <table>
+          <thead><tr><th>종목</th><th>주주/제출인</th><th>직전→이번<br/><small>(단위:%)</small></th><th>보고사유</th></tr></thead>
+          <tbody>
+    <tr>
+      <td><strong>KX하이텍</strong><br><small>052900 · KOSDAQ</small></td>
+      <td>인터레이스자산운용<br><small>기관·투자자</small></td>
+      <td><strong>0 → 10.19</strong><br><span class="up">▲10.19%p</span></td>
+      <td>단순투자목적의 매매</td>
+    </tr>
+    <tr>
+      <td><strong>한탑</strong><br><small>002680 · KOSDAQ</small></td>
+      <td>류원기<br><small>오너·특수관계</small></td>
+      <td><strong>42.4 → 51.56</strong><br><span class="up">▲9.16%p</span></td>
+      <td>특별관계자의 제3자배정 유상증자에 따른 신주취득 및 특별관계자의 주식담보대출</td>
+    </tr>
+    <tr>
+      <td><strong>그리드위즈</strong><br><small>453450 · KOSDAQ</small></td>
+      <td>SBI인베스트먼트<br><small>주요주주</small></td>
+      <td><strong>0 → 8.19</strong><br><span class="up">▲8.19%p</span></td>
+      <td>전환사채 인수</td>
+    </tr>
+    <tr>
+      <td><strong>피엔티엠에스</strong><br><small>257370 · KOSDAQ</small></td>
+      <td>수성자산운용<br><small>기관·투자자</small></td>
+      <td><strong>0 → 5.7</strong><br><span class="up">▲5.7%p</span></td>
+      <td>사모3CB 행사가액 조정에 따른 보유비율 5% 이상 보유</td>
+    </tr>
+    <tr>
+      <td><strong>한주에이알티</strong><br><small>058450 · KOSDAQ</small></td>
+      <td>신승욱<br><small>주요주주</small></td>
+      <td><strong>0 → 5.07</strong><br><span class="up">▲5.07%p</span></td>
+      <td>장내매수</td>
+    </tr>
+    <tr>
+      <td><strong>한양이엔지</strong><br><small>045100 · KOSDAQ</small></td>
+      <td>FILLIMITED<br><small>주요주주</small></td>
+      <td><strong>0 → 5</strong><br><span class="up">▲5%p</span></td>
+      <td>단순 주식 취득에 의한 신규 보고</td>
+    </tr>
+    <tr>
+      <td><strong>글로벌텍스프리</strong><br><small>204620 · KOSDAQ</small></td>
+      <td>MiriCapitalManagementLLC<br><small>외국계</small></td>
+      <td><strong>5.83 → 8.43</strong><br><span class="up">▲2.6%p</span></td>
+      <td>일반투자목적으로 장내에서 발행회사 주식 매수</td>
+    </tr>
+    <tr>
+      <td><strong>유니셈</strong><br><small>036200 · KOSDAQ</small></td>
+      <td>FILLIMITED<br><small>주요주주</small></td>
+      <td><strong>5.03 → 6.98</strong><br><span class="up">▲1.95%p</span></td>
+      <td>단순 주식 취득에 의한 변동 보고</td>
+    </tr></tbody>
+        </table>
+        <div class="source">출처: DART 전자공시</div>
+      </div>
+    </foreignObject>
+  </svg>

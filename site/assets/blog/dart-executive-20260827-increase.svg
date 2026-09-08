@@ -1,0 +1,80 @@
+
+  <svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1920" viewBox="0 0 1080 1920">
+    <rect width="1080" height="1920" fill="#f8f8f7"/>
+    <foreignObject x="86" y="92" width="908" height="1720">
+      <div xmlns="http://www.w3.org/1999/xhtml" class="card">
+        <style>
+          .card{font-family:Pretendard,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#333}
+          .top{display:flex;align-items:center;justify-content:space-between;margin-bottom:58px}
+          .date{color:#ff4d0d;font-size:36px;font-weight:800;letter-spacing:-.02em}
+          .logo{color:#666;font-size:30px;font-weight:800;letter-spacing:-.04em}
+          h1{margin:0 0 8px;font-size:48px;line-height:1.18;letter-spacing:-.04em;color:#444}
+          h2{margin:0 0 62px;font-size:46px;line-height:1.15;letter-spacing:-.04em;color:#777}
+          table{width:100%;border-collapse:collapse;table-layout:fixed;background:white;border:1px solid #cfcfcf}
+          th,td{border:1px solid #cfcfcf;text-align:center;vertical-align:middle}
+          th{height:68px;background:#ecebea;color:#444;font-size:21px;font-weight:800}
+          td{height:112px;padding:10px 12px;font-size:20px;line-height:1.28;font-weight:650}
+          td:nth-child(1){width:24%}td:nth-child(2){width:29%}td:nth-child(3){width:22%}td:nth-child(4){width:25%}
+          small{display:block;margin-top:6px;color:#777;font-size:16px;font-weight:700;line-height:1.2}
+          .up{color:#ff3b30}.down{color:#1f6feb}.flat{color:#777}
+          .source{margin-top:38px;text-align:right;color:#aaa;font-size:15px;font-weight:700}
+        </style>
+        <div class="top"><div class="date">2026.08.27</div><div class="logo">LEE &amp; NOTE</div></div>
+        <h1>Daily Dart 임원보고 요약표</h1>
+        <h2>#임원보유증가</h2>
+        <table>
+          <thead><tr><th>종목</th><th>주주/제출인</th><th>직전→이번<br/><small>(단위:%)</small></th><th>보고사유</th></tr></thead>
+          <tbody>
+    <tr>
+      <td><strong>엠엑스로보틱스</strong><br><small>007820 · KOSDAQ</small></td>
+      <td>엠엑스온<br><small>10%이상주주</small></td>
+      <td><strong>21.11 → 32.24</strong><br><span class="up">▲11.13%p</span></td>
+      <td>임원·주요주주 소유상황 변동</td>
+    </tr>
+    <tr>
+      <td><strong>아바코</strong><br><small>083930 · KOSDAQ</small></td>
+      <td>위지명<br><small>회장 · 10%이상주주 · 등기임원</small></td>
+      <td><strong>5.07 → 10.33</strong><br><span class="up">▲5.26%p</span></td>
+      <td>임원·주요주주 소유상황 변동</td>
+    </tr>
+    <tr>
+      <td><strong>HLB이노베이션</strong><br><small>024850 · KOSDAQ</small></td>
+      <td>HLB<br><small>사실상지배주주</small></td>
+      <td><strong>16.14 → 16.95</strong><br><span class="up">▲0.81%p</span></td>
+      <td>임원·주요주주 소유상황 변동</td>
+    </tr>
+    <tr>
+      <td><strong>롯데리츠</strong><br><small>330590 · KOSPI</small></td>
+      <td>미래에셋자산운용<br><small>10%이상주주</small></td>
+      <td><strong>14.69 → 14.75</strong><br><span class="up">▲0.06%p</span></td>
+      <td>임원·주요주주 소유상황 변동</td>
+    </tr>
+    <tr>
+      <td><strong>SK리츠</strong><br><small>395400 · KOSPI</small></td>
+      <td>미래에셋자산운용<br><small>10%이상주주</small></td>
+      <td><strong>20.81 → 20.87</strong><br><span class="up">▲0.06%p</span></td>
+      <td>임원·주요주주 소유상황 변동</td>
+    </tr>
+    <tr>
+      <td><strong>HLB파나진</strong><br><small>046210 · KOSDAQ</small></td>
+      <td>진양곤<br><small>사내이사 · 등기임원</small></td>
+      <td><strong>1.01 → 1.3</strong><br><span class="up">▲0.29%p</span></td>
+      <td>임원·주요주주 소유상황 변동</td>
+    </tr>
+    <tr>
+      <td><strong>HLB제약</strong><br><small>047920 · KOSDAQ</small></td>
+      <td>진양곤<br><small>이사 · 등기임원</small></td>
+      <td><strong>3.05 → 2.78</strong><br><span class="down">▼0.27%p</span></td>
+      <td>임원·주요주주 소유상황 변동</td>
+    </tr>
+    <tr>
+      <td><strong>한화리츠</strong><br><small>451800 · KOSPI</small></td>
+      <td>미래에셋자산운용<br><small>10%이상주주</small></td>
+      <td><strong>25.62 → 25.69</strong><br><span class="up">▲0.07%p</span></td>
+      <td>임원·주요주주 소유상황 변동</td>
+    </tr></tbody>
+        </table>
+        <div class="source">출처: DART 전자공시</div>
+      </div>
+    </foreignObject>
+  </svg>

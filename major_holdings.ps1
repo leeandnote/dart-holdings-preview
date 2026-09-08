@@ -32,6 +32,128 @@ function Convert-ToNumber($Value) {
     return $null
 }
 
+function Decode-XmlText([string]$Value) {
+    if ($null -eq $Value) { return "" }
+    $text = [regex]::Replace([string]$Value, '<[^>]+>', '')
+    return [System.Net.WebUtility]::HtmlDecode($text).Trim()
+}
+
+function Get-XmlCellValue([string]$RowXml, [string]$Code) {
+    $pattern = '(?is)<(?:TE|TU)\b(?=[^>]*(?:ACODE|AUNIT)="' + [regex]::Escape($Code) + '")[^>]*>(.*?)</(?:TE|TU)>'
+    $match = [regex]::Match($RowXml, $pattern)
+    if (-not $match.Success) { return "" }
+    return Decode-XmlText $match.Groups[1].Value
+}
+
+function Get-DisclosureDocumentText([string]$Key, [string]$ReceiptNo, [string]$Dir) {
+    $docDir = Join-Path $Dir 'documents'
+    New-Item -ItemType Directory -Force -Path $docDir | Out-Null
+    $xmlPath = Join-Path $docDir "$ReceiptNo.xml"
+    if (Test-Path -LiteralPath $xmlPath) {
+        return Get-Content -LiteralPath $xmlPath -Raw -Encoding UTF8
+    }
+
+    $zipPath = Join-Path $docDir "$ReceiptNo.zip"
+    $tmpDir = Join-Path $docDir "$ReceiptNo.tmp"
+    if (Test-Path -LiteralPath $tmpDir) {
+        Remove-Item -LiteralPath $tmpDir -Recurse -Force
+    }
+
+    $uri = "$BaseUrl/document.xml?crtfc_key=$([uri]::EscapeDataString($Key))&rcept_no=$([uri]::EscapeDataString($ReceiptNo))"
+    Save-DartFile -Uri $uri -OutFile $zipPath
+    Expand-Archive -LiteralPath $zipPath -DestinationPath $tmpDir -Force
+    $doc = Get-ChildItem -LiteralPath $tmpDir -Recurse -File | Select-Object -First 1
+    if (-not $doc) { return "" }
+    Copy-Item -LiteralPath $doc.FullName -Destination $xmlPath -Force
+    Remove-Item -LiteralPath $tmpDir -Recurse -Force
+    return Get-Content -LiteralPath $xmlPath -Raw -Encoding UTF8
+}
+
+function Get-DisclosureUnitPriceInfo([string]$Key, [string]$ReceiptNo, [string]$Dir) {
+    if (-not $ReceiptNo) { return $null }
+    $priceDir = Join-Path $Dir 'detail_unit_prices'
+    New-Item -ItemType Directory -Force -Path $priceDir | Out-Null
+    $cachePath = Join-Path $priceDir "$ReceiptNo.json"
+    if (Test-Path -LiteralPath $cachePath) {
+        try {
+            return Get-Content -LiteralPath $cachePath -Raw -Encoding UTF8 | ConvertFrom-Json
+        } catch {}
+    }
+
+    try {
+        $text = Get-DisclosureDocumentText -Key $Key -ReceiptNo $ReceiptNo -Dir $Dir
+        if (-not $text -or $text.IndexOf('취득/처분단가') -lt 0) { return $null }
+
+        $signedValue = 0.0
+        $absValue = 0.0
+        $absShares = 0.0
+        $rowsWithPrice = 0
+        $detailRows = @()
+
+        foreach ($match in [regex]::Matches($text, '(?is)<TR\b[^>]*>.*?</TR>')) {
+            $rowXml = $match.Value
+            if ($rowXml.IndexOf('MDF_SDK_CNT') -lt 0 -or $rowXml.IndexOf('HLD_UNT_PR') -lt 0) { continue }
+
+            $shareDelta = Convert-ToNumber (Get-XmlCellValue -RowXml $rowXml -Code 'MDF_SDK_CNT')
+            $unitPrice = Convert-ToNumber (Get-XmlCellValue -RowXml $rowXml -Code 'HLD_UNT_PRJ')
+            if ($null -eq $unitPrice) {
+                $unitPrice = Convert-ToNumber (Get-XmlCellValue -RowXml $rowXml -Code 'HLD_UNT_PRG')
+            }
+            if ($null -eq $shareDelta -or $null -eq $unitPrice -or $unitPrice -le 0) { continue }
+
+            $method = Get-XmlCellValue -RowXml $rowXml -Code 'HLD_MTH'
+            $detailDateRaw = Get-XmlCellValue -RowXml $rowXml -Code 'MDF_DT'
+            $beforeShares = Convert-ToNumber (Get-XmlCellValue -RowXml $rowXml -Code 'BFR_MDF_CNT')
+            $afterShares = Convert-ToNumber (Get-XmlCellValue -RowXml $rowXml -Code 'AFR_MDF_CNT')
+            $stockType = Get-XmlCellValue -RowXml $rowXml -Code 'STK_KND'
+            $remark = Get-XmlCellValue -RowXml $rowXml -Code 'RMK'
+            $signedShares = [double]$shareDelta
+            if ($method -match '\(-\)|처분|매도|감소') {
+                $signedShares = -[math]::Abs($signedShares)
+            } elseif ($method -match '\(\+\)|취득|매수|증가|신규') {
+                $signedShares = [math]::Abs($signedShares)
+            }
+
+            $detailDate = $detailDateRaw
+            if ($detailDateRaw -match '^\d{8}$') {
+                $detailDate = '{0}-{1}-{2}' -f $detailDateRaw.Substring(0, 4), $detailDateRaw.Substring(4, 2), $detailDateRaw.Substring(6, 2)
+            }
+
+            $signedValue += ($signedShares * [double]$unitPrice)
+            $absValue += ([math]::Abs($signedShares) * [double]$unitPrice)
+            $absShares += [math]::Abs($signedShares)
+            $rowsWithPrice += 1
+            $detailRows += [pscustomobject]@{
+                date = $detailDate
+                method = $method
+                stockType = $stockType
+                beforeShares = $beforeShares
+                changeShares = [math]::Round($signedShares, 0)
+                afterShares = $afterShares
+                unitPrice = [math]::Round([double]$unitPrice, 2)
+                amount = [math]::Round($signedShares * [double]$unitPrice, 0)
+                remark = $remark
+            }
+        }
+
+        if ($rowsWithPrice -le 0 -or $absShares -le 0) { return $null }
+
+        $result = [pscustomobject]@{
+            unitPrice = [math]::Round($absValue / $absShares, 2)
+            tradeValue = [math]::Round($signedValue, 0)
+            shares = [math]::Round($absShares, 0)
+            rows = $rowsWithPrice
+            source = '공시 세부변동내역'
+            details = $detailRows
+        }
+        $result | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $cachePath -Encoding UTF8
+        return $result
+    } catch {
+        Write-Host "세부변동 단가 추출 실패: $ReceiptNo $($_.Exception.Message)"
+        return $null
+    }
+}
+
 function Invoke-DartJson([string]$Path, [hashtable]$Params) {
     $queryString = ($Params.GetEnumerator() | ForEach-Object {
         '{0}={1}' -f [uri]::EscapeDataString($_.Key), [uri]::EscapeDataString([string]$_.Value)
@@ -223,7 +345,7 @@ function Get-RecentMajorReports([string]$Key, [string]$Bgn, [string]$End) {
     return @($all)
 }
 
-function New-Row($Item, $Corp, [hashtable]$WantedMap, [string]$Bgn, [string]$End) {
+function New-Row($Item, $Corp, [hashtable]$WantedMap, [string]$Bgn, [string]$End, [string]$Key, [string]$Dir) {
     $rceptNo = [string]$Item.rcept_no
     $rceptDe = Normalize-Date ([string]$Item.rcept_dt)
     $obligationDe = Normalize-Date ([string]$(if ($Item.report_ostn) { $Item.report_ostn } elseif ($Item.report_de) { $Item.report_de } elseif ($Item.report_dt) { $Item.report_dt } else { $Item.rcept_dt }))
@@ -238,6 +360,12 @@ function New-Row($Item, $Corp, [hashtable]$WantedMap, [string]$Bgn, [string]$End
         $previous = [math]::Round($current - $delta, 4)
     }
     $crossed5 = ($null -ne $previous -and $null -ne $current -and $previous -lt 5 -and $current -ge 5)
+    $unitPriceInfo = Get-DisclosureUnitPriceInfo -Key $Key -ReceiptNo $rceptNo -Dir $Dir
+    $shareDelta = Convert-ToNumber $Item.stkqy_irds
+    $disclosedTradeValue = $null
+    if ($unitPriceInfo -and $null -ne $shareDelta) {
+        $disclosedTradeValue = [math]::Round([double]$unitPriceInfo.unitPrice * [double]$shareDelta, 0)
+    }
 
     return [pscustomobject]@{
         보고의무발생일 = $obligationDe
@@ -258,6 +386,12 @@ function New-Row($Item, $Corp, [hashtable]$WantedMap, [string]$Bgn, [string]$End
         DART_URL = "https://dart.fss.or.kr/dsaf001/main.do?rcpNo=$rceptNo"
         주요계약주식수 = [string]$Item.ctr_stkqy
         주요계약지분율 = [string]$Item.ctr_stkrt
+        공시취득처분단가 = $(if ($unitPriceInfo) { $unitPriceInfo.unitPrice } else { $null })
+        공시단가기준금액 = $disclosedTradeValue
+        공시단가적용주식수 = $(if ($unitPriceInfo) { $unitPriceInfo.shares } else { $null })
+        공시단가행수 = $(if ($unitPriceInfo) { $unitPriceInfo.rows } else { $null })
+        단가출처 = $(if ($unitPriceInfo) { $unitPriceInfo.source } else { '보고의무발생일 종가' })
+        세부변동내역 = $(if ($unitPriceInfo -and $unitPriceInfo.details) { @($unitPriceInfo.details) } else { @() })
     }
 }
 
@@ -321,7 +455,7 @@ foreach ($corp in $corps) {
     }
     $wanted = $wantedByCorp[$corp.corp_code].rcepts
     foreach ($item in @($major.list)) {
-        $row = New-Row -Item $item -Corp $corp -WantedMap $wanted -Bgn $bgn -End $end
+        $row = New-Row -Item $item -Corp $corp -WantedMap $wanted -Bgn $bgn -End $end -Key $ApiKey -Dir $CacheDir
         if ($null -ne $row) { $rows += $row }
     }
 }
@@ -343,7 +477,7 @@ if (-not $Out) {
     $Out = Join-Path 'results' "major_holdings_${safeName}_$stamp.csv"
 }
 
-$fields = @('접수일', '시장', '보고구분', '종목명', '종목코드', '보고자', '직전지분율', '이번지분율', '증감률', '5퍼센트상향돌파', '보유주식수', '증감주식수', '보고사유', '접수번호', 'DART_URL')
+$fields = @('접수일', '시장', '보고구분', '종목명', '종목코드', '보고자', '직전지분율', '이번지분율', '증감률', '5퍼센트상향돌파', '보유주식수', '증감주식수', '공시취득처분단가', '공시단가기준금액', '공시단가적용주식수', '단가출처', '보고사유', '접수번호', 'DART_URL')
 if ($IncludeControl) {
     $fields += @('주요계약주식수', '주요계약지분율')
 }
@@ -369,7 +503,7 @@ if ($JsonOut) {
         })
         rows = @($rows)
     }
-    $json = $payload | ConvertTo-Json -Depth 6
+    $json = $payload | ConvertTo-Json -Depth 10
     $json | Set-Content -LiteralPath $JsonOut -Encoding UTF8
     $latestJs = Join-Path (Split-Path -Parent $JsonOut) 'latest.js'
     "window.__DART_DATA__ = $json;" | Set-Content -LiteralPath $latestJs -Encoding UTF8
