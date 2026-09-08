@@ -50,11 +50,20 @@ function Invoke-DartJson([string]$Path, [hashtable]$Params) {
       $response = Invoke-RestMethod -Uri $uri -Headers @{ "User-Agent" = "dart-disclosure-signals/1.0" } -TimeoutSec 60
       break
     } catch {
-      if ($attempt -eq 4) { throw }
+      if ($attempt -eq 4) { break }
       $delay = 2 * $attempt
       Write-Host "DART API request failed (attempt $attempt/4). Retrying in $delay seconds." -ForegroundColor Yellow
       Start-Sleep -Seconds $delay
     }
+  }
+  if (-not $response) {
+    $curl = Get-Command curl.exe -ErrorAction SilentlyContinue
+    if (-not $curl) { throw "DART API request failed and curl.exe is unavailable." }
+    $raw = & $curl.Source -fsSL --retry 4 --retry-all-errors --connect-timeout 20 --max-time 60 -A "dart-disclosure-signals/1.0" $uri
+    if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($raw)) {
+      throw "DART API curl fallback failed with exit code $LASTEXITCODE"
+    }
+    $response = $raw | ConvertFrom-Json
   }
   if ($response.status -ne "000" -and $response.status -ne "013") {
     throw "DART API 오류 $($response.status): $($response.message)"
