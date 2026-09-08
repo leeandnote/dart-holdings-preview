@@ -32,7 +32,7 @@ concurrency:
 
 jobs:
   publish:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     timeout-minutes: 45
     env:
       DART_API_KEY: ${{ secrets.DART_API_KEY }}
@@ -77,7 +77,7 @@ jobs:
         shell: pwsh
         run: |
           if (-not [string]::IsNullOrWhiteSpace($env:WRANGLER_CONFIG_TOML_B64)) {
-            $configPath = Join-Path $env:APPDATA "xdg.config\.wrangler\config\default.toml"
+            $configPath = Join-Path $HOME ".config/.wrangler/config/default.toml"
             New-Item -ItemType Directory -Path (Split-Path -Parent $configPath) -Force | Out-Null
             [IO.File]::WriteAllBytes($configPath, [Convert]::FromBase64String($env:WRANGLER_CONFIG_TOML_B64))
           }
@@ -105,4 +105,4 @@ jobs:
           if ("${{ inputs.post_x }}" -ne "false") { $args += "-PostXCards" }
           if ("${{ inputs.post_threads }}" -ne "false") { $args += "-PostThreadsCards" }
           if ("${{ inputs.post_instagram }}" -ne "false") { $args += "-PostInstagramCards" }
-          & powershell @args
+          & pwsh @args

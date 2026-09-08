@@ -70,7 +70,8 @@ Invoke-Step "2. Refresh contract disclosure signals" {
   if ([string]::IsNullOrWhiteSpace($env:DART_API_KEY)) {
     Write-Host "DART_API_KEY missing. Contract disclosure refresh skipped." -ForegroundColor Yellow
   } else {
-    & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $root "disclosure_signals.ps1") -BgnDe ([datetime]::ParseExact($ReportDate, "yyyyMMdd", $null).AddDays(-7).ToString("yyyyMMdd")) -EndDe $ReportDate -ApiKey $env:DART_API_KEY -MaxSearchPages 20 -MaxCandidates 260 -MaxDocuments 80 -JsonOut (Join-Path $root "site\data\disclosure_signals.json")
+    $shell = if (Get-Command pwsh -ErrorAction SilentlyContinue) { "pwsh" } else { "powershell" }
+    & $shell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $root "disclosure_signals.ps1") -BgnDe ([datetime]::ParseExact($ReportDate, "yyyyMMdd", $null).AddDays(-7).ToString("yyyyMMdd")) -EndDe $ReportDate -ApiKey $env:DART_API_KEY -MaxSearchPages 20 -MaxCandidates 260 -MaxDocuments 80 -JsonOut (Join-Path $root "site\data\disclosure_signals.json")
     if ($LASTEXITCODE -ne 0) { throw "Contract disclosure signal refresh failed for $ReportDate" }
     & $node (Join-Path $root "sync_convex_price_targets.mjs") --days 30
     if ($LASTEXITCODE -ne 0) { throw "Price target sync failed" }
