@@ -12,6 +12,7 @@
 
 $ErrorActionPreference = "Stop"
 $BaseUrl = "https://opendart.fss.or.kr/api"
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
 function Normalize-Date([string]$Value) {
   return ($Value -replace "-", "").Trim()
@@ -43,7 +44,18 @@ function Invoke-DartJson([string]$Path, [hashtable]$Params) {
     "{0}={1}" -f [uri]::EscapeDataString($_.Key), [uri]::EscapeDataString([string]$_.Value)
   }) -join "&"
   $uri = "$BaseUrl/$Path`?$queryString"
-  $response = Invoke-RestMethod -Uri $uri -Headers @{ "User-Agent" = "dart-disclosure-signals/1.0" } -TimeoutSec 60
+  $response = $null
+  for ($attempt = 1; $attempt -le 4; $attempt++) {
+    try {
+      $response = Invoke-RestMethod -Uri $uri -Headers @{ "User-Agent" = "dart-disclosure-signals/1.0" } -TimeoutSec 60
+      break
+    } catch {
+      if ($attempt -eq 4) { throw }
+      $delay = 2 * $attempt
+      Write-Host "DART API request failed (attempt $attempt/4). Retrying in $delay seconds." -ForegroundColor Yellow
+      Start-Sleep -Seconds $delay
+    }
+  }
   if ($response.status -ne "000" -and $response.status -ne "013") {
     throw "DART API 오류 $($response.status): $($response.message)"
   }
