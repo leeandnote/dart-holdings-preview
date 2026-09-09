@@ -13,6 +13,7 @@ const iso = `${ymd.slice(0, 4)}-${ymd.slice(4, 6)}-${ymd.slice(6, 8)}`;
 const dotted = `${ymd.slice(0, 4)}.${ymd.slice(4, 6)}.${ymd.slice(6, 8)}`;
 const dryRun = process.argv.includes("--dry-run");
 const keep = process.argv.includes("--keep");
+const skipTelegram = process.argv.includes("--skip-telegram");
 const channelOnly = process.argv.includes("--channel") || process.argv.includes("--channel-only");
 const xOnly = process.argv.includes("--x-only");
 const threadsOnly = process.argv.includes("--threads-only");
@@ -763,12 +764,14 @@ async function postThreadsCarousel(cards) {
     for (const url of urls) await waitForPublicUrl(url, "Threads");
     const children = [];
     for (const [index, imageUrl] of urls.entries()) {
-      children.push(await threadsFetch("/me/threads", {
+      const childId = await threadsFetch("/me/threads", {
         media_type: "IMAGE",
         image_url: imageUrl,
         is_carousel_item: "true",
         alt_text: `${dotted} 리앤노트 DART 공시 요약 ${index + 1}`,
-      }));
+      });
+      await waitForThreadsContainer(childId);
+      children.push(childId);
     }
     const containerId = await threadsFetch("/me/threads", {
       media_type: "CAROUSEL",
@@ -780,6 +783,23 @@ async function postThreadsCarousel(cards) {
   } finally {
     await rm(publicDir, { recursive: true, force: true });
     deployPublicDist();
+  }
+}
+
+async function waitForThreadsContainer(containerId) {
+  const { accessToken } = await loadMetaConfig();
+  for (let attempt = 1; attempt <= 20; attempt += 1) {
+    const url = new URL(`https://graph.threads.net/v1.0/${containerId}`);
+    url.searchParams.set("fields", "status,error_message");
+    url.searchParams.set("access_token", accessToken);
+    const response = await fetch(url);
+    const body = await response.json().catch(() => ({}));
+    if (response.ok && ["FINISHED", "PUBLISHED"].includes(body.status)) return;
+    if (body.status === "ERROR" || body.status === "EXPIRED") {
+      throw new Error(`Threads media processing failed: ${body.error_message || body.status}`);
+    }
+    if (attempt === 20) throw new Error(`Threads media processing timed out: ${body.status || response.status}`);
+    await new Promise((resolve) => setTimeout(resolve, 3000));
   }
 }
 
@@ -889,7 +909,7 @@ async function main() {
       cards.push({ kind: "contracts", file: png, rows: contractRows });
     }
     const targetCards = onlyKinds ? cards.filter((card) => onlyKinds.has(card.kind)) : cards;
-    if (!dryRun && !xOnly && !threadsOnly && !instagramOnly && !youtubeOnly) await sendMediaGroup(targetCards);
+    if (!dryRun && !skipTelegram && !xOnly && !threadsOnly && !instagramOnly && !youtubeOnly) await sendMediaGroup(targetCards);
     const xPosts = postX && !dryRun ? await postXThread(targetCards) : [];
     const threadsPost = postThreads && !dryRun ? await postThreadsCarousel(targetCards) : null;
     const instagramPost = postInstagram && !dryRun ? await postInstagramCarousel(targetCards) : null;
@@ -915,7 +935,7 @@ async function main() {
     console.log(JSON.stringify({
       reportDate: ymd,
       dryRun,
-      telegramSent: dryRun || xOnly || threadsOnly || instagramOnly ? 0 : sent.length,
+      telegramSent: dryRun || skipTelegram || xOnly || threadsOnly || instagramOnly ? 0 : sent.length,
       xRequested: postX,
       xPosts,
       threadsRequested: postThreads,

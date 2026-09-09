@@ -5,6 +5,7 @@ param(
   [int]$BackfillDays = 7,
   [switch]$SkipDeploy,
   [switch]$SendSocialCards,
+  [switch]$SendTelegramCards,
   [switch]$PostXCards,
   [switch]$PostThreadsCards,
   [switch]$PostInstagramCards,
@@ -148,6 +149,9 @@ if ($SendSocialCards) {
   Invoke-Step "7. Send Telegram social summary cards" {
     $env:LEEANDNOTE_PNPM = $pnpm
     $socialArgs = @($ReportDate)
+    if (-not $SendTelegramCards) {
+      $socialArgs += "--skip-telegram"
+    }
     if ($PostXCards) {
       $socialArgs += "--x"
     }

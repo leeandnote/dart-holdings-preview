@@ -127,6 +127,7 @@ jobs:
           if ($sendTelegram -or "${{ inputs.post_x }}" -ne "false" -or "${{ inputs.post_threads }}" -ne "false" -or "${{ inputs.post_instagram }}" -ne "false" -or "${{ inputs.post_youtube }}" -eq "true") {
             $args += "-SendSocialCards"
           }
+          if ($sendTelegram) { $args += "-SendTelegramCards" }
           if ("${{ inputs.post_x }}" -ne "false") { $args += "-PostXCards" }
           if ("${{ inputs.post_threads }}" -ne "false") { $args += "-PostThreadsCards" }
           if ("${{ inputs.post_instagram }}" -ne "false") { $args += "-PostInstagramCards" }
