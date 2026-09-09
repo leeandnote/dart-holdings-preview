@@ -30,6 +30,16 @@ on:
         required: false
         default: true
         type: boolean
+      post_youtube:
+        description: "Upload the 3-card vertical video to YouTube Shorts."
+        required: false
+        default: false
+        type: boolean
+      render_youtube_only:
+        description: "Render and validate the YouTube video without uploading it."
+        required: false
+        default: false
+        type: boolean
 
 concurrency:
   group: daily-leeandnote-publish
@@ -56,6 +66,10 @@ jobs:
       THREADS_USER_ID: ${{ secrets.THREADS_USER_ID }}
       INSTAGRAM_ACCESS_TOKEN: ${{ secrets.INSTAGRAM_ACCESS_TOKEN }}
       INSTAGRAM_USER_ID: ${{ secrets.INSTAGRAM_USER_ID }}
+      YOUTUBE_CLIENT_ID: ${{ secrets.YOUTUBE_CLIENT_ID }}
+      YOUTUBE_CLIENT_SECRET: ${{ secrets.YOUTUBE_CLIENT_SECRET }}
+      YOUTUBE_REFRESH_TOKEN: ${{ secrets.YOUTUBE_REFRESH_TOKEN }}
+      YOUTUBE_PRIVACY_STATUS: ${{ vars.YOUTUBE_PRIVACY_STATUS || 'private' }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       WRANGLER_CONFIG_TOML_B64: ${{ secrets.WRANGLER_CONFIG_TOML_B64 }}
@@ -77,6 +91,9 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: Install FFmpeg
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
 
       - name: Restore Cloudflare authentication
         shell: pwsh
@@ -107,10 +124,21 @@ jobs:
             "-PublishDays", "120"
           )
           $sendTelegram = "${{ github.event_name }}" -eq "schedule" -or "${{ inputs.send_telegram }}" -eq "true"
-          if ($sendTelegram -or "${{ inputs.post_x }}" -ne "false" -or "${{ inputs.post_threads }}" -ne "false" -or "${{ inputs.post_instagram }}" -ne "false") {
+          if ($sendTelegram -or "${{ inputs.post_x }}" -ne "false" -or "${{ inputs.post_threads }}" -ne "false" -or "${{ inputs.post_instagram }}" -ne "false" -or "${{ inputs.post_youtube }}" -eq "true") {
             $args += "-SendSocialCards"
           }
           if ("${{ inputs.post_x }}" -ne "false") { $args += "-PostXCards" }
           if ("${{ inputs.post_threads }}" -ne "false") { $args += "-PostThreadsCards" }
           if ("${{ inputs.post_instagram }}" -ne "false") { $args += "-PostInstagramCards" }
+          if ("${{ inputs.post_youtube }}" -eq "true") { $args += "-PostYouTubeShort" }
           & pwsh @args
+
+      - name: Validate YouTube Short rendering
+        if: ${{ inputs.render_youtube_only == true }}
+        shell: pwsh
+        run: |
+          $output = & node .\send_daily_social_cards.mjs $env:REPORT_DATE --dry-run --youtube --keep | ConvertFrom-Json
+          if (-not (Test-Path -LiteralPath $output.youtubeVideo)) {
+            throw "Rendered YouTube video was not created."
+          }
+          & ffprobe -v error -select_streams v:0 -show_entries stream=width,height,duration -of default=noprint_wrappers=1 $output.youtubeVideo

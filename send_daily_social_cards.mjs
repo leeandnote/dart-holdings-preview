@@ -4,6 +4,7 @@ import os from "node:os";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
 import crypto from "node:crypto";
+import { renderYouTubeShort, uploadYouTubeShort } from "./youtube_short.mjs";
 
 const ROOT = process.cwd();
 const CONVEX_URL = "https://gregarious-lemming-92.convex.cloud";
@@ -16,9 +17,11 @@ const channelOnly = process.argv.includes("--channel") || process.argv.includes(
 const xOnly = process.argv.includes("--x-only");
 const threadsOnly = process.argv.includes("--threads-only");
 const instagramOnly = process.argv.includes("--instagram-only");
+const youtubeOnly = process.argv.includes("--youtube-only");
 const postX = process.argv.includes("--x") || process.argv.includes("--post-x") || xOnly;
 const postThreads = process.argv.includes("--threads") || process.argv.includes("--post-threads") || threadsOnly;
 const postInstagram = process.argv.includes("--instagram") || process.argv.includes("--post-instagram") || instagramOnly;
+const postYouTube = process.argv.includes("--youtube") || process.argv.includes("--post-youtube") || youtubeOnly;
 const showXCaptions = process.argv.includes("--show-x-captions");
 const onlyArg = process.argv.find((arg) => arg.startsWith("--only="));
 const onlyKinds = onlyArg ? new Set(onlyArg.slice("--only=".length).split(",").map((kind) => kind.trim()).filter(Boolean)) : null;
@@ -863,10 +866,29 @@ async function main() {
       cards.push({ kind: "contracts", file: png, rows: contractRows });
     }
     const targetCards = onlyKinds ? cards.filter((card) => onlyKinds.has(card.kind)) : cards;
-    if (!dryRun && !xOnly && !threadsOnly && !instagramOnly) await sendMediaGroup(targetCards);
+    if (!dryRun && !xOnly && !threadsOnly && !instagramOnly && !youtubeOnly) await sendMediaGroup(targetCards);
     const xPosts = postX && !dryRun ? await postXThread(targetCards) : [];
     const threadsPost = postThreads && !dryRun ? await postThreadsCarousel(targetCards) : null;
     const instagramPost = postInstagram && !dryRun ? await postInstagramCarousel(targetCards) : null;
+    let youtubePost = null;
+    let youtubeVideo = null;
+    if (postYouTube) {
+      youtubeVideo = path.join(tempDir, `leeandnote-dart-${iso}.mp4`);
+      renderYouTubeShort(targetCards, youtubeVideo);
+      if (postYouTube && !dryRun) {
+        youtubePost = await uploadYouTubeShort({
+          file: youtubeVideo,
+          title: `${dotted} 주요 DART 공시 요약 #Shorts`,
+          description: [
+            `${dotted} 주요 5%보고·임원보고·대형수주 공시를 한눈에 정리했습니다.`,
+            "공시 원문과 상세 데이터: https://leeandnote.com",
+            "본 영상은 정보 제공 목적이며 투자 권유가 아닙니다.",
+            "#주식 #공시 #DART #대형수주 #지분변동 #Shorts",
+          ].join("\n\n"),
+          tags: ["주식", "공시", "DART", "5%보고", "임원보고", "대형수주", "기업공시", "Shorts"],
+        });
+      }
+    }
     console.log(JSON.stringify({
       reportDate: ymd,
       dryRun,
@@ -877,6 +899,9 @@ async function main() {
       threadsPost,
       instagramRequested: postInstagram,
       instagramPost,
+      youtubeRequested: postYouTube,
+      youtubePost,
+      youtubeVideo: keep ? youtubeVideo : undefined,
       xCaptions: showXCaptions
         ? (xSeparate
           ? targetCards.map((card) => ({ kind: card.kind, text: xCaption(card.kind, card.rows) }))

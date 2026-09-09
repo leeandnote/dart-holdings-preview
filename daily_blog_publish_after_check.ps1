@@ -8,6 +8,7 @@ param(
   [switch]$PostXCards,
   [switch]$PostThreadsCards,
   [switch]$PostInstagramCards,
+  [switch]$PostYouTubeShort,
   [switch]$AllowWarnings
 )
 
@@ -149,6 +150,9 @@ if ($SendSocialCards) {
     }
     if ($PostInstagramCards) {
       $socialArgs += "--instagram"
+    }
+    if ($PostYouTubeShort) {
+      $socialArgs += "--youtube"
     }
     & $node (Join-Path $root "send_daily_social_cards.mjs") @socialArgs
     if ($LASTEXITCODE -ne 0) {
