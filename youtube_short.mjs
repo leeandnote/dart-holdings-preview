@@ -4,7 +4,7 @@ import { spawnSync } from "node:child_process";
 
 const VIDEO_WIDTH = 1080;
 const VIDEO_HEIGHT = 1920;
-const CARD_SECONDS = 9;
+const CARD_SECONDS = 8;
 const FPS = 30;
 
 function requireValue(name) {
@@ -21,11 +21,10 @@ export function renderYouTubeShort(cards, outputPath) {
     args.push("-loop", "1", "-t", String(CARD_SECONDS), "-i", card.file);
   }
 
-  const frames = CARD_SECONDS * FPS;
   const filters = selected.map((_, index) =>
     `[${index}:v]scale=${VIDEO_WIDTH}:${VIDEO_HEIGHT}:force_original_aspect_ratio=increase,` +
     `crop=${VIDEO_WIDTH}:${VIDEO_HEIGHT},` +
-    `zoompan=z='min(zoom+0.00012,1.022)':d=${frames}:s=${VIDEO_WIDTH}x${VIDEO_HEIGHT}:fps=${FPS},` +
+    `fps=${FPS},` +
     `fade=t=in:st=0:d=0.3,fade=t=out:st=${CARD_SECONDS - 0.3}:d=0.3,` +
     `setsar=1[v${index}]`
   );
@@ -37,7 +36,8 @@ export function renderYouTubeShort(cards, outputPath) {
     "-map", "[v]",
     "-an",
     "-c:v", "libx264",
-    "-preset", "medium",
+    "-preset", "veryfast",
+    "-tune", "stillimage",
     "-crf", "20",
     "-movflags", "+faststart",
     "-r", String(FPS),
