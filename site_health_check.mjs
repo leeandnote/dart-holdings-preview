@@ -181,9 +181,11 @@ const recentContractDate = maxDate(contractRows.map((row) => row["접수일"]));
 const recentContracts = contractRows.filter((row) => normalizeDate(row["접수일"]) === recentContractDate);
 const invalidContracts = recentContracts.filter((row) => !isFiniteNumber(row["계약금액"]) || row["계약금액"] <= 0 || !isFiniteNumber(row["매출대비비율"]) || row["매출대비비율"] < 0);
 const parseFailures = Number(disclosureSignals.parseFailures || 0);
+const excludedIncompleteContracts = Number(disclosureSignals.excludedIncompleteContracts || 0);
 const parseSuccesses = Number(disclosureSignals.parseSuccesses ?? (Number(disclosureSignals.parsedDocuments || 0) - parseFailures));
 if (Number(disclosureSignals.totalCandidates || 0) > 0 && parseSuccesses <= 0) addIssue(issues, "error", "대형수주 원문 파싱 전부 실패", `${disclosureSignals.totalCandidates}개 후보가 있으나 원문 파싱 성공 건수가 0입니다. 불완전한 계약 데이터의 배포를 중단합니다.`);
 if (recentContracts.length && invalidContracts.length) addIssue(issues, "error", "최신 대형수주 핵심 데이터 누락", `${displayDate(recentContractDate)} 계약 ${recentContracts.length}건 중 ${invalidContracts.length}건에서 계약금액 또는 매출대비비율이 누락되었습니다.`, invalidContracts.map((row) => `${row["종목명"]} ${row["접수번호"] || ""}`));
+if (excludedIncompleteContracts > 0) addIssue(issues, "warn", "검증 불완전 계약 제외", `${excludedIncompleteContracts}건의 계약 정정 공시는 계약금액 또는 매출대비비율을 확정하지 못해 사이트와 소셜 카드에서 제외했습니다.`);
 function daysBetweenYmd(a, b) {
   const aa = normalizeDate(a);
   const bb = normalizeDate(b);
@@ -233,7 +235,7 @@ if (shortChunk.length) addIssue(issues, "warn", "가격 추이 데이터 길이 
 if (staleChunk.length) addIssue(issues, "warn", "가격 추이 최신성 낮음", `${staleChunk.length}개 종목의 마지막 가격일이 2026-08-14 이전입니다.`, staleChunk);
 
 const missingCurrent5 = recentRows5.filter((r) => !currentPrices[normalizeCode(r["종목코드"])]);
-const missingEvent5 = recentRows5.filter((r) => !eventPrices[`${normalizeCode(r["종목코드"])}_${normalizeDate(r["보고의무발생일"])}`]);
+const missingEvent5 = recentRows5.filter((r) => !isFiniteNumber(r["보고의무발생일종가"]) && !eventPrices[`${normalizeCode(r["종목코드"])}_${normalizeDate(r["보고의무발생일"])}`]);
 const missingRatio5 = recentRows5.filter((r) => !isFiniteNumber(r["직전지분율"]) || !isFiniteNumber(r["이번지분율"]));
 const badDate5 = recentRows5.filter((r) => !normalizeDate(r["보고의무발생일"]) || !normalizeDate(r["접수일"]));
 
@@ -281,6 +283,7 @@ const summary = {
     contractsLatest: recentContracts.length,
     contractsInvalid: invalidContracts.length,
     contractParseFailures: parseFailures,
+    excludedIncompleteContracts,
   },
   issues,
 };

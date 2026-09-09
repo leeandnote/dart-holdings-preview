@@ -417,6 +417,17 @@ foreach ($report in @($reports | Sort-Object rcept_dt -Descending)) {
 }
 
 $rows = @($rows | Sort-Object 접수일, 종목명 -Descending)
+$incompleteContracts = @($rows | Where-Object {
+  $_.공시유형 -eq "단일판매·공급계약" -and
+  ($null -eq $_.계약금액 -or [double]$_.계약금액 -le 0 -or $null -eq $_.매출대비비율 -or [double]$_.매출대비비율 -lt 0)
+})
+foreach ($row in $incompleteContracts) {
+  Write-Warning "검증 불완전 계약 제외: $($row.종목명) $($row.접수번호)"
+}
+$rows = @($rows | Where-Object {
+  $_.공시유형 -ne "단일판매·공급계약" -or
+  ($null -ne $_.계약금액 -and [double]$_.계약금액 -gt 0 -and $null -ne $_.매출대비비율 -and [double]$_.매출대비비율 -ge 0)
+})
 New-Item -ItemType Directory -Force -Path (Split-Path -Parent $JsonOut) | Out-Null
 $payload = [pscustomobject]@{
   generatedAt = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss")
@@ -427,6 +438,7 @@ $payload = [pscustomobject]@{
   parsedDocuments = [Math]::Min($reports.Count, $MaxDocuments)
   parseFailures = $parseFailures
   parseSuccesses = ([Math]::Min($reports.Count, $MaxDocuments) - $parseFailures)
+  excludedIncompleteContracts = $incompleteContracts.Count
   maxSearchPages = $MaxSearchPages
   skipDocumentParsing = [bool]$SkipDocumentParsing
   rows = @($rows)
