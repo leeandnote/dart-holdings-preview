@@ -119,6 +119,7 @@ Write-Host "Health summary: errors=$errors warnings=$warnings" -ForegroundColor 
 if ($errors -gt 0) {
   Write-Host "Publishing stopped because blocking data errors remain." -ForegroundColor Red
   Write-Host "Check: site\reports\site_health_report.md"
+  Get-Content -LiteralPath (Join-Path $root "site\reports\site_health_report.md") -Encoding UTF8
   exit 1
 }
 
