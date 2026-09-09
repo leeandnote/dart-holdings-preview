@@ -154,6 +154,7 @@ const rows5 = Array.isArray(dart.rows) ? dart.rows : [];
 const shareholders = loadDataFile("shareholders.js", "__REGULAR_SHAREHOLDERS__") ?? {};
 const eventPrices = loadDataFile("event_prices.js", "__EVENT_PRICES__") ?? {};
 const currentPrices = loadDataFile("current_prices.js", "__CURRENT_PRICES__") ?? {};
+const disclosureSignals = loadDataFile("disclosure_signals.js", "__DISCLOSURE_SIGNALS__") ?? { rows: [] };
 const todayKst = todayYmdKst();
 const expectedTradeYmd = latestBusinessYmd(todayKst);
 const siteGeneratedYmd = normalizeDate(dart.generatedAt);
@@ -174,6 +175,15 @@ const priceChunks = loadPriceChunks(allTargetCodes);
 const liveRecentReceiptDate5 = await getLiveRecentReceiptDate5(todayKst);
 const dartMajorDbGapReport = await getDartMajorDbGaps(todayKst).catch((error) => ({ checks: [], gaps: [{ reportDate: todayKst, sourceCount: 0, dbCount: 0, level: "warn", error: error.message }] }));
 const issues = [];
+if (liveRecentReceiptDate5 && recentReceiptDate5 !== liveRecentReceiptDate5) addIssue(issues, "error", "5%보고 정적 백업 미동기화", `Convex 최신 접수일은 ${displayDate(liveRecentReceiptDate5)}이나 정적 백업 최신 접수일은 ${displayDate(recentReceiptDate5)}입니다.`);
+const contractRows = (Array.isArray(disclosureSignals.rows) ? disclosureSignals.rows : []).filter((row) => row["공시유형"] === "단일판매·공급계약");
+const recentContractDate = maxDate(contractRows.map((row) => row["접수일"]));
+const recentContracts = contractRows.filter((row) => normalizeDate(row["접수일"]) === recentContractDate);
+const invalidContracts = recentContracts.filter((row) => !isFiniteNumber(row["계약금액"]) || row["계약금액"] <= 0 || !isFiniteNumber(row["매출대비비율"]) || row["매출대비비율"] < 0);
+const parseFailures = Number(disclosureSignals.parseFailures || 0);
+const parseSuccesses = Number(disclosureSignals.parseSuccesses ?? (Number(disclosureSignals.parsedDocuments || 0) - parseFailures));
+if (Number(disclosureSignals.totalCandidates || 0) > 0 && parseSuccesses <= 0) addIssue(issues, "error", "대형수주 원문 파싱 전부 실패", `${disclosureSignals.totalCandidates}개 후보가 있으나 원문 파싱 성공 건수가 0입니다. 불완전한 계약 데이터의 배포를 중단합니다.`);
+if (recentContracts.length && invalidContracts.length) addIssue(issues, "error", "최신 대형수주 핵심 데이터 누락", `${displayDate(recentContractDate)} 계약 ${recentContracts.length}건 중 ${invalidContracts.length}건에서 계약금액 또는 매출대비비율이 누락되었습니다.`, invalidContracts.map((row) => `${row["종목명"]} ${row["접수번호"] || ""}`));
 function daysBetweenYmd(a, b) {
   const aa = normalizeDate(a);
   const bb = normalizeDate(b);
@@ -268,6 +278,9 @@ const summary = {
     issues: issues.length,
     errors: issues.filter((i) => i.level === "error").length,
     warnings: issues.filter((i) => i.level === "warn").length,
+    contractsLatest: recentContracts.length,
+    contractsInvalid: invalidContracts.length,
+    contractParseFailures: parseFailures,
   },
   issues,
 };

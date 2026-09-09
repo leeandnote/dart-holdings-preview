@@ -66,6 +66,11 @@ Invoke-Step "1. Convex price gap repair" {
   & $node (Join-Path $root "repair_convex_price_gaps.mjs") --days $PriceDays
 }
 
+Invoke-Step "1b. Sync Convex holdings fallback" {
+  & $node (Join-Path $root "sync_convex_holdings_fallback.mjs")
+  if ($LASTEXITCODE -ne 0) { throw "Convex holdings fallback sync failed" }
+}
+
 
 
 Invoke-Step "2. Refresh contract disclosure signals" {

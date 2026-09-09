@@ -844,6 +844,9 @@ async function main() {
   const fiveRows = pickFive(fiveRaw.map(rowModel));
   const execRows = pickExecutive(execRaw.map(rowModel));
   const contractRows = pickContracts(contractRaw);
+  if (contractRaw.length > 0 && contractRows.length === 0) {
+    throw new Error(`${iso} contract disclosures exist, but every row is missing contract amount/ratio. Social publishing stopped.`);
+  }
   if (fiveRows.length === 0 && execRows.length === 0 && contractRows.length === 0) throw new Error(`${iso} card source rows are empty.`);
 
   const tempDir = await mkdtemp(path.join(os.tmpdir(), "leeandnote-social-"));

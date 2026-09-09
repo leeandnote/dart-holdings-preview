@@ -132,7 +132,19 @@ function Get-DocumentText([string]$Key, [string]$RceptNo, [string]$Dir) {
   New-Item -ItemType Directory -Force -Path $docDir | Out-Null
   $zipPath = Join-Path $docDir "document.zip"
   $uri = "$BaseUrl/document.xml?crtfc_key=$([uri]::EscapeDataString($Key))&rcept_no=$([uri]::EscapeDataString($RceptNo))"
-  Invoke-WebRequest -Uri $uri -OutFile $zipPath -Headers @{ "User-Agent" = "dart-disclosure-signals/1.0" } -TimeoutSec 90
+  try {
+    Invoke-WebRequest -Uri $uri -OutFile $zipPath -Headers @{ "User-Agent" = "dart-disclosure-signals/1.0" } -TimeoutSec 90
+  }
+  catch {
+    Write-Warning "Invoke-WebRequest failed; retrying DART document with curl: $($_.Exception.Message)"
+    $curl = Get-Command curl -ErrorAction SilentlyContinue
+    if (-not $curl) { throw }
+    & $curl.Source -fsSL --retry 4 --retry-delay 2 --retry-all-errors -A "dart-disclosure-signals/1.0" -o $zipPath $uri
+    if ($LASTEXITCODE -ne 0) { throw "curl failed to download DART document $RceptNo (exit $LASTEXITCODE)" }
+  }
+  if (-not (Test-Path -LiteralPath $zipPath) -or (Get-Item -LiteralPath $zipPath).Length -lt 100) {
+    throw "DART document archive is missing or empty: $RceptNo"
+  }
   Expand-Archive -LiteralPath $zipPath -DestinationPath $docDir -Force
 
   $raw = ""
@@ -363,6 +375,7 @@ $end = Normalize-Date $EndDe
 $reports = Get-RecentDisclosures -Key $ApiKey -Bgn $bgn -End $end -SearchPages $MaxSearchPages -CandidateLimit $MaxCandidates
 $rows = @()
 $count = 0
+$parseFailures = 0
 foreach ($report in @($reports | Sort-Object rcept_dt -Descending)) {
   $count += 1
   if ($count -gt $MaxDocuments) {
@@ -379,6 +392,7 @@ foreach ($report in @($reports | Sort-Object rcept_dt -Descending)) {
     $rows += New-DisclosureRow -Item $report -Text $text
   }
   catch {
+    $parseFailures += 1
     Write-Warning "원문 파싱 실패: $($report.rcept_no) $($_.Exception.Message)"
     $rows += New-DisclosureRow -Item $report -Text ""
   }
@@ -393,6 +407,8 @@ $payload = [pscustomobject]@{
   endDe = $end
   totalCandidates = $reports.Count
   parsedDocuments = [Math]::Min($reports.Count, $MaxDocuments)
+  parseFailures = $parseFailures
+  parseSuccesses = ([Math]::Min($reports.Count, $MaxDocuments) - $parseFailures)
   maxSearchPages = $MaxSearchPages
   skipDocumentParsing = [bool]$SkipDocumentParsing
   rows = @($rows)
