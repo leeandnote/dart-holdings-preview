@@ -137,7 +137,7 @@ jobs:
         if: ${{ inputs.render_youtube_only == true }}
         shell: pwsh
         run: |
-          $output = & node .\send_daily_social_cards.mjs $env:REPORT_DATE --dry-run --youtube --keep | ConvertFrom-Json
+          $output = & node ./send_daily_social_cards.mjs $env:REPORT_DATE --dry-run --youtube --keep | ConvertFrom-Json
           if (-not (Test-Path -LiteralPath $output.youtubeVideo)) {
             throw "Rendered YouTube video was not created."
           }
