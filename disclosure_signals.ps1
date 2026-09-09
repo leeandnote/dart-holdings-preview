@@ -263,6 +263,7 @@ function Normalize-FieldValue([string]$Value) {
 function Normalize-CounterpartyValue([string]$Value) {
   $clean = Normalize-FieldValue $Value
   if (-not $clean) { return "" }
+  if ($clean.Length -lt 2 -or $clean -match "^(방|상대방|계약상대방)$") { return "" }
   if ($clean.Length -gt 80) { return "" }
   if ($clean -match "재공시|사업개요|기타 투자판단|공시유보|협의") { return "" }
   return $clean
