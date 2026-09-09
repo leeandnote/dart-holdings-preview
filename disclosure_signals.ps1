@@ -187,6 +187,24 @@ function Get-NumberAfter([string]$Text, [string[]]$Labels) {
   return $null
 }
 
+function Get-NumberAfterInRange([string]$Text, [string[]]$Labels, [double]$Minimum, [double]$Maximum) {
+  foreach ($label in $Labels) {
+    $idx = 0
+    while ($idx -lt $Text.Length) {
+      $found = $Text.IndexOf($label, $idx, [StringComparison]::OrdinalIgnoreCase)
+      if ($found -lt 0) { break }
+      $start = $found + $label.Length
+      $chunk = $Text.Substring($start, [Math]::Min(260, $Text.Length - $start))
+      foreach ($match in [regex]::Matches($chunk, "[-+]?\d[\d,]*(?:\.\d+)?")) {
+        $value = Convert-ToNumber $match.Value
+        if ($null -ne $value -and $value -ge $Minimum -and $value -le $Maximum) { return $value }
+      }
+      $idx = $start
+    }
+  }
+  return $null
+}
+
 function Get-PrimaryContractText([string]$Text) {
   if (-not $Text) { return "" }
   $patterns = @(
@@ -323,7 +341,7 @@ function New-DisclosureRow($Item, [string]$Text) {
 
   if ($type -eq "contract") {
     $primaryText = Get-PrimaryContractText $Text
-    $contractAmount = Get-SaneContractAmount (Get-NumberAfter $primaryText @("계약금액", "계약 금액", "총 계약금액"))
+    $contractAmount = Get-SaneContractAmount (Get-NumberAfterInRange $primaryText @("계약금액", "계약 금액", "총 계약금액") 1000000 1000000000000000)
     $salesRatio = Get-SaneSalesRatio (Get-NumberAfter $primaryText @("매출액대비", "매출액 대비", "최근매출액대비", "최근 매출액 대비"))
     $recentSales = Get-VerifiedRecentSales $contractAmount $salesRatio (Get-NumberAfter $primaryText @("최근매출액", "최근 매출액"))
     $contractFields = Get-ContractFields $primaryText
