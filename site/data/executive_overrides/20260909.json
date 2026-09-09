@@ -1,0 +1,22 @@
+{
+  "rows": [
+    {
+      "corpName": "삼성전자",
+      "stockCode": "005930",
+      "market": "KOSPI",
+      "reporter": "이재용",
+      "reporterType": "회장 · 주요주주",
+      "previousRate": 1.47,
+      "currentRate": 1.58,
+      "rateDelta": 0.11,
+      "previousShares": 97551953,
+      "currentShares": 104740746,
+      "shareDelta": 7188793,
+      "tradeValue": 1937379713500,
+      "buyTradeValue": 1937379713500,
+      "reason": "홍라희 보유주식 7,188,793주 장외매수 예정",
+      "reportName": "임원·주요주주특정증권등거래계획보고서",
+      "plannedTrade": true
+    }
+  ]
+}

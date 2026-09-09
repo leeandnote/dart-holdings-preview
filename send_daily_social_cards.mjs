@@ -23,6 +23,8 @@ const postThreads = process.argv.includes("--threads") || process.argv.includes(
 const postInstagram = process.argv.includes("--instagram") || process.argv.includes("--post-instagram") || instagramOnly;
 const postYouTube = process.argv.includes("--youtube") || process.argv.includes("--post-youtube") || youtubeOnly;
 const showXCaptions = process.argv.includes("--show-x-captions");
+const contractDataArg = process.argv.find((arg) => arg.startsWith("--contract-data="));
+const executiveDataArg = process.argv.find((arg) => arg.startsWith("--executive-data="));
 const onlyArg = process.argv.find((arg) => arg.startsWith("--only="));
 const onlyKinds = onlyArg ? new Set(onlyArg.slice("--only=".length).split(",").map((kind) => kind.trim()).filter(Boolean)) : null;
 const replyToArg = process.argv.find((arg) => arg.startsWith("--reply-to="));
@@ -121,7 +123,10 @@ function compactPoint(value) {
 }
 
 function reporterMeta(row, kind) {
-  if (kind === "executive") return row.reporterType || "";
+  if (kind === "executive") {
+    if (row.plannedTrade) return `거래계획 · ${sharesText(row.shareDelta)}`;
+    return row.reporterType || "";
+  }
   return [row.reporterType, compactPoint(row.reason)].filter(Boolean).join(" · ");
 }
 
@@ -183,6 +188,8 @@ function rowModel(row) {
     shareDeltaText: sharesText(shareDelta),
     value,
     reason,
+    reportName: row.reportName || "",
+    plannedTrade: Boolean(row.plannedTrade) || /거래계획보고서/.test(String(row.reportName || "")),
     receiptNo: row.receiptNo || "",
   };
 }
@@ -232,23 +239,34 @@ function topicForFive(row) {
 }
 
 function pickExecutive(rows) {
+  const plannedTrades = rows.filter((r) => r.plannedTrade).sort((a, b) => scoreAbsShares(b) - scoreAbsShares(a));
   const increases = rows.filter((r) => (r.delta ?? 0) > 0 || (r.shareDelta ?? 0) > 0).sort((a, b) => scoreAbsShares(b) - scoreAbsShares(a));
   const decreases = rows.filter((r) => (r.delta ?? 0) < 0 || (r.shareDelta ?? 0) < 0).sort((a, b) => scoreAbsShares(b) - scoreAbsShares(a));
   const insiders = rows.filter((r) => /오너|특수관계|대표|이사|상무|전무|사장|회장|주요주주|개인/i.test(`${r.reporter} ${r.reporterType}`)).sort((a, b) => scoreAbsShares(b) - scoreAbsShares(a));
   const flow = rows.filter((r) => Math.abs(r.value || 0) > 0).sort((a, b) => Math.abs(b.value) - Math.abs(a.value));
-  const priorityRows = [...increases, ...decreases, ...insiders, ...flow].filter(hasUsefulSignal);
+  const priorityRows = [...plannedTrades, ...increases, ...decreases, ...insiders, ...flow].filter(hasUsefulSignal);
   return uniqueRows(priorityRows.length ? priorityRows : rows, 5).map((row) => ({ ...row, topic: topicForExecutive(row) }));
 }
 
 function topicForExecutive(row) {
+  if (row.plannedTrade) return "거래계획";
   if ((row.delta ?? 0) > 0 || (row.shareDelta ?? 0) > 0) return "증가";
   if ((row.delta ?? 0) < 0 || (row.shareDelta ?? 0) < 0) return "감소";
   if (/주요주주/i.test(`${row.reporter} ${row.reporterType}`)) return "주요주주";
   return "임원";
 }
 
+async function loadExtraExecutiveRows() {
+  const filePath = executiveDataArg
+    ? path.resolve(executiveDataArg.slice("--executive-data=".length))
+    : path.join(ROOT, "site", "data", "executive_overrides", `${ymd}.json`);
+  if (!existsSync(filePath)) return [];
+  const payload = JSON.parse(await readFile(filePath, "utf8"));
+  return Array.isArray(payload) ? payload : (payload.rows || []);
+}
+
 async function loadContractRows() {
-  const filePath = path.join(ROOT, "site", "data", "disclosure_signals.json");
+  const filePath = contractDataArg ? path.resolve(contractDataArg.slice("--contract-data=".length)) : path.join(ROOT, "site", "data", "disclosure_signals.json");
   if (!existsSync(filePath)) return [];
   const payload = JSON.parse(await readFile(filePath, "utf8"));
   return (payload.rows || []).filter((row) => {
@@ -836,13 +854,15 @@ async function postInstagramCarousel(cards) {
 }
 
 async function main() {
-  const [fiveRaw, execRaw, contractRaw] = await Promise.all([
+  const [fiveRaw, execRaw, extraExecRaw, contractRaw] = await Promise.all([
     convexQuery("dart:listDailyReportItems", { reportDate: ymd, limit: 500 }),
     convexQuery("dart:listExecutiveDailyReportItems", { reportDate: ymd, limit: 500 }),
+    loadExtraExecutiveRows(),
     loadContractRows(),
   ]);
   const fiveRows = pickFive(fiveRaw.map(rowModel));
-  const execRows = pickExecutive(execRaw.map(rowModel));
+  const mergedExecRaw = [...extraExecRaw, ...execRaw];
+  const execRows = pickExecutive(mergedExecRaw.map(rowModel));
   const contractRows = pickContracts(contractRaw);
   if (contractRaw.length > 0 && contractRows.length === 0) {
     throw new Error(`${iso} contract disclosures exist, but every row is missing contract amount/ratio. Social publishing stopped.`);
@@ -859,7 +879,7 @@ async function main() {
       cards.push({ kind: "five", file: png, rows: fiveRows });
     }
     if (execRows.length) {
-      const png = await renderPng(cardHtml({ kind: "executive", title: `${dotted} 주요 임원보고공시`, subtitle: "임원·주요주주의 보유비율과 보유주식수 변동 중 눈에 띄는 흐름을 정리했습니다.", rows: execRows, total: execRaw.length }), tempDir, `leeandnote-executive-${iso}`);
+      const png = await renderPng(cardHtml({ kind: "executive", title: `${dotted} 주요 임원보고공시`, subtitle: "임원·주요주주의 보유비율과 보유주식수 변동 중 눈에 띄는 흐름을 정리했습니다.", rows: execRows, total: mergedExecRaw.length }), tempDir, `leeandnote-executive-${iso}`);
       sent.push(png);
       cards.push({ kind: "executive", file: png, rows: execRows });
     }
