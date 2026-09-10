@@ -2,8 +2,8 @@ name: Daily DART data update
 
 on:
   schedule:
-    # Refresh source data before the 20:10 KST preview build.
-    - cron: "30 10 * * 1-5"
+    # Refresh source data with enough headroom before the 20:10 KST preview build.
+    - cron: "15 10 * * 1-5"
   workflow_dispatch:
     inputs:
       mode:
@@ -21,7 +21,7 @@ concurrency:
 jobs:
   update-and-deploy:
     runs-on: windows-latest
-    timeout-minutes: 25
+    timeout-minutes: 55
 
     steps:
       - name: Checkout
@@ -29,7 +29,7 @@ jobs:
 
       - name: Run DART and price update
         shell: pwsh
-        timeout-minutes: 18
+        timeout-minutes: 45
         env:
           DART_API_KEY: ${{ secrets.DART_API_KEY }}
           SITE_URL: ${{ vars.SITE_URL }}
