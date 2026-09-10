@@ -376,6 +376,19 @@ async function renderPng(html, outDir, name) {
   return pngPath;
 }
 
+function convertToJpeg(sourcePath, targetPath) {
+  const result = spawnSync("ffmpeg", [
+    "-y",
+    "-i", sourcePath,
+    "-frames:v", "1",
+    "-q:v", "2",
+    targetPath,
+  ], { encoding: "utf8" });
+  if (result.status !== 0 || !existsSync(targetPath)) {
+    throw new Error(`Instagram JPEG conversion failed: ${result.stderr || result.stdout}`);
+  }
+}
+
 async function loadTelegramConfig() {
   const configPath = path.join(ROOT, "telegram_config.local.ps1");
   const text = existsSync(configPath) ? await readFile(configPath, "utf8") : "";
@@ -844,8 +857,8 @@ async function postInstagramCarousel(cards) {
   const urls = [];
   try {
     for (const [index, card] of cards.slice(0, 3).entries()) {
-      const fileName = `${index + 1}-${card.kind}.png`;
-      await copyFile(card.file, path.join(publicDir, fileName));
+      const fileName = `${index + 1}-${card.kind}.jpg`;
+      convertToJpeg(card.file, path.join(publicDir, fileName));
       urls.push(`https://leeandnote.com/social-temp/${publicKey}/${fileName}`);
     }
     deployPublicDist();
