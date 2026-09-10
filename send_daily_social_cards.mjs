@@ -307,7 +307,7 @@ function cardHtml({ kind, title, subtitle, rows, total }) {
   const soft = kind === "executive" ? "#f4f2ff" : "#fff2ed";
   const label = kind === "executive" ? "EXECUTIVE REPORT" : "5% REPORT";
   return `<!doctype html><html><head><meta charset="utf-8"><style>
-    *{box-sizing:border-box} body{margin:0;width:1080px;height:1920px;background:#f7f5f2;font-family:Pretendard,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#111827}
+    *{box-sizing:border-box} body{margin:0;width:1080px;height:1920px;background:#f7f5f2;font-family:"Noto Sans CJK KR",Pretendard,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#111827}
     .card{position:relative;width:1080px;height:1920px;padding:214px 74px 168px;overflow:hidden;background:linear-gradient(180deg,#faf8f5 0%,#ffffff 54%,#f8fafc 100%)}
     .orb{position:absolute;right:-126px;top:252px;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle at 38% 36%,${soft},${accent}66 52%,transparent 70%);opacity:.78}
     .orbit{position:absolute;right:26px;top:392px;width:600px;height:174px;border:2px solid ${accent}33;border-radius:50%;transform:rotate(-13deg)}
@@ -330,7 +330,7 @@ function contractCardHtml({ rows, total }) {
   `).join("");
 
   return `<!doctype html><html><head><meta charset="utf-8"><style>
-    *{box-sizing:border-box} body{margin:0;width:1080px;height:1920px;background:#f8f6f3;font-family:Pretendard,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#101827}
+    *{box-sizing:border-box} body{margin:0;width:1080px;height:1920px;background:#f8f6f3;font-family:"Noto Sans CJK KR",Pretendard,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#101827}
     .card{position:relative;width:1080px;height:1920px;overflow:hidden;padding:214px 72px 168px;background:linear-gradient(180deg,#fbfaf8 0%,#fff 55%,#f7fafc 100%)}
     .dots{position:absolute;inset:0;background-image:radial-gradient(#d5dbe4 1.15px,transparent 1.15px);background-size:34px 34px;opacity:.24}
     .planet{position:absolute;right:-116px;top:250px;width:520px;height:520px;border-radius:50%;background:radial-gradient(circle at 35% 32%,#fff4ed 0%,#8fd8cc 48%,#5f9d97 82%);opacity:.72;box-shadow:0 36px 120px rgba(15,23,42,.10), inset -40px -50px 70px rgba(93,54,46,.14)}

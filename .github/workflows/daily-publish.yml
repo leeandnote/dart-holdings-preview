@@ -92,8 +92,12 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Install FFmpeg
-        run: command -v ffmpeg >/dev/null || (sudo apt-get update && sudo apt-get install -y ffmpeg)
+      - name: Install rendering dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y fonts-noto-cjk
+          fc-cache -f
+          command -v ffmpeg >/dev/null || sudo apt-get install -y ffmpeg
 
       - name: Restore Cloudflare authentication
         shell: pwsh
