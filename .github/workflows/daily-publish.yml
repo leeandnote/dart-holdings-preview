@@ -109,7 +109,11 @@ jobs:
         run: |
           $inputDate = "${{ inputs.report_date }}"
           if ([string]::IsNullOrWhiteSpace($inputDate)) {
-            $inputDate = [DateTimeOffset]::UtcNow.ToOffset([TimeSpan]::FromHours(9)).ToString("yyyyMMdd")
+            $kstNow = [DateTimeOffset]::UtcNow.ToOffset([TimeSpan]::FromHours(9))
+            if ("${{ github.event_name }}" -eq "schedule" -and $kstNow.Hour -lt 6) {
+              $kstNow = $kstNow.AddDays(-1)
+            }
+            $inputDate = $kstNow.ToString("yyyyMMdd")
           }
           "REPORT_DATE=$inputDate" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
 
@@ -123,16 +127,40 @@ jobs:
             "-BackfillDays", "8",
             "-PublishDays", "120"
           )
-          $sendTelegram = "${{ github.event_name }}" -eq "schedule" -or "${{ inputs.send_telegram }}" -eq "true"
-          if ($sendTelegram -or "${{ inputs.post_x }}" -ne "false" -or "${{ inputs.post_threads }}" -ne "false" -or "${{ inputs.post_instagram }}" -ne "false" -or "${{ inputs.post_youtube }}" -eq "true") {
+          $sendTelegram = "${{ github.event_name }}" -eq "workflow_dispatch" -and "${{ inputs.send_telegram }}" -eq "true"
+          $postX = "${{ github.event_name }}" -eq "workflow_dispatch" -and "${{ inputs.post_x }}" -eq "true"
+          $postThreads = "${{ github.event_name }}" -eq "workflow_dispatch" -and "${{ inputs.post_threads }}" -eq "true"
+          $postInstagram = "${{ github.event_name }}" -eq "workflow_dispatch" -and "${{ inputs.post_instagram }}" -eq "true"
+          $postYouTube = "${{ github.event_name }}" -eq "workflow_dispatch" -and "${{ inputs.post_youtube }}" -eq "true"
+          if ($sendTelegram -or $postX -or $postThreads -or $postInstagram -or $postYouTube) {
             $args += "-SendSocialCards"
           }
           if ($sendTelegram) { $args += "-SendTelegramCards" }
-          if ("${{ inputs.post_x }}" -ne "false") { $args += "-PostXCards" }
-          if ("${{ inputs.post_threads }}" -ne "false") { $args += "-PostThreadsCards" }
-          if ("${{ inputs.post_instagram }}" -ne "false") { $args += "-PostInstagramCards" }
-          if ("${{ inputs.post_youtube }}" -eq "true") { $args += "-PostYouTubeShort" }
+          if ($postX) { $args += "-PostXCards" }
+          if ($postThreads) { $args += "-PostThreadsCards" }
+          if ($postInstagram) { $args += "-PostInstagramCards" }
+          if ($postYouTube) { $args += "-PostYouTubeShort" }
           & pwsh @args
+
+      - name: Render social card previews
+        if: ${{ success() }}
+        shell: pwsh
+        run: |
+          $output = & node ./send_daily_social_cards.mjs $env:REPORT_DATE --dry-run --keep | ConvertFrom-Json
+          New-Item -ItemType Directory -Path social-preview -Force | Out-Null
+          foreach ($file in $output.files) {
+            Copy-Item -LiteralPath $file -Destination social-preview -Force
+          }
+          Get-ChildItem social-preview | Select-Object Name,Length
+
+      - name: Upload social card previews
+        if: ${{ success() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: social-card-preview-${{ env.REPORT_DATE }}
+          path: social-preview/*.png
+          if-no-files-found: error
+          retention-days: 7
 
       - name: Validate YouTube Short rendering
         if: ${{ inputs.render_youtube_only == true }}
