@@ -1,11 +1,4 @@
 User-agent: *
 Allow: /
-Disallow: /prices.html
-Disallow: /institutions.html
-Disallow: /disclosure-signals.html
-Disallow: /earnings-quarterly.html
-Disallow: /earnings-turnaround.html
-Disallow: /earnings/quarterly
-Disallow: /earnings/turnaround
 
-Sitemap: https://leeandnote.com/sitemap.xml
+Sitemap: https://leeandnote.github.io/dart-holdings-preview/sitemap.xml
