@@ -794,6 +794,7 @@ async function postThreadsCarousel(cards) {
       children: children.join(","),
       text: xBundleCaption(cards.slice(0, 3)),
     });
+    await waitForThreadsContainer(containerId);
     const postId = await threadsFetch("/me/threads_publish", { creation_id: containerId });
     return { postId, cards: urls.length };
   } finally {
