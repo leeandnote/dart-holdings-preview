@@ -24,15 +24,21 @@ async function query(queryPath, args) {
 }
 
 const numberOrBlank = (value) => Number.isFinite(value) ? value : "";
+const normalizedDate = (value) => {
+  const text = String(value || "").replace(/\D/g, "");
+  return /^\d{8}$/.test(text) ? text : "";
+};
 function mapRow(row) {
   const previousRate = row.previousRate ?? row.prevRate;
   const currentRate = row.currentRate ?? row.ratio;
   const previousShares = row.previousShares ?? row.prevShares ?? row.previousStockCount ?? row.beforeShares;
   const currentShares = row.currentShares ?? row.curShares ?? row.currentStockCount ?? row.afterShares;
   const shareDelta = row.shareDelta ?? row.deltaShares ?? row.shareChange ?? row.changedShares ?? row.stockDelta;
+  const receiptDate = normalizedDate(row.reportDate || row.receiptDate);
+  const obligationDate = normalizedDate(row.obligationDate) || receiptDate;
   return {
-    "접수일": String(row.reportDate || row.receiptDate || ""),
-    "보고의무발생일": String(row.obligationDate || row.reportDate || ""),
+    "접수일": receiptDate,
+    "보고의무발생일": obligationDate,
     "시장": row.market || "", "보고구분": row.reportName || "대량보유 공시",
     "종목명": row.corpName || "", "종목코드": row.stockCode || "", "보고자": row.reporter || "",
     "직전지분율": numberOrBlank(previousRate), "이번지분율": numberOrBlank(currentRate),
