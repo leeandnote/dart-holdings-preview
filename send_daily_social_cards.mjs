@@ -748,6 +748,8 @@ function deployPublicDist() {
     shell: process.platform === "win32",
   });
   if (result.status !== 0) throw new Error(`Temporary social image deploy failed: ${result.stderr || result.stdout}`);
+  const output = `${result.stdout || ""}\n${result.stderr || ""}`;
+  return output.match(/https:\/\/[a-z0-9-]+\.leeandnote\.pages\.dev/i)?.[0] || "https://leeandnote.com";
 }
 
 async function waitForPublicUrl(url, label) {
@@ -766,14 +768,15 @@ async function postThreadsCarousel(cards) {
   const publicKey = `${ymd}-${crypto.randomBytes(8).toString("hex")}`;
   const publicDir = path.join(publicDist, "social-temp", publicKey);
   await mkdir(publicDir, { recursive: true });
-  const urls = [];
+  const fileNames = [];
   try {
     for (const [index, card] of cards.slice(0, 3).entries()) {
       const fileName = `${index + 1}-${card.kind}.png`;
       await copyFile(card.file, path.join(publicDir, fileName));
-      urls.push(`https://leeandnote.com/social-temp/${publicKey}/${fileName}`);
+      fileNames.push(fileName);
     }
-    deployPublicDist();
+    const deploymentUrl = deployPublicDist();
+    const urls = fileNames.map((fileName) => `${deploymentUrl}/social-temp/${publicKey}/${fileName}`);
     for (const url of urls) await waitForPublicUrl(url, "Threads");
     const children = [];
     for (const [index, imageUrl] of urls.entries()) {
@@ -854,14 +857,15 @@ async function postInstagramCarousel(cards) {
   const publicKey = `${ymd}-instagram-${crypto.randomBytes(8).toString("hex")}`;
   const publicDir = path.join(publicDist, "social-temp", publicKey);
   await mkdir(publicDir, { recursive: true });
-  const urls = [];
+  const fileNames = [];
   try {
     for (const [index, card] of cards.slice(0, 3).entries()) {
       const fileName = `${index + 1}-${card.kind}.jpg`;
       convertToJpeg(card.file, path.join(publicDir, fileName));
-      urls.push(`https://leeandnote.com/social-temp/${publicKey}/${fileName}`);
+      fileNames.push(fileName);
     }
-    deployPublicDist();
+    const deploymentUrl = deployPublicDist();
+    const urls = fileNames.map((fileName) => `${deploymentUrl}/social-temp/${publicKey}/${fileName}`);
     for (const url of urls) await waitForPublicUrl(url, "Instagram");
     const children = [];
     for (const imageUrl of urls) {
