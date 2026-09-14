@@ -1,0 +1,11 @@
+name = "leeandnote-publish-scheduler"
+main = "src/index.js"
+compatibility_date = "2026-09-15"
+
+[triggers]
+crons = ["10 11 * * *", "30 11 * * *"]
+
+[vars]
+GITHUB_REPOSITORY = "leeandnote/dart-holdings-preview"
+GITHUB_WORKFLOW = "daily-publish.yml"
+GITHUB_REF = "main"

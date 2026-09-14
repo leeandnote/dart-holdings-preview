@@ -1,9 +1,6 @@
 name: Daily Lee&Note publish
 
 on:
-  schedule:
-    # 20:10 KST (11:10 UTC). Runs in GitHub even when the local PC is off.
-    - cron: "10 11 * * *"
   workflow_dispatch:
     inputs:
       report_date:
