@@ -804,7 +804,7 @@ async function postThreadsCarousel(cards) {
       text: xBundleCaption(cards.slice(0, 3)),
     });
     await waitForThreadsContainer(containerId);
-    const postId = await threadsFetch("/me/threads_publish", { creation_id: containerId });
+    const postId = await publishThreadsContainer(containerId);
     return { postId, cards: urls.length };
   } finally {
     await rm(publicDir, { recursive: true, force: true });
@@ -827,6 +827,20 @@ async function waitForThreadsContainer(containerId) {
     if (attempt === 20) throw new Error(`Threads media processing timed out: ${body.status || response.status}`);
     await new Promise((resolve) => setTimeout(resolve, 3000));
   }
+}
+
+async function publishThreadsContainer(containerId) {
+  for (let attempt = 1; attempt <= 6; attempt += 1) {
+    try {
+      return await threadsFetch("/me/threads_publish", { creation_id: containerId });
+    } catch (error) {
+      const message = String(error?.message || error);
+      const retryable = message.includes("code=24") || message.includes("subcode=4279009");
+      if (!retryable || attempt === 6) throw error;
+      await new Promise((resolve) => setTimeout(resolve, attempt * 10000));
+    }
+  }
+  throw new Error("Threads publish retry loop ended unexpectedly.");
 }
 
 async function instagramFetch(pathname, params = {}) {
