@@ -752,12 +752,19 @@ function deployPublicDist() {
   return output.match(/https:\/\/[a-z0-9-]+\.leeandnote\.pages\.dev/i)?.[0] || "https://leeandnote.com";
 }
 
-async function waitForPublicUrl(url, label) {
-  for (let attempt = 1; attempt <= 8; attempt += 1) {
-    const response = await fetch(url, { method: "HEAD", cache: "no-store" });
-    if (response.ok) return;
-    if (attempt === 8) throw new Error(`Temporary ${label} image is unavailable: HTTP ${response.status}`);
-    await new Promise((resolve) => setTimeout(resolve, attempt * 1500));
+async function waitForPublicFile(url, file, label) {
+  const expectedHash = crypto.createHash("sha256").update(await readFile(file)).digest("hex");
+  let lastStatus = "not fetched";
+  for (let attempt = 1; attempt <= 12; attempt += 1) {
+    const response = await fetch(url, { cache: "no-store" });
+    lastStatus = `HTTP ${response.status}`;
+    if (response.ok) {
+      const actualHash = crypto.createHash("sha256").update(Buffer.from(await response.arrayBuffer())).digest("hex");
+      if (actualHash === expectedHash) return;
+      lastStatus = "content mismatch";
+    }
+    if (attempt === 12) throw new Error(`Temporary ${label} image is unavailable: ${lastStatus}`);
+    await new Promise((resolve) => setTimeout(resolve, attempt * 2000));
   }
 }
 
@@ -775,9 +782,11 @@ async function postThreadsCarousel(cards) {
       await copyFile(card.file, path.join(publicDir, fileName));
       fileNames.push(fileName);
     }
-    const deploymentUrl = deployPublicDist();
-    const urls = fileNames.map((fileName) => `${deploymentUrl}/social-temp/${publicKey}/${fileName}`);
-    for (const url of urls) await waitForPublicUrl(url, "Threads");
+    deployPublicDist();
+    const urls = fileNames.map((fileName) => `https://leeandnote.com/social-temp/${publicKey}/${fileName}?v=${publicKey}`);
+    for (const [index, url] of urls.entries()) {
+      await waitForPublicFile(url, path.join(publicDir, fileNames[index]), "Threads");
+    }
     const children = [];
     for (const [index, imageUrl] of urls.entries()) {
       const childId = await threadsFetch("/me/threads", {
@@ -865,9 +874,11 @@ async function postInstagramCarousel(cards) {
       convertToJpeg(card.file, path.join(publicDir, fileName));
       fileNames.push(fileName);
     }
-    const deploymentUrl = deployPublicDist();
-    const urls = fileNames.map((fileName) => `${deploymentUrl}/social-temp/${publicKey}/${fileName}`);
-    for (const url of urls) await waitForPublicUrl(url, "Instagram");
+    deployPublicDist();
+    const urls = fileNames.map((fileName) => `https://leeandnote.com/social-temp/${publicKey}/${fileName}?v=${publicKey}`);
+    for (const [index, url] of urls.entries()) {
+      await waitForPublicFile(url, path.join(publicDir, fileNames[index]), "Instagram");
+    }
     const children = [];
     for (const imageUrl of urls) {
       const childId = await instagramFetch(`/${userId}/media`, {
