@@ -131,10 +131,11 @@ jobs:
             "-BackfillDays", "8",
             "-PublishDays", "120"
           )
-          $sendTelegram = "${{ github.event_name }}" -eq "workflow_dispatch" -and "${{ inputs.send_telegram }}" -eq "true"
-          $postX = "${{ github.event_name }}" -eq "workflow_dispatch" -and "${{ inputs.post_x }}" -eq "true"
-          $postThreads = "${{ github.event_name }}" -eq "workflow_dispatch" -and "${{ inputs.post_threads }}" -eq "true"
-          $postInstagram = "${{ github.event_name }}" -eq "workflow_dispatch" -and "${{ inputs.post_instagram }}" -eq "true"
+          $isScheduled = "${{ github.event_name }}" -eq "schedule"
+          $sendTelegram = $isScheduled -or ("${{ github.event_name }}" -eq "workflow_dispatch" -and "${{ inputs.send_telegram }}" -eq "true")
+          $postX = $isScheduled -or ("${{ github.event_name }}" -eq "workflow_dispatch" -and "${{ inputs.post_x }}" -eq "true")
+          $postThreads = $isScheduled -or ("${{ github.event_name }}" -eq "workflow_dispatch" -and "${{ inputs.post_threads }}" -eq "true")
+          $postInstagram = $isScheduled -or ("${{ github.event_name }}" -eq "workflow_dispatch" -and "${{ inputs.post_instagram }}" -eq "true")
           $postYouTube = "${{ github.event_name }}" -eq "workflow_dispatch" -and "${{ inputs.post_youtube }}" -eq "true"
           if ($sendTelegram -or $postX -or $postThreads -or $postInstagram -or $postYouTube) {
             $args += "-SendSocialCards"
