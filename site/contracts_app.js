@@ -599,9 +599,9 @@ function renderSalesGauge(row, ratioClass, gauge) {
 }
 
 function renderSegmentedGauge(gauge) {
+  const filledCount = gauge > 0 ? Math.ceil(gauge / 10) : 0;
   const segments = Array.from({ length: 10 }, (_, index) => {
-    const fill = Math.max(0, Math.min(100, (gauge - index * 10) * 10));
-    return `<i class="gaugeSegment"><b style="width:${fill}%"></b></i>`;
+    return `<i class="gaugeSegment ${index < filledCount ? "filled" : ""}"></i>`;
   }).join("");
   return `<span class="gaugeBar" aria-hidden="true">${segments}</span>`;
 }
