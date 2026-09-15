@@ -9944,7 +9944,7 @@ button {
 .contractSortButton span{display:flex;flex-direction:column;align-items:center;gap:2px}.contractSortButton small{display:block;color:#aeb7c4;font-size:10px;font-weight:800;line-height:1;letter-spacing:0}
 .contractTable .counterparty,.contractTable .counterparty.secret{display:inline-flex!important;align-items:center!important;max-width:100%!important;min-height:26px!important;padding:2px 8px!important;border:1px solid #ffb899!important;border-radius:999px!important;background:#fffaf7!important;color:#111827!important;font-size:13px!important;font-weight:750!important;text-align:left!important;line-height:1.25!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}.contractTable .counterparty.secret{background:#f8fafc!important;border-color:#dce3ec!important;color:#667085!important}.contractTable .contractCol-counterparty em{display:block!important;margin-top:5px!important;overflow:hidden!important;color:#64748b!important;font-weight:540!important;line-height:1.3!important;text-overflow:ellipsis!important;white-space:nowrap!important}
 .contractTable .dartLink,.contractTable .amountLink{display:inline!important;min-height:0!important;margin-top:4px!important;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;color:#7b8493!important;font-size:11px!important;font-weight:650!important;text-decoration:none!important}.contractTable .dartLink:hover{color:#475467!important;text-decoration:underline!important}
-.salesGauge.compact{display:grid!important;grid-template-columns:minmax(72px,1fr) auto!important;align-items:center!important;gap:9px!important;text-align:left!important}.salesGauge.compact .gaugeBar{height:10px!important}.salesGauge.compact strong{font-size:14px!important;line-height:1!important;text-align:right!important}.salesGauge.compact em,.salesGauge.compact .impactBadge{display:none!important}.contractTextMain{display:block;color:#1f2937;font-size:14px;font-weight:620;line-height:1.3}.contractTable td{padding:10px 12px!important;line-height:1.3!important}.contractTable td em{margin-top:3px!important}.contractTable .contractCol-amount strong{font-weight:800!important}.contractTable .contractCol-recentSales em,.contractTable .contractCol-price em{font-size:11px!important;color:#7b8493!important;font-weight:520!important}.contractCorrectionText{display:block;margin-top:3px;color:#7b8493;font-size:11px;font-weight:650}
+.salesGauge.compact{display:grid!important;grid-template-columns:minmax(72px,1fr) auto!important;align-items:center!important;gap:9px!important;text-align:left!important}.salesGauge.compact .gaugeBar{display:grid!important;grid-template-columns:repeat(10,minmax(0,1fr))!important;gap:2px!important;height:10px!important;overflow:visible!important;background:transparent!important}.gaugeSegment{display:block!important;height:100%!important;overflow:hidden!important;border-radius:2px!important;background:#e8edf3!important}.gaugeSegment b{display:block!important;height:100%!important;background:#ff5520!important}.salesGauge.mega .gaugeSegment b,.contractMobileRatio.mega .gaugeSegment b{background:#e03131!important}.salesGauge.compact strong{font-size:14px!important;line-height:1!important;text-align:right!important}.salesGauge.compact em,.salesGauge.compact .impactBadge{display:none!important}.contractTextMain{display:block;color:#1f2937;font-size:14px;font-weight:620;line-height:1.3}.contractTable td{padding:10px 12px!important;line-height:1.3!important}.contractTable td em{margin-top:3px!important}.contractTable .contractCol-amount strong{font-weight:800!important}.contractTable .contractCol-recentSales em,.contractTable .contractCol-price em{font-size:11px!important;color:#7b8493!important;font-weight:520!important}.contractCorrectionText{display:block;margin-top:3px;color:#7b8493;font-size:11px;font-weight:650}
 .contractAdvancedFilters.modalFilterPanel{display:grid!important;grid-template-columns:1fr!important;gap:12px!important;margin:0!important;padding:0!important;border:0!important;background:transparent!important}.contractAdvancedFilters.modalFilterPanel label{display:grid!important;gap:6px!important}.contractAdvancedFilters.modalFilterPanel label span{color:#64748b;font-size:12px;font-weight:850}.contractAdvancedFilters.modalFilterPanel .filterSelect{width:100%;height:40px;border-radius:8px;background:#fff}
 @media(max-width:900px){.contractTable{min-width:1100px!important}.contractTable col.contractCol-counterparty{width:230px!important}}@media(max-width:560px){.contractTableToolbar .searchInput{min-width:250px!important}.contractTable{min-width:1060px!important}}
 
@@ -10136,6 +10136,18 @@ button {
     overflow: hidden;
     border-radius: 999px;
     background: #edf2f7;
+  }
+
+  .contractMobileRatio .gaugeBar {
+    display: grid;
+    grid-template-columns: repeat(10, minmax(0, 1fr));
+    gap: 2px;
+    height: 7px;
+    margin-top: 8px;
+  }
+
+  .contractMobileRatio .gaugeSegment {
+    margin: 0;
   }
 
   .contractMobileRatio b {

@@ -91,6 +91,8 @@
         </div>
         <div class="modalBody">
           <section class="contractAdvancedFilters modalFilterPanel" aria-label="상세 필터">
+            <label><span>시작일</span><input id="contractFromDate" class="dateInput" type="date" aria-label="공시 시작일"></label>
+            <label><span>종료일</span><input id="contractToDate" class="dateInput" type="date" aria-label="공시 종료일"></label>
             <label><span>시장</span><select id="contractMarket" class="filterSelect"><option value="all">전체 시장</option><option value="KOSPI">KOSPI</option><option value="KOSDAQ">KOSDAQ</option></select></label>
             <label><span>정렬</span><select id="contractSort" class="filterSelect"><option value="date">최근 공시순</option><option value="amount">계약금액 큰 순</option><option value="ratio">매출액 대비 큰 순</option><option value="term">계약기간 짧은 순</option></select></label>
             <label><span>공시구분</span><select id="contractCorrection" class="filterSelect"><option value="all">전체</option><option value="new">신규 공시</option><option value="correction">정정 공시</option></select></label>

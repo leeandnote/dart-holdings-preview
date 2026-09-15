@@ -6,6 +6,8 @@ const contractState = {
   correction: "all",
   ratioFilter: "all",
   amountFilter: "all",
+  fromDate: "",
+  toDate: "",
   sortKey: "date",
   sortDir: "desc",
   page: 1,
@@ -198,6 +200,16 @@ function bindContracts() {
     contractState.page = 1;
     renderContracts();
   });
+  $("contractFromDate")?.addEventListener("change", (event) => {
+    contractState.fromDate = compactDate(event.target.value);
+    contractState.page = 1;
+    renderContracts();
+  });
+  $("contractToDate")?.addEventListener("change", (event) => {
+    contractState.toDate = compactDate(event.target.value);
+    contractState.page = 1;
+    renderContracts();
+  });
   $("contractPageSize")?.addEventListener("change", (event) => {
     contractState.pageSize = Number(event.target.value) || 10;
     contractState.page = 1;
@@ -222,6 +234,8 @@ function filteredContracts() {
   const minRatio = contractState.ratioFilter === "all" ? null : Number(contractState.ratioFilter);
   const minAmount = contractState.amountFilter === "all" ? null : Number(contractState.amountFilter);
   const rows = contractState.rows.filter((row) => {
+    if (contractState.fromDate && row.date < contractState.fromDate) return false;
+    if (contractState.toDate && row.date > contractState.toDate) return false;
     if (contractState.market !== "all" && row.market !== contractState.market) return false;
     if (contractState.correction === "new" && row.correction) return false;
     if (contractState.correction === "correction" && !row.correction) return false;
@@ -321,7 +335,7 @@ function renderContractMobileCard(row) {
       <div class="contractMobileRatio ${ratioClass}">
         <span>매출대비</span>
         <strong>${Number.isFinite(row.salesRatio) ? `${formatRatio(row.salesRatio)}%` : "-"}</strong>
-        <i><b style="width:${gauge}%"></b></i>
+        ${renderSegmentedGauge(gauge)}
       </div>
     </div>
     <div class="contractMobileBody">
@@ -581,7 +595,15 @@ function drawClippedCanvasText(ctx, text, x, y, maxWidth) {
   ctx.fillText(`${output}...`, x, y);
 }
 function renderSalesGauge(row, ratioClass, gauge) {
-  return `<div class="salesGauge compact ${ratioClass}"><span class="gaugeBar"><i style="width:${gauge}%"></i></span><strong>${Number.isFinite(row.salesRatio) ? `${formatRatio(row.salesRatio)}%` : "-"}</strong></div>`;
+  return `<div class="salesGauge compact ${ratioClass}">${renderSegmentedGauge(gauge)}<strong>${Number.isFinite(row.salesRatio) ? `${formatRatio(row.salesRatio)}%` : "-"}</strong></div>`;
+}
+
+function renderSegmentedGauge(gauge) {
+  const segments = Array.from({ length: 10 }, (_, index) => {
+    const fill = Math.max(0, Math.min(100, (gauge - index * 10) * 10));
+    return `<i class="gaugeSegment"><b style="width:${fill}%"></b></i>`;
+  }).join("");
+  return `<span class="gaugeBar" aria-hidden="true">${segments}</span>`;
 }
 
 function renderContractPagination(totalRows, totalPages) {
