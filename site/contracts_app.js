@@ -122,6 +122,7 @@ function normalizeContractRow(row) {
   const recentSales = normalizeRecentSales(amount, salesRatio, row["최근매출액"]);
   const startDate = normalizeDate(row["계약시작일"] || "");
   const endDate = normalizeDate(row["계약종료일"] || "");
+  const period = String(row["계약기간"] || "").replace(/\s+/g, " ").trim();
   const price = latestPrice(stockCode);
   return {
     date: compactDate(row["접수일"]),
@@ -138,6 +139,7 @@ function normalizeContractRow(row) {
     salesRatio,
     startDate,
     endDate,
+    period,
     days: daysBetween(startDate, endDate),
     content: String(row["계약내용"] || "").trim(),
     region: String(row["판매공급지역"] || "").trim(),
@@ -337,7 +339,7 @@ function renderContractMobileCard(row) {
       <div class="contractMobileField">
         <span>계약기간</span>
         <strong>${escapeHtml(periodText(row))}</strong>
-        <em>${row.days !== null ? `${row.days.toLocaleString("ko-KR")}일` : "기간 확인 필요"}</em>
+        <em>${escapeHtml(periodMetaText(row))}</em>
       </div>
       <div class="contractMobileField">
         <span>최근일 종가</span>
@@ -384,7 +386,7 @@ function renderContractCell(row, key) {
   if (key === "amount") return `<strong>${formatMoney(row.amount)}</strong><a class="dartLink amountLink" href="${escapeHtml(row.url)}" target="_blank" rel="noopener">원문보기</a>`;
   if (key === "salesRatio") return renderSalesGauge(row, ratioClass, gauge);
   if (key === "recentSales") return Number.isFinite(row.recentSales) ? `<span class="contractTextMain">${formatMoney(row.recentSales)}</span><em>${escapeHtml(row.recentSalesBasis || "공시 원문 기준")}</em>` : `<span class="mutedDash">확인 필요</span><em>${escapeHtml(row.recentSalesBasis || "원문 확인 필요")}</em>`;
-  if (key === "period") return `<span class="contractTextMain">${escapeHtml(periodText(row))}</span><em>${row.days !== null ? `${row.days.toLocaleString("ko-KR")}일` : "기간 확인 필요"}</em>`;
+  if (key === "period") return `<span class="contractTextMain">${escapeHtml(periodText(row))}</span><em>${escapeHtml(periodMetaText(row))}</em>`;
   if (key === "price") return `<span class="contractTextMain">${formatPrice(row.close)}</span><em class="${priceClass}">${formatPlainPct(row.changePct)}</em>`;
   return "-";
 }
@@ -528,7 +530,7 @@ function plainContractCell(row, key) {
   if (key === "amount") return formatMoney(row.amount);
   if (key === "salesRatio") return `${Number.isFinite(row.salesRatio) ? `${formatRatio(row.salesRatio)}%` : "-"}`;
   if (key === "recentSales") return Number.isFinite(row.recentSales) ? `${formatMoney(row.recentSales)}\n${row.recentSalesBasis || "공시 원문 기준"}` : `확인 필요\n${row.recentSalesBasis || "원문 확인 필요"}`;
-  if (key === "period") return `${periodText(row)}\n${row.days !== null ? `${row.days.toLocaleString("ko-KR")}일` : "기간 확인 필요"}`;
+  if (key === "period") return `${periodText(row)}\n${periodMetaText(row)}`;
   if (key === "price") return `${formatPrice(row.close)}\n${formatPlainPct(row.changePct)}`;
   return "-";
 }
@@ -607,8 +609,14 @@ function bindContractPagination() {
 }
 
 function periodText(row) {
-  if (!row.startDate && !row.endDate) return "-";
+  if (!row.startDate && !row.endDate) return row.period || "-";
   return `${formatDate(row.startDate)} ~ ${formatDate(row.endDate)}`;
+}
+
+function periodMetaText(row) {
+  if (row.days !== null) return `${row.days.toLocaleString("ko-KR")}일`;
+  if (row.period) return "원문 기재 기간";
+  return "기간 확인 필요";
 }
 
 function formatMoney(value) {

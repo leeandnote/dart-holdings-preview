@@ -296,20 +296,55 @@ function Get-FirstRegexGroup([string]$Text, [string]$Pattern) {
   return ""
 }
 
+function Normalize-ContractDate([string]$Value) {
+  if (-not $Value) { return "" }
+  $digits = $Value -replace "[^0-9]", ""
+  if ($digits.Length -eq 8) {
+    return "$($digits.Substring(0,4))-$($digits.Substring(4,2))-$($digits.Substring(6,2))"
+  }
+  $match = [regex]::Match($Value, "^\s*([0-9]{4})[^0-9]+([0-9]{1,2})[^0-9]+([0-9]{1,2})")
+  if (-not $match.Success) { return "" }
+  return "{0}-{1:D2}-{2:D2}" -f [int]$match.Groups[1].Value, [int]$match.Groups[2].Value, [int]$match.Groups[3].Value
+}
+
+function Get-ContractRelativePeriod([string]$Text) {
+  if (-not $Text) { return "" }
+  $patterns = @(
+    "(?:상기\s*[0-9.]+\s*)?(?:계약|공사)\s*기간(?:은|는|:)\s*(.{2,100}?(?:[0-9]+\s*(?:개월|개\s*월|일|년)))(?:임|입니다|이다|이며|으로|\.| |$)",
+    "(?:착공|실착공|계약|공사|납품|발주|개시)(?:일|일자|시점)?(?:로부터|부터|후)\s*[0-9]+\s*(?:개월|개\s*월|일|년)"
+  )
+  foreach ($pattern in $patterns) {
+    $value = Get-FirstRegexGroup $Text $pattern
+    if (-not $value) {
+      $match = [regex]::Match($Text, $pattern)
+      if ($match.Success) { $value = Normalize-FieldValue $match.Value }
+    }
+    if ($value) {
+      $value = $value -replace "^상기\s*[0-9.]+\s*", ""
+      $value = $value -replace "^(?:계약|공사)\s*기간(?:은|는|:)\s*", ""
+      return (Normalize-FieldValue $value)
+    }
+  }
+  return ""
+}
+
 function Get-ContractFields([string]$Text) {
   $content = Get-TextBetweenLabels $Text @("판매ㆍ공급계약 내용", "판매·공급계약 내용", "체결계약명", "계약명") @("2. 계약내역", "2. 계약 내용", "계약내역", "계약금액", "조건부 계약여부") 360
   $counterparty = Normalize-CounterpartyValue (Get-TextBetweenLabels $Text @("계약상대방", "계약상대") @("- 최근", "- 주요사업", "- 회사와", "4. 판매", "5. 계약기간", "계약기간", "판매ㆍ공급지역", "판매·공급지역") 260)
   $region = Get-TextBetweenLabels $Text @("판매ㆍ공급지역", "판매·공급지역", "공급지역") @("5. 계약기간", "6. 주요", "계약기간", "계약(수주)일자") 180
-  $startDate = Get-FirstRegexGroup $Text "계약기간\s*시작일\s*([0-9]{4}[-.][0-9]{2}[-.][0-9]{2})"
-  $endDate = Get-FirstRegexGroup $Text "계약기간\s*시작일\s*[0-9]{4}[-.][0-9]{2}[-.][0-9]{2}\s*종료일\s*([0-9]{4}[-.][0-9]{2}[-.][0-9]{2})"
-  if (-not $startDate) { $startDate = Get-FirstRegexGroup $Text "시작일\s*([0-9]{4}[-.][0-9]{2}[-.][0-9]{2})" }
-  if (-not $endDate) { $endDate = Get-FirstRegexGroup $Text "종료일\s*([0-9]{4}[-.][0-9]{2}[-.][0-9]{2})" }
+  $datePattern = "[0-9]{4}(?:[-./]|\s*년\s*)[0-9]{1,2}(?:[-./]|\s*월\s*)[0-9]{1,2}(?:\s*일)?"
+  $startDate = Get-FirstRegexGroup $Text "계약\s*기간\s*시작일\s*($datePattern)"
+  $endDate = Get-FirstRegexGroup $Text "계약\s*기간\s*시작일\s*$datePattern\s*종료일\s*($datePattern)"
+  if (-not $startDate) { $startDate = Get-FirstRegexGroup $Text "시작일\s*($datePattern)" }
+  if (-not $endDate) { $endDate = Get-FirstRegexGroup $Text "종료일\s*($datePattern)" }
+  $startDate = Normalize-ContractDate $startDate
+  $endDate = Normalize-ContractDate $endDate
   $period = ""
   if ($startDate -and $endDate) { $period = "$startDate ~ $endDate" }
   elseif ($startDate) { $period = "$startDate ~" }
   elseif ($endDate) { $period = "~ $endDate" }
   else {
-    $relativePeriod = Get-FirstRegexGroup $Text "계약기간은\s*(.{2,80}?)(?:임|입니다|\.|\s-\s상기)"
+    $relativePeriod = Get-ContractRelativePeriod $Text
     if ($relativePeriod) { $period = $relativePeriod }
   }
 
