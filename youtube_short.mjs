@@ -71,8 +71,30 @@ async function youtubeAccessToken() {
   return body.access_token;
 }
 
+async function verifyYouTubeChannel(accessToken) {
+  const expectedChannelId = requireValue("YOUTUBE_CHANNEL_ID");
+  const response = await fetch("https://www.googleapis.com/youtube/v3/channels?part=id,snippet&mine=true", {
+    headers: { authorization: `Bearer ${accessToken}` },
+  });
+  const body = await response.json().catch(() => ({}));
+  const channel = body.items?.[0];
+  if (!response.ok || !channel?.id) {
+    throw new Error(`YouTube channel verification failed: HTTP ${response.status}`);
+  }
+  if (channel.id !== expectedChannelId) {
+    throw new Error(
+      `YouTube channel mismatch: expected ${expectedChannelId}, received ${channel.id} (${channel.snippet?.title || "unknown"}).`,
+    );
+  }
+  return {
+    channelId: channel.id,
+    channelTitle: channel.snippet?.title || "",
+  };
+}
+
 export async function uploadYouTubeShort({ file, title, description, tags = [] }) {
   const accessToken = await youtubeAccessToken();
+  const channel = await verifyYouTubeChannel(accessToken);
   const privacyStatus = String(process.env.YOUTUBE_PRIVACY_STATUS || "private").toLowerCase();
   if (!["private", "unlisted", "public"].includes(privacyStatus)) {
     throw new Error(`Invalid YOUTUBE_PRIVACY_STATUS: ${privacyStatus}`);
@@ -122,6 +144,7 @@ export async function uploadYouTubeShort({ file, title, description, tags = [] }
   }
   return {
     videoId: String(body.id),
+    ...channel,
     privacyStatus,
     url: `https://www.youtube.com/shorts/${body.id}`,
     fileName: path.basename(file),
