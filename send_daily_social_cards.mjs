@@ -829,6 +829,17 @@ async function waitForThreadsContainer(containerId) {
   }
 }
 
+async function postThreadsVideo(videoUrl, cards) {
+  const containerId = await threadsFetch("/me/threads", {
+    media_type: "VIDEO",
+    video_url: videoUrl,
+    text: xBundleCaption(cards.slice(0, 3)),
+  });
+  await waitForThreadsContainer(containerId);
+  const postId = await publishThreadsContainer(containerId);
+  return { postId, mediaType: "VIDEO" };
+}
+
 async function publishThreadsContainer(containerId) {
   for (let attempt = 1; attempt <= 6; attempt += 1) {
     try {
@@ -916,6 +927,38 @@ async function postInstagramCarousel(cards) {
   }
 }
 
+async function postInstagramReel(videoUrl, cards) {
+  const { userId } = await loadInstagramConfig();
+  const containerId = await instagramFetch(`/${userId}/media`, {
+    media_type: "REELS",
+    video_url: videoUrl,
+    caption: xBundleCaption(cards.slice(0, 3)),
+    share_to_feed: "true",
+  });
+  await waitForInstagramContainer(containerId);
+  const postId = await instagramFetch(`/${userId}/media_publish`, { creation_id: containerId });
+  return { postId, mediaType: "REELS" };
+}
+
+async function withPublicSocialVideo(videoFile, action) {
+  const publicDist = path.join(ROOT, "public_dist");
+  if (!existsSync(publicDist)) throw new Error("public_dist is missing. Build the site before video publishing.");
+  const publicKey = `${ymd}-video-${crypto.randomBytes(8).toString("hex")}`;
+  const publicDir = path.join(publicDist, "social-temp", publicKey);
+  const fileName = `leeandnote-dart-${iso}.mp4`;
+  await mkdir(publicDir, { recursive: true });
+  try {
+    await copyFile(videoFile, path.join(publicDir, fileName));
+    deployPublicDist();
+    const videoUrl = `https://leeandnote.com/social-temp/${publicKey}/${fileName}?v=${publicKey}`;
+    await waitForPublicFile(videoUrl, path.join(publicDir, fileName), "social video");
+    return await action(videoUrl);
+  } finally {
+    await rm(publicDir, { recursive: true, force: true });
+    deployPublicDist();
+  }
+}
+
 async function main() {
   const [fiveRaw, execRaw, extraExecRaw, contractRaw] = await Promise.all([
     convexQuery("dart:listDailyReportItems", { reportDate: ymd, limit: 500 }),
@@ -954,16 +997,25 @@ async function main() {
     const targetCards = onlyKinds ? cards.filter((card) => onlyKinds.has(card.kind)) : cards;
     if (!dryRun && !skipTelegram && !xOnly && !threadsOnly && !instagramOnly && !youtubeOnly) await sendMediaGroup(targetCards);
     const xPosts = postX && !dryRun ? await postXThread(targetCards) : [];
-    const threadsPost = postThreads && !dryRun ? await postThreadsCarousel(targetCards) : null;
-    const instagramPost = postInstagram && !dryRun ? await postInstagramCarousel(targetCards) : null;
+    const needsVideo = postThreads || postInstagram || postYouTube;
     let youtubePost = null;
-    let youtubeVideo = null;
+    let socialVideo = null;
+    let threadsPost = null;
+    let instagramPost = null;
+    if (needsVideo) {
+      socialVideo = path.join(tempDir, `leeandnote-dart-${iso}.mp4`);
+      renderYouTubeShort(targetCards, socialVideo);
+    }
+    if (!dryRun && (postThreads || postInstagram)) {
+      await withPublicSocialVideo(socialVideo, async (videoUrl) => {
+        if (postThreads) threadsPost = await postThreadsVideo(videoUrl, targetCards);
+        if (postInstagram) instagramPost = await postInstagramReel(videoUrl, targetCards);
+      });
+    }
     if (postYouTube) {
-      youtubeVideo = path.join(tempDir, `leeandnote-dart-${iso}.mp4`);
-      renderYouTubeShort(targetCards, youtubeVideo);
       if (postYouTube && !dryRun) {
         youtubePost = await uploadYouTubeShort({
-          file: youtubeVideo,
+          file: socialVideo,
           title: `${dotted} 주요 DART 공시 요약 #Shorts`,
           description: [
             `${dotted} 주요 5%보고·임원보고·대형수주 공시를 한눈에 정리했습니다.`,
@@ -978,7 +1030,7 @@ async function main() {
     console.log(JSON.stringify({
       reportDate: ymd,
       dryRun,
-      telegramSent: dryRun || skipTelegram || xOnly || threadsOnly || instagramOnly ? 0 : sent.length,
+      telegramSent: dryRun || skipTelegram || xOnly || threadsOnly || instagramOnly || youtubeOnly ? 0 : sent.length,
       xRequested: postX,
       xPosts,
       threadsRequested: postThreads,
@@ -987,7 +1039,8 @@ async function main() {
       instagramPost,
       youtubeRequested: postYouTube,
       youtubePost,
-      youtubeVideo: keep ? youtubeVideo : undefined,
+      socialVideo: keep ? socialVideo : undefined,
+      youtubeVideo: keep && postYouTube ? socialVideo : undefined,
       xCaptions: showXCaptions
         ? (xSeparate
           ? targetCards.map((card) => ({ kind: card.kind, text: xCaption(card.kind, card.rows) }))

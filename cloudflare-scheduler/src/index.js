@@ -32,7 +32,7 @@ async function dispatchPublish(env, reportDate) {
         post_x: "true",
         post_threads: "true",
         post_instagram: "true",
-        post_youtube: "false",
+        post_youtube: "true",
         render_youtube_only: "false",
       },
     }),

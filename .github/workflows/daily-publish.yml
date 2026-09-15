@@ -18,19 +18,19 @@ on:
         default: true
         type: boolean
       post_threads:
-        description: "Post the 3-image bundle to Threads."
+        description: "Post the 3-card vertical video to Threads."
         required: false
         default: true
         type: boolean
       post_instagram:
-        description: "Post the 3-image carousel to Instagram."
+        description: "Post the 3-card vertical video as an Instagram Reel."
         required: false
         default: true
         type: boolean
       post_youtube:
         description: "Upload the 3-card vertical video to YouTube Shorts."
         required: false
-        default: false
+        default: true
         type: boolean
       render_youtube_only:
         description: "Render and validate the YouTube video without uploading it."
@@ -133,7 +133,7 @@ jobs:
           $postX = $isScheduled -or ("${{ github.event_name }}" -eq "workflow_dispatch" -and "${{ inputs.post_x }}" -eq "true")
           $postThreads = $isScheduled -or ("${{ github.event_name }}" -eq "workflow_dispatch" -and "${{ inputs.post_threads }}" -eq "true")
           $postInstagram = $isScheduled -or ("${{ github.event_name }}" -eq "workflow_dispatch" -and "${{ inputs.post_instagram }}" -eq "true")
-          $postYouTube = "${{ github.event_name }}" -eq "workflow_dispatch" -and "${{ inputs.post_youtube }}" -eq "true"
+          $postYouTube = $isScheduled -or ("${{ github.event_name }}" -eq "workflow_dispatch" -and "${{ inputs.post_youtube }}" -eq "true")
           if ($sendTelegram -or $postX -or $postThreads -or $postInstagram -or $postYouTube) {
             $args += "-SendSocialCards"
           }
@@ -173,3 +173,14 @@ jobs:
             throw "Rendered YouTube video was not created."
           }
           & ffprobe -v error -select_streams v:0 -show_entries stream=width,height,duration -of default=noprint_wrappers=1 $output.youtubeVideo
+          New-Item -ItemType Directory -Path social-video-preview -Force | Out-Null
+          Copy-Item -LiteralPath $output.youtubeVideo -Destination social-video-preview -Force
+
+      - name: Upload social video preview
+        if: ${{ inputs.render_youtube_only == true }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: social-video-preview-${{ env.REPORT_DATE }}
+          path: social-video-preview/*.mp4
+          if-no-files-found: error
+          retention-days: 7
