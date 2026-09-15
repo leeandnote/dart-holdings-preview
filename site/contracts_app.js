@@ -23,7 +23,7 @@ const contractColumns = [
   { key: "salesRatio", label: "매출액 대비 비중", unit: "단위: %", sort: "ratio" },
   { key: "recentSales", label: "최근 매출액", unit: "단위: 억원", sort: "recentSales" },
   { key: "period", label: "계약 기간", sort: "term" },
-  { key: "price", label: "최근일 종가 / 등락률", sort: "changePct" },
+  { key: "price", label: "최근일 종가", sort: "close" },
 ];
 
 const $ = (id) => document.getElementById(id);
@@ -312,7 +312,6 @@ function renderContractTable(rows) {
 function renderContractMobileCard(row) {
   const ratioClass = row.salesRatio >= 100 ? "mega" : row.salesRatio >= 50 ? "large" : "";
   const gauge = Math.max(0, Math.min(100, row.salesRatio || 0));
-  const priceClass = row.changePct > 0 ? "positive" : row.changePct < 0 ? "negative" : "neutral";
   return `<article class="contractMobileCard">
     <div class="contractMobileTop">
       <div class="contractMobileStock">
@@ -344,7 +343,7 @@ function renderContractMobileCard(row) {
       <div class="contractMobileField">
         <span>최근일 종가</span>
         <strong>${formatPrice(row.close)}</strong>
-        <em class="${priceClass}">${formatPlainPct(row.changePct)}</em>
+        <em>${escapeHtml(priceDateText(row.closeDate))}</em>
       </div>
       <div class="contractMobileField">
         <span>공시일</span>
@@ -379,15 +378,14 @@ function renderContractCell(row, key) {
   const ratioClass = row.salesRatio >= 100 ? "mega" : row.salesRatio >= 50 ? "large" : "";
   const gauge = Math.max(0, Math.min(100, row.salesRatio || 0));
   const badge = row.salesRatio >= 100 ? `<span class="impactBadge mega">초대형</span>` : row.salesRatio >= 50 ? `<span class="impactBadge large">대형</span>` : "";
-  const priceClass = row.changePct > 0 ? "positive" : row.changePct < 0 ? "negative" : "neutral";
   if (key === "stock") return `<strong class="contractStock">${escapeHtml(row.corpName)}</strong><em>${escapeHtml(row.stockCode)} · ${escapeHtml(row.market)}</em>`;
-  if (key === "date") return `<span class="contractTextMain">${escapeHtml(row.dateText)}</span>${row.correction ? `<span class="miniTag">정정</span>` : ""}`;
+  if (key === "date") return `<span class="contractTextMain">${escapeHtml(row.dateText)}</span>${row.correction ? `<span class="contractCorrectionText">정정</span>` : ""}`;
   if (key === "counterparty") return `<span class="counterparty ${row.counterpartySecret ? "secret" : ""}">${escapeHtml(row.counterparty)}</span><em>${escapeHtml(row.content || row.reportName || "-")}</em>`;
   if (key === "amount") return `<strong>${formatMoney(row.amount)}</strong><a class="dartLink amountLink" href="${escapeHtml(row.url)}" target="_blank" rel="noopener">원문보기</a>`;
   if (key === "salesRatio") return renderSalesGauge(row, ratioClass, gauge);
   if (key === "recentSales") return Number.isFinite(row.recentSales) ? `<span class="contractTextMain">${formatMoney(row.recentSales)}</span><em>${escapeHtml(row.recentSalesBasis || "공시 원문 기준")}</em>` : `<span class="mutedDash">확인 필요</span><em>${escapeHtml(row.recentSalesBasis || "원문 확인 필요")}</em>`;
   if (key === "period") return `<span class="contractTextMain">${escapeHtml(periodText(row))}</span><em>${escapeHtml(periodMetaText(row))}</em>`;
-  if (key === "price") return `<span class="contractTextMain">${formatPrice(row.close)}</span><em class="${priceClass}">${formatPlainPct(row.changePct)}</em>`;
+  if (key === "price") return `<span class="contractTextMain">${formatPrice(row.close)}</span><em>${escapeHtml(priceDateText(row.closeDate))}</em>`;
   return "-";
 }
 
@@ -630,6 +628,10 @@ function formatMoney(value) {
 function formatPrice(value) {
   if (!Number.isFinite(value)) return "-";
   return `${Math.round(value).toLocaleString("ko-KR")}원`;
+}
+
+function priceDateText(value) {
+  return value ? `${formatDate(value)} 기준` : "종가 수집 대기";
 }
 
 function formatRatio(value) {
