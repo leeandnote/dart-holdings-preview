@@ -57,6 +57,10 @@ if (!fs.existsSync(siteDir)) throw new Error(`site folder not found: ${siteDir}`
 removeDirSafe(distDir);
 fs.mkdirSync(deployDir, { recursive: true });
 fs.cpSync(siteDir, distDir, { recursive: true });
+const publicLogosDir = path.join(root, "public", "logos");
+if (fs.existsSync(publicLogosDir)) {
+  fs.cpSync(publicLogosDir, path.join(distDir, "logos"), { recursive: true });
+}
 makeCleanRoute("5percent.html", "5percent");
 makeCleanRoute("executives.html", "executives");
 makeCleanRoute("contracts.html", "contracts");

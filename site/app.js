@@ -24,8 +24,6 @@ const state = {
 };
 
 const number = new Intl.NumberFormat("ko-KR", { maximumFractionDigits: 2, minimumFractionDigits: 2 });
-const fallbackStockLogo = "assets/company-placeholder.svg";
-const blockedLogoStocks = new Set(["107640"]);
 const canUseApi = window.location.protocol !== "file:";
 const CONVEX_URL = "https://gregarious-lemming-92.convex.cloud";
 const holdingsKind = document.body?.dataset?.holdingsKind || "major";
@@ -2092,8 +2090,8 @@ function renderTableRow(row) {
   const shareDeltaClass = row.shareDelta < 0 ? "negative" : row.shareDelta > 0 ? "positive" : "";
   const moneyClass = row.tradeValue < 0 ? "negative" : row.tradeValue > 0 ? "positive" : "";
   const priceGapClass = row.priceGap < 0 ? "negative" : row.priceGap > 0 ? "positive" : "";
-  const logoSrc = blockedLogoStocks.has(row.stockCode) ? fallbackStockLogo : (state.logos[row.stockCode] || fallbackStockLogo);
-  const logo = `<img class="stockLogo" src="${escapeHtml(logoSrc)}" alt="" loading="lazy" onerror="this.onerror=null;this.src='${fallbackStockLogo}'">`;
+  const logo = window.StockLogo?.render({ stockCode: row.stockCode, stockName: row.corpName })
+    || `<span class="stockLogoComponent"><span class="stockLogoFallback">${escapeHtml(Array.from(row.corpName || "?")[0] || "?")}</span></span>`;
   const field = (key, value, sub = "", extraClass = "", title = "") => state.visibleColumns.has(key)
     ? `<div class="scanField ${extraClass}" data-col="${key}"${title ? ` title="${escapeHtml(title)}"` : ""}><span class="fieldLabel">${columns.find((column) => column.key === key)?.label || key}</span><strong>${value}</strong>${sub ? `<em>${sub}</em>` : ""}</div>`
     : "";

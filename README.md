@@ -112,3 +112,15 @@ GitHub Actions 자동 갱신에서도 알림을 보내려면 저장소 `Settings
 - `TELEGRAM_CHAT_ID`
 
 사이트 링크를 메시지에 넣으려면 Variables에 `SITE_URL`도 추가합니다.
+# Stock logos
+
+Download Naver Finance SVG logos for the stock codes found in the site data:
+
+```powershell
+python scripts/download_naver_stock_logos.py
+```
+
+Use `--codes-file codes.txt` to provide a separate list, `--force` to replace
+existing SVGs, or `--output-dir site/logos` for a local site-only run. The
+default output is `public/logos/{stockCode}.svg`; the Cloudflare build copies
+that directory to the deployed `/logos` route.

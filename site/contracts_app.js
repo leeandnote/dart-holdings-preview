@@ -329,8 +329,9 @@ function renderContractMobileCard(row) {
   return `<article class="contractMobileCard">
     <div class="contractMobileTop">
       <div class="contractMobileStock">
-        <strong>${escapeHtml(row.corpName)}</strong>
-        <em>${escapeHtml(row.stockCode)} · ${escapeHtml(row.market)}</em>
+        ${renderContractStockLogo(row)}
+        <span><strong>${escapeHtml(row.corpName)}</strong>
+        <em>${escapeHtml(row.stockCode)} · ${escapeHtml(row.market)}</em></span>
       </div>
       <div class="contractMobileRatio ${ratioClass}">
         <span>매출대비</span>
@@ -392,7 +393,7 @@ function renderContractCell(row, key) {
   const ratioClass = row.salesRatio >= 100 ? "mega" : row.salesRatio >= 50 ? "large" : "";
   const gauge = Math.max(0, Math.min(100, row.salesRatio || 0));
   const badge = row.salesRatio >= 100 ? `<span class="impactBadge mega">초대형</span>` : row.salesRatio >= 50 ? `<span class="impactBadge large">대형</span>` : "";
-  if (key === "stock") return `<strong class="contractStock">${escapeHtml(row.corpName)}</strong><em>${escapeHtml(row.stockCode)} · ${escapeHtml(row.market)}</em>`;
+  if (key === "stock") return `<div class="contractStockIdentity">${renderContractStockLogo(row)}<span><strong class="contractStock">${escapeHtml(row.corpName)}</strong><em>${escapeHtml(row.stockCode)} · ${escapeHtml(row.market)}</em></span></div>`;
   if (key === "date") return `<span class="contractTextMain">${escapeHtml(row.dateText)}</span>${row.correction ? `<span class="contractCorrectionText">정정</span>` : ""}`;
   if (key === "counterparty") return `<span class="counterparty ${row.counterpartySecret ? "secret" : ""}">${escapeHtml(row.counterparty)}</span><em>${escapeHtml(row.content || row.reportName || "-")}</em>`;
   if (key === "amount") return `<strong>${formatMoney(row.amount)}</strong><a class="dartLink amountLink" href="${escapeHtml(row.url)}" target="_blank" rel="noopener">원문보기</a>`;
@@ -604,6 +605,11 @@ function renderSegmentedGauge(gauge) {
     return `<i class="gaugeSegment ${index < filledCount ? "filled" : ""}"></i>`;
   }).join("");
   return `<span class="gaugeBar" aria-hidden="true">${segments}</span>`;
+}
+
+function renderContractStockLogo(row) {
+  return window.StockLogo?.render({ stockCode: row.stockCode, stockName: row.corpName })
+    || `<span class="stockLogoComponent"><span class="stockLogoFallback">${escapeHtml(Array.from(row.corpName || "?")[0] || "?")}</span></span>`;
 }
 
 function renderContractPagination(totalRows, totalPages) {
