@@ -1,6 +1,10 @@
 const PRIMARY_CRON = "10 11 * * *";
 const BACKUP_CRON = "30 11 * * *";
-const INTRADAY_CRON = "*/10 0-8 * * 1-5";
+const INTRADAY_CRONS = [
+  "*/10 22-23 * * SUN-THU", // KST weekdays 07:00-08:50
+  "*/10 0-10 * * MON-FRI", // KST weekdays 09:00-19:50
+  "0 11 * * MON-FRI",      // KST weekdays 20:00
+];
 
 function kstReportDate(timestamp) {
   return new Intl.DateTimeFormat("en-CA", {
@@ -84,7 +88,7 @@ async function handleScheduled(controller, env) {
   const reportDate = kstReportDate(controller.scheduledTime);
   if (controller.cron === PRIMARY_CRON) return dispatchPublish(env, reportDate);
   if (controller.cron === BACKUP_CRON) return backupPublish(env, controller.scheduledTime, reportDate);
-  if (controller.cron === INTRADAY_CRON) return dispatchIntraday(env);
+  if (INTRADAY_CRONS.includes(controller.cron)) return dispatchIntraday(env);
   return { action: "ignored", cron: controller.cron, reportDate };
 }
 
@@ -102,7 +106,7 @@ export default {
       scheduler: "leeandnote-publish-scheduler",
       primary: PRIMARY_CRON,
       backup: BACKUP_CRON,
-      intraday: INTRADAY_CRON,
+      intraday: INTRADAY_CRONS,
     });
   },
 };
