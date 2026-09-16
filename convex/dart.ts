@@ -719,28 +719,35 @@ async function getDartViewerDocumentText(receiptNo: string): Promise<string | un
   const texts: string[] = [];
   for (const match of [...docs.values()].slice(0, 20)) {
     const [, rcpNo, dcmNo, eleId, offset, length, dtd] = match;
-    const viewerUrl = new URL("https://dart.fss.or.kr/report/viewer.do");
+    const viewerUrl = dartRequestUrl("https://dart.fss.or.kr/report/viewer.do", "/dart/report/viewer.do");
     viewerUrl.searchParams.set("rcpNo", rcpNo);
     viewerUrl.searchParams.set("dcmNo", dcmNo);
     viewerUrl.searchParams.set("eleId", eleId);
     viewerUrl.searchParams.set("offset", offset);
     viewerUrl.searchParams.set("length", length);
     viewerUrl.searchParams.set("dtd", dtd);
-    const viewerResponse = await fetch(viewerUrl, {
-      headers: { "user-agent": "leeandnote-convex-dart-monitor/1.0" },
-    });
+    const viewerResponse = await fetch(viewerUrl, { headers: dartRequestHeaders() });
     if (viewerResponse.ok) texts.push(await viewerResponse.text());
   }
   return texts.length > 0 ? texts.join("\n") : undefined;
 }
 
+function dartRequestUrl(directUrl: string, proxyPath: string): URL {
+  const proxyBase = process.env.DART_PROXY_BASE_URL?.replace(/\/$/, "");
+  return new URL(proxyBase ? `${proxyBase}${proxyPath}` : directUrl);
+}
+
+function dartRequestHeaders(): Record<string, string> {
+  const headers: Record<string, string> = { "user-agent": "leeandnote-convex-dart-monitor/1.0" };
+  if (process.env.DART_PROXY_SECRET) headers["x-dart-proxy-secret"] = process.env.DART_PROXY_SECRET;
+  return headers;
+}
+
 async function getDartDocumentText(apiKey: string, receiptNo: string): Promise<string | undefined> {
-  const url = new URL("https://opendart.fss.or.kr/api/document.xml");
+  const url = dartRequestUrl("https://opendart.fss.or.kr/api/document.xml", "/opendart/api/document.xml");
   url.searchParams.set("crtfc_key", apiKey);
   url.searchParams.set("rcept_no", receiptNo);
-  const response = await fetch(url, {
-    headers: { "user-agent": "leeandnote-convex-dart-monitor/1.0" },
-  });
+  const response = await fetch(url, { headers: dartRequestHeaders() });
   if (!response.ok) {
     console.warn(`OpenDART document HTTP ${response.status}: ${receiptNo}`);
     return undefined;
@@ -874,13 +881,11 @@ async function applyEventCloseFallback(row: AlertRow, summary: DocumentSummaryIn
 }
 
 async function dartGet(path: string, params: Record<string, string | number>) {
-  const url = new URL(`https://opendart.fss.or.kr/api/${path}`);
+  const url = dartRequestUrl(`https://opendart.fss.or.kr/api/${path}`, `/opendart/api/${path}`);
   for (const [key, value] of Object.entries(params)) {
     url.searchParams.set(key, String(value));
   }
-  const response = await fetch(url, {
-    headers: { "user-agent": "leeandnote-convex-dart-monitor/1.0" },
-  });
+  const response = await fetch(url, { headers: dartRequestHeaders() });
   if (!response.ok) {
     throw new Error(`OpenDART HTTP ${response.status}`);
   }
