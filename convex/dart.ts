@@ -1805,6 +1805,11 @@ async function pollContractReportsHandler(ctx: any, args: PollArgs): Promise<any
   )) as ContractAlertRow[]).filter((row) => row.amount !== undefined || row.salesRatio !== undefined);
   if (enrichedRows.length === 0) return { found: reports.length, enqueued: 0, skippedMissingContractFields: candidates.length };
 
+  await ctx.runMutation(internal.dart.upsertContractDailyReportItems, {
+    reportDate,
+    rows: enrichedRows,
+  });
+
   const unseen: AlertRow[] = await ctx.runMutation(internal.dart.filterAndRecordDisclosures, {
     force: args.force ?? false,
     rows: enrichedRows.map((row) => ({
@@ -1852,6 +1857,57 @@ export const pollContractReportsInternal = internalAction({
   },
   handler: async (ctx, args) => {
     return await pollContractReportsHandler(ctx, args);
+  },
+});
+
+export const upsertContractDailyReportItems = internalMutation({
+  args: {
+    reportDate: v.string(),
+    rows: v.array(v.object({
+      receiptNo: v.string(),
+      receiptDate: v.string(),
+      corpCode: v.string(),
+      stockCode: v.string(),
+      corpName: v.string(),
+      market: v.string(),
+      reportName: v.string(),
+      url: v.string(),
+      amount: v.optional(v.number()),
+      salesRatio: v.optional(v.number()),
+      counterparty: v.optional(v.string()),
+      content: v.optional(v.string()),
+      startDate: v.optional(v.string()),
+      endDate: v.optional(v.string()),
+      correction: v.optional(v.boolean()),
+    })),
+  },
+  handler: async (ctx, args) => {
+    const now = Date.now();
+    for (const row of args.rows) {
+      const existing = await ctx.db
+        .query("contractDailyReportItems")
+        .withIndex("by_receiptNo", (q) => q.eq("receiptNo", row.receiptNo))
+        .unique();
+      const payload = {
+        reportDate: args.reportDate,
+        receiptNo: row.receiptNo,
+        corpCode: row.corpCode,
+        corpName: row.corpName,
+        stockCode: row.stockCode,
+        market: row.market,
+        reportName: row.reportName,
+        amount: row.amount,
+        salesRatio: row.salesRatio,
+        counterparty: row.counterparty,
+        content: row.content,
+        startDate: row.startDate,
+        endDate: row.endDate,
+        correction: row.correction ?? false,
+        url: row.url,
+      };
+      if (existing) await ctx.db.patch(existing._id, payload);
+      else await ctx.db.insert("contractDailyReportItems", { ...payload, createdAt: now });
+    }
   },
 });
 
@@ -2311,6 +2367,35 @@ export const listExecutiveDailyReportItemsRange = query({
     const endDe = String(args.endDe ?? "99999999").replace(/\D/g, "").slice(0, 8);
     const takeLimit = Math.min(Math.max(args.limit ?? 3000, 1), 5000);
     const rows = await ctx.db.query("executiveDailyReportItems").withIndex("by_reportDate").order("desc").take(takeLimit);
+    return rows.filter((row) => row.reportDate >= bgnDe && row.reportDate <= endDe);
+  },
+});
+
+export const listContractDailyReportItems = query({
+  args: {
+    reportDate: v.union(v.string(), v.number()),
+    limit: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    const reportDate = String(args.reportDate).replace(/\D/g, "").slice(0, 8);
+    return await ctx.db
+      .query("contractDailyReportItems")
+      .withIndex("by_reportDate", (q) => q.eq("reportDate", reportDate))
+      .take(args.limit ?? 100);
+  },
+});
+
+export const listContractDailyReportItemsRange = query({
+  args: {
+    bgnDe: v.optional(v.union(v.string(), v.number())),
+    endDe: v.optional(v.union(v.string(), v.number())),
+    limit: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    const bgnDe = String(args.bgnDe ?? "00000000").replace(/\D/g, "").slice(0, 8);
+    const endDe = String(args.endDe ?? "99999999").replace(/\D/g, "").slice(0, 8);
+    const takeLimit = Math.min(Math.max(args.limit ?? 3000, 1), 5000);
+    const rows = await ctx.db.query("contractDailyReportItems").withIndex("by_reportDate").order("desc").take(takeLimit);
     return rows.filter((row) => row.reportDate >= bgnDe && row.reportDate <= endDe);
   },
 });
