@@ -254,6 +254,12 @@ function Format-Percent([object]$Value) {
   return "{0:N2}%" -f $number
 }
 
+function Format-Shares([object]$Value) {
+  $number = Convert-ToNumber $Value
+  if ($null -eq $number) { return "" }
+  return "{0:N0}주" -f $number
+}
+
 function Get-IntradayShareChange([object]$CachedRow) {
   if (-not $CachedRow) { return $null }
   $previous = Format-Percent (Get-JsonField $CachedRow @("직전지분율"))
@@ -300,6 +306,13 @@ function Get-IntradayChangeLines([object]$CachedRow) {
     }
   } elseif ($contractText) {
     $lines.Add("<b>주요계약체결 비율</b>: $contractText")
+  }
+
+  $currentShares = Convert-ToNumber (Get-JsonField $CachedRow @("보유주식수"))
+  $shareDelta = Convert-ToNumber (Get-JsonField $CachedRow @("증감주식수"))
+  if ($null -ne $currentShares -and $null -ne $shareDelta) {
+    $previousShares = $currentShares - $shareDelta
+    $lines.Add("<b>보유주식수</b>: $(Format-Shares $previousShares) → $(Format-Shares $currentShares)")
   }
 
   return @($lines)
@@ -484,13 +497,12 @@ if ($confirmedItems.Count -eq 0) {
 }
 
 $lines = New-Object System.Collections.Generic.List[string]
-$lines.Add("<b>[장중 대량보유 공시 알림]</b>")
-$lines.Add("기준: $($now.ToString("yyyy-MM-dd HH:mm")) KST")
-$lines.Add("접수일: $($Date.Substring(0,4))-$($Date.Substring(4,2))-$($Date.Substring(6,2))")
-$lines.Add("대량보유 공시: <b>$($confirmedItems.Count)건</b>")
+$firstName = Escape-Html ([string]$confirmedItems[0].Item.corp_name)
+$titleName = if ($confirmedItems.Count -gt 1) { "${firstName}등" } else { $firstName }
+$lines.Add("<b>[5%보고공시 - $titleName]</b>")
+$lines.Add("$($now.ToString("yyyy-MM-dd HH:mm")) KST")
 $lines.Add("")
 
-$i = 1
 foreach ($entry in $confirmedItems) {
   $item = $entry.Item
   $cachedRow = $entry.Row
@@ -510,22 +522,24 @@ foreach ($entry in $confirmedItems) {
   $obligationDate = Format-DisplayDate ([string](Get-JsonField $cachedRow @("보고의무발생일")))
   $dartUrl = "https://dart.fss.or.kr/dsaf001/main.do?rcpNo=$receiptNo"
   $codeLine = if ($market) { "$stockCode · $market" } else { "$stockCode" }
-  $lines.Add("$i. <b>$corpName</b> ($reporter · $reporterType)")
+  if ($confirmedItems.Count -gt 1) {
+    $lines.Add("<b>$corpName</b>")
+  }
+  $lines.Add("<b>보고자:</b> $reporter/$reporterType")
   foreach ($changeLine in $changeLines) {
-    $lines.Add("   $changeLine")
+    $lines.Add($changeLine)
   }
   if ($reasonText) {
-    $lines.Add("   <b>보고사유</b>: $reasonText")
+    $lines.Add("<b>보고사유:</b> $reasonText")
   } elseif ($item.report_nm) {
     $reportName = Escape-Html ([string]$item.report_nm)
-    $lines.Add("   <b>공시명</b>: $reportName")
+    $lines.Add("<b>공시명:</b> $reportName")
   }
   if ($obligationDate) {
-    $lines.Add("   <b>보고의무발생일</b>: $obligationDate")
+    $lines.Add("<b>보고의무발생일:</b> $obligationDate")
   }
-  $lines.Add("   $codeLine · <a href=""$dartUrl"">원문 보기</a>")
+  $lines.Add("$codeLine · <a href=""$dartUrl"">원문 보기</a>")
   $lines.Add("")
-  $i += 1
 }
 Send-TelegramMessage -Text ($lines -join "`n")
 
