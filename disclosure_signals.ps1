@@ -265,7 +265,7 @@ function Normalize-CounterpartyValue([string]$Value) {
   if (-not $clean) { return "" }
   if ($clean.Length -lt 2 -or $clean -match "^(방|상대방|계약상대방)$") { return "" }
   if ($clean.Length -gt 80) { return "" }
-  if ($clean -match "재공시|사업개요|기타 투자판단|공시유보|협의") { return "" }
+  if ($clean -match "재공시|사업개요|기타 투자판단|공시유보|협의|최근\s*매출액|주요사업|회사와의\s*관계") { return "" }
   return $clean
 }
 
@@ -331,6 +331,9 @@ function Get-ContractRelativePeriod([string]$Text) {
 function Get-ContractFields([string]$Text) {
   $content = Get-TextBetweenLabels $Text @("판매ㆍ공급계약 내용", "판매·공급계약 내용", "체결계약명", "계약명") @("2. 계약내역", "2. 계약 내용", "계약내역", "계약금액", "조건부 계약여부") 360
   $counterparty = Normalize-CounterpartyValue (Get-TextBetweenLabels $Text @("계약상대방", "계약상대") @("- 최근", "- 주요사업", "- 회사와", "4. 판매", "5. 계약기간", "계약기간", "판매ㆍ공급지역", "판매·공급지역") 260)
+  if (-not $counterparty) {
+    $counterparty = Normalize-CounterpartyValue (Get-FirstRegexGroup $Text "계약상대(?:방)?\s+(.{1,120}?)\s+-\s*회사와의\s*관계")
+  }
   $region = Get-TextBetweenLabels $Text @("판매ㆍ공급지역", "판매·공급지역", "공급지역") @("5. 계약기간", "6. 주요", "계약기간", "계약(수주)일자") 180
   $datePattern = "[0-9]{4}(?:[-./]|\s*년\s*)[0-9]{1,2}(?:[-./]|\s*월\s*)[0-9]{1,2}(?:\s*일)?"
   $startDate = Get-FirstRegexGroup $Text "계약\s*기간\s*시작일\s*($datePattern)"
