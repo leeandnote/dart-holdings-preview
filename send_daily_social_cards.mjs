@@ -24,6 +24,7 @@ const postThreads = process.argv.includes("--threads") || process.argv.includes(
 const postInstagram = process.argv.includes("--instagram") || process.argv.includes("--post-instagram") || instagramOnly;
 const postYouTube = process.argv.includes("--youtube") || process.argv.includes("--post-youtube") || youtubeOnly;
 const showXCaptions = process.argv.includes("--show-x-captions");
+const allowPartial = process.argv.includes("--allow-partial");
 const contractDataArg = process.argv.find((arg) => arg.startsWith("--contract-data="));
 const executiveDataArg = process.argv.find((arg) => arg.startsWith("--executive-data="));
 const onlyArg = process.argv.find((arg) => arg.startsWith("--only="));
@@ -513,7 +514,7 @@ async function refreshXConfig(config) {
   return xConfigCache;
 }
 
-async function sendMediaGroup(cards) {
+async function sendMediaGroup(cards, caption) {
   const { token, chatId } = await loadTelegramConfig();
   const selected = cards.slice(0, 10);
   if (!selected.length) return;
@@ -526,7 +527,7 @@ async function sendMediaGroup(cards) {
     media.push({
       type: "photo",
       media: `attach://${field}`,
-      ...(index === 0 ? { caption: `Lee&Note ${dotted} 주요 DART 공시 요약표` } : {}),
+      ...(index === 0 ? { caption: caption.slice(0, 1024) } : {}),
     });
   }
   form.set("media", JSON.stringify(media));
@@ -714,14 +715,83 @@ function xBundleCaption(cards = []) {
   return [`${dotted} 주요 DART 공시 요약`, "", ...lines].join("\n");
 }
 
-async function postXThread(cards) {
+function hashtagName(value) {
+  return String(value || "").replace(/[^0-9A-Za-z가-힣]/g, "");
+}
+
+function signedShares(value) {
+  const amount = Math.round(Number(value) || 0);
+  return `${amount >= 0 ? "+" : "-"}${Math.abs(amount).toLocaleString("ko-KR")}주`;
+}
+
+function koreanParticle(value, consonantForm, vowelForm) {
+  const text = String(value || "");
+  const code = text.charCodeAt(text.length - 1);
+  const hasFinal = code >= 0xac00 && code <= 0xd7a3 ? (code - 0xac00) % 28 !== 0 : false;
+  return `${text}${hasFinal ? consonantForm : vowelForm}`;
+}
+
+function buildDailyCommentary({ fiveRows, executiveRows, contractRows }) {
+  const paragraphs = [`[${iso} DART전자공시 주요 이슈]`];
+  const tags = new Set(["dart전자공시", "리앤노트", "leeandnote", "주식", "주식공시"]);
+  const executiveGroups = new Map();
+  for (const row of executiveRows) {
+    if (!row.name || row.name === "-") continue;
+    const group = executiveGroups.get(row.name) || { count: 0, shares: 0, rows: [] };
+    group.count += 1;
+    group.shares += Number(row.shareDelta) || 0;
+    group.rows.push(row);
+    executiveGroups.set(row.name, group);
+  }
+  const [executiveName, executiveGroup] = [...executiveGroups.entries()]
+    .sort((a, b) => b[1].count - a[1].count || Math.abs(b[1].shares) - Math.abs(a[1].shares))[0] || [];
+  if (executiveName && executiveGroup) {
+    const leader = [...executiveGroup.rows].sort((a, b) => Math.abs(b.shareDelta || 0) - Math.abs(a.shareDelta || 0))[0];
+    const leaderLabel = [leader?.reporter, leader?.reporterType].filter(Boolean).join(" ") || "최대 변동 보고자";
+    paragraphs.push(`${executiveName}에서 임원·주요주주 보유주식 변동 공시 ${executiveGroup.count}건이 집중됐습니다. 합산 변동은 ${signedShares(executiveGroup.shares)}이며, ${leaderLabel}의 변동폭이 ${signedShares(leader?.shareDelta)}로 가장 큽니다.`);
+    tags.add(hashtagName(executiveName));
+  }
+  const ownership = [...fiveRows].sort((a, b) => Math.abs(b.delta || 0) - Math.abs(a.delta || 0)).slice(0, 2);
+  if (ownership.length) {
+    paragraphs.push(ownership.map((row) => `${koreanParticle(row.name, "은", "는")} ${row.reporter}의 보유비율이 ${pct(row.prev)}%에서 ${pct(row.cur)}%로 ${row.delta >= 0 ? "높아졌습니다" : "낮아졌습니다"}`).join(". ") + ".");
+    ownership.forEach((row) => tags.add(hashtagName(row.name)));
+  }
+  const topAmount = [...contractRows].sort((a, b) => (b.amount || 0) - (a.amount || 0))[0];
+  const topRatio = [...contractRows].filter((row) => row !== topAmount).sort((a, b) => (b.ratio || 0) - (a.ratio || 0))[0];
+  const contracts = [topAmount, topRatio].filter(Boolean);
+  if (contracts.length) {
+    paragraphs.push(`대형수주에서는 ${contracts.map((row) => `${koreanParticle(row.name, "이", "가")} ${contractMoneyEok(row.amount)} 규모(매출액 대비 ${contractRatioText(row.ratio)})`).join(", ")}의 계약을 공시했습니다.`);
+    contracts.forEach((row) => tags.add(hashtagName(row.name)));
+  }
+  const tagList = [...tags].filter(Boolean).slice(0, 10);
+  const full = `${paragraphs.join("\n\n")}\n\n${tagList.map((tag) => `#${tag}`).join(" ")}`;
+  const compactParts = [
+    `[${iso} DART 주요 이슈]`,
+    executiveName ? `${executiveName} 공시 ${executiveGroup.count}건·합산 ${signedShares(executiveGroup.shares)}` : "",
+    ownership[0] ? `${ownership[0].name} ${pct(ownership[0].prev)}%→${pct(ownership[0].cur)}%` : "",
+    contracts[0] ? `${contracts[0].name} ${contractMoneyEok(contracts[0].amount)}·매출대비 ${contractRatioText(contracts[0].ratio)}` : "",
+  ].filter(Boolean);
+  const compactTags = tagList.slice(0, 6).map((tag) => `#${tag}`).join(" ");
+  return { full, compact: `${compactParts.join("\n")}\n${compactTags}`.slice(0, 280), tags: tagList };
+}
+
+function validateCompleteBundle(cards) {
+  const required = ["five", "executive", "contracts"];
+  const present = new Set(cards.map((card) => card.kind));
+  const missing = required.filter((kind) => !present.has(kind));
+  if (!allowPartial && (cards.length !== 3 || missing.length)) {
+    throw new Error(`Social publishing blocked: complete 3-card bundle required; missing=${missing.join(",") || "none"}, cards=${cards.length}`);
+  }
+}
+
+async function postXThread(cards, caption) {
   if (!cards.length) return [];
   if (!xSeparate) {
     const mediaIds = [];
     for (const card of cards.slice(0, 4)) {
       mediaIds.push(await uploadXImage(card.file));
     }
-    const postId = await createXPost({ text: xBundleCaption(cards.slice(0, 4)), mediaIds });
+    const postId = await createXPost({ text: caption, mediaIds });
     return [{ kind: "bundle", postId, mediaIds }];
   }
   const posted = [];
@@ -848,11 +918,11 @@ async function waitForThreadsContainer(containerId) {
   }
 }
 
-async function postThreadsVideo(videoUrl, cards) {
+async function postThreadsVideo(videoUrl, cards, caption) {
   const containerId = await threadsFetch("/me/threads", {
     media_type: "VIDEO",
     video_url: videoUrl,
-    text: xBundleCaption(cards.slice(0, 3)),
+    text: caption.slice(0, 500),
   });
   await waitForThreadsContainer(containerId);
   const postId = await publishThreadsContainer(containerId);
@@ -946,12 +1016,12 @@ async function postInstagramCarousel(cards) {
   }
 }
 
-async function postInstagramReel(videoUrl, cards) {
+async function postInstagramReel(videoUrl, cards, caption) {
   const { userId } = await loadInstagramConfig();
   const containerId = await instagramFetch(`/${userId}/media`, {
     media_type: "REELS",
     video_url: videoUrl,
-    caption: xBundleCaption(cards.slice(0, 3)),
+    caption: caption.slice(0, 2200),
     share_to_feed: "true",
   });
   await waitForInstagramContainer(containerId);
@@ -987,7 +1057,8 @@ async function main() {
   ]);
   const fiveRows = pickFive(fiveRaw.map(rowModel));
   const mergedExecRaw = [...extraExecRaw, ...execRaw];
-  const execRows = pickExecutive(mergedExecRaw.map(rowModel));
+  const executiveModels = mergedExecRaw.map(rowModel);
+  const execRows = pickExecutive(executiveModels);
   const contractRows = pickContracts(contractRaw);
   if (contractRaw.length > 0 && contractRows.length === 0) {
     throw new Error(`${iso} contract disclosures exist, but every row is missing contract amount/ratio. Social publishing stopped.`);
@@ -1014,8 +1085,10 @@ async function main() {
       cards.push({ kind: "contracts", file: png, rows: contractRows });
     }
     const targetCards = onlyKinds ? cards.filter((card) => onlyKinds.has(card.kind)) : cards;
-    if (!dryRun && !skipTelegram && !xOnly && !threadsOnly && !instagramOnly && !youtubeOnly) await sendMediaGroup(targetCards);
-    const xPosts = postX && !dryRun ? await postXThread(targetCards) : [];
+    validateCompleteBundle(targetCards);
+    const commentary = buildDailyCommentary({ fiveRows, executiveRows: executiveModels, contractRows });
+    if (!dryRun && !skipTelegram && !xOnly && !threadsOnly && !instagramOnly && !youtubeOnly) await sendMediaGroup(targetCards, commentary.full);
+    const xPosts = postX && !dryRun ? await postXThread(targetCards, commentary.compact) : [];
     const needsVideo = postThreads || postInstagram || postYouTube;
     let youtubePost = null;
     let socialVideo = null;
@@ -1027,8 +1100,8 @@ async function main() {
     }
     if (!dryRun && (postThreads || postInstagram)) {
       await withPublicSocialVideo(socialVideo, async (videoUrl) => {
-        if (postThreads) threadsPost = await postThreadsVideo(videoUrl, targetCards);
-        if (postInstagram) instagramPost = await postInstagramReel(videoUrl, targetCards);
+        if (postThreads) threadsPost = await postThreadsVideo(videoUrl, targetCards, commentary.full);
+        if (postInstagram) instagramPost = await postInstagramReel(videoUrl, targetCards, commentary.full);
       });
     }
     if (postYouTube) {
@@ -1037,12 +1110,11 @@ async function main() {
           file: socialVideo,
           title: `${dotted} 주요 DART 공시 요약 #Shorts`,
           description: [
-            `${dotted} 주요 5%보고·임원보고·대형수주 공시를 한눈에 정리했습니다.`,
+            commentary.full,
             "공시 원문과 상세 데이터: https://leeandnote.com",
             "본 영상은 정보 제공 목적이며 투자 권유가 아닙니다.",
-            "#주식 #공시 #DART #대형수주 #지분변동 #Shorts",
           ].join("\n\n"),
-          tags: ["주식", "공시", "DART", "5%보고", "임원보고", "대형수주", "기업공시", "Shorts"],
+          tags: [...commentary.tags, "5%보고", "임원보고", "대형수주", "Shorts"],
         });
       }
     }
@@ -1063,8 +1135,9 @@ async function main() {
       xCaptions: showXCaptions
         ? (xSeparate
           ? targetCards.map((card) => ({ kind: card.kind, text: xCaption(card.kind, card.rows) }))
-          : [{ kind: "bundle", text: xBundleCaption(targetCards.slice(0, 4)) }])
+          : [{ kind: "bundle", text: commentary.compact }])
         : undefined,
+      commentary: showXCaptions ? commentary : undefined,
       files: keep ? sent : [],
     }, null, 2));
   } finally {
