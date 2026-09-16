@@ -248,7 +248,63 @@ function cardSvg({ title, tag, rows, fileName }) {
   return { fileName, html };
 }
 
-function htmlHead({ title, description, canonical, image }) {
+function jsonLd(value) {
+  return JSON.stringify(value).replaceAll("<", "\\u003c");
+}
+
+function articleStructuredData({ title, description, canonical, image, section, rows, facts }) {
+  const graph = [
+    {
+      "@type": "Article",
+      "@id": `${canonical}#article`,
+      headline: title,
+      description,
+      datePublished: iso,
+      dateModified: iso,
+      inLanguage: "ko-KR",
+      articleSection: section,
+      mainEntityOfPage: { "@type": "WebPage", "@id": canonical },
+      image: [image],
+      author: { "@type": "Organization", name: "리앤노트", url: "https://leeandnote.com/" },
+      publisher: { "@type": "Organization", name: "리앤노트", url: "https://leeandnote.com/" },
+      isBasedOn: "https://dart.fss.or.kr/",
+    },
+    {
+      "@type": "Dataset",
+      "@id": `${canonical}#dataset`,
+      name: `${title} 데이터`,
+      description,
+      url: canonical,
+      dateModified: iso,
+      temporalCoverage: iso,
+      inLanguage: "ko-KR",
+      creator: { "@type": "Organization", name: "리앤노트", url: "https://leeandnote.com/" },
+      isBasedOn: "https://dart.fss.or.kr/",
+      variableMeasured: rows,
+    },
+  ];
+  if (facts?.length) {
+    graph.push({
+      "@type": "FAQPage",
+      "@id": `${canonical}#facts`,
+      mainEntity: facts.map(({ question, answer }) => ({
+        "@type": "Question",
+        name: question,
+        acceptedAnswer: { "@type": "Answer", text: answer },
+      })),
+    });
+  }
+  return { "@context": "https://schema.org", "@graph": graph };
+}
+
+function factQa(facts) {
+  return `<section class="factQa" aria-labelledby="factQaTitle">
+    <h2 id="factQaTitle">핵심 팩트 Q&amp;A</h2>
+    <dl>${facts.map(({ question, answer }) => `<div><dt>${esc(question)}</dt><dd>${esc(answer)}</dd></div>`).join("")}</dl>
+  </section>`;
+}
+
+function htmlHead({ title, description, canonical, image, structuredData }) {
   return `<!doctype html>
 <html lang="ko">
 <head>
@@ -270,6 +326,7 @@ function htmlHead({ title, description, canonical, image }) {
   <link rel="icon" href="/assets/favicon.ico" sizes="any">
   <link rel="icon" type="image/png" href="/assets/favicon-32.png" sizes="32x32">
   <link rel="stylesheet" href="/styles.css">
+  ${structuredData ? `<script type="application/ld+json">${jsonLd(structuredData)}</script>` : ""}
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE}" crossorigin="anonymous"></script>
 </head>`;
 }
@@ -295,6 +352,7 @@ function blogCss() {
     .downloadRow{display:none}.downloadBtn{display:none}
     .reviewList{display:grid;gap:12px;margin-top:0}.reviewItem{border:1px solid #e3e8ef;border-radius:16px;background:white;padding:16px 18px;box-shadow:0 12px 32px rgba(15,23,42,.04)}.reviewItem h3{margin:0 0 7px;color:#111827;font-size:17px;line-height:1.35;letter-spacing:-.02em}.reviewItem .reviewMeta{margin:0 0 7px;color:#ff5520;font-size:12px;font-weight:900}.reviewItem p{margin:0;color:#4b5563;font-size:14px;line-height:1.75;font-weight:550}
     .pointBox{padding:17px 18px;border:1px solid #e3e8ef;border-radius:16px;background:#fbfcfd;color:#4b5563;font-size:14px;line-height:1.75}.pointBox strong{color:#111827}.pointBox ul{margin:8px 0 0;padding-left:18px}.pointBox li+li{margin-top:6px}
+    .factQa{margin-top:8px;padding:20px;border:1px solid #e3e8ef;border-radius:16px;background:#fff}.factQa h2{margin:0 0 12px;padding:0;border:0;font-size:20px}.factQa dl{display:grid;gap:0;margin:0}.factQa dl div{padding:13px 0;border-top:1px solid #edf1f5}.factQa dt{color:#111827;font-weight:760}.factQa dd{margin:5px 0 0;color:#4b5563;line-height:1.65}
     .blogCta{display:flex;align-items:center;justify-content:space-between;gap:18px;margin:14px 0 4px;padding:20px;border:1px solid #ffd8cc;border-radius:20px;background:linear-gradient(135deg,#fff7f3,#ffece5);box-shadow:0 14px 42px rgba(250,73,5,.08)}.blogCta strong{display:block;color:#111827;font-size:16px}.blogCta p{margin-top:5px;color:#5b6470;font-size:13px;line-height:1.6}.blogCta a{flex:0 0 auto;border-radius:13px;background:#ff5520;color:white;padding:12px 16px;text-decoration:none;font-size:13px;font-weight:900;box-shadow:0 10px 24px rgba(255,85,32,.18)}
     .note{padding:18px 20px;border-left:4px solid #ff4d0d;background:#fff7f3;color:#4b5563;border-radius:12px;font-size:14px;line-height:1.7}
     footer.blogFoot{margin-top:64px;padding-top:24px;border-top:1px solid #dfe5ec;color:#7b8490;font-size:12px;line-height:1.7}.statusNotice{margin:0 0 22px;padding:16px 18px;border:1px solid #d8e1eb;border-radius:16px;background:#fff;color:#4b5563;font-size:14px;line-height:1.72;box-shadow:0 10px 28px rgba(15,23,42,.04)}.statusNotice strong{color:#111827;font-weight:760}.statusNotice em{color:#f0521d;font-style:normal;font-weight:760}
@@ -717,8 +775,17 @@ async function main() {
   const leadNames = primaryRows.slice(0, 3).map((r) => r.name).join(", ");
   const themeSections = themes.map((theme, index) => themeSection(theme, index + 1)).join("\n");
   const dailySummary = introSummary({ items, newEntries, increases, decreases, flow, insiders });
+  const ownershipFacts = [
+    { question: `${dotted} 5%보고공시는 몇 건인가요?`, answer: `${dotted} 접수 기준 총 ${items.length.toLocaleString("ko-KR")}건입니다.` },
+    { question: "새로 5% 보고 대상에 포함된 종목은 몇 개인가요?", answer: `직전 보유비율 5% 미만에서 이번 보고 5% 이상으로 확인된 종목은 ${newEntries.length.toLocaleString("ko-KR")}개입니다.` },
+    { question: "어떤 자료를 기준으로 정리했나요?", answer: "금융감독원 DART 전자공시의 당일 5%보고공시와 공개 가격 데이터를 기준으로 정리했습니다." },
+  ];
+  const ownershipSchema = articleStructuredData({
+    title: postTitle, description: postDescription, canonical: postUrl, image: imageUrl,
+    section: "5%보고공시", rows: ["종목명", "제출인", "직전 보유비율", "이번 보유비율", "지분변동주식수", "보고사유"], facts: ownershipFacts,
+  });
 
-  await writeFile(path.join(postDir, "index.html"), `${htmlHead({ title: postTitle, description: postDescription, canonical: postUrl, image: imageUrl })}
+  await writeFile(path.join(postDir, "index.html"), `${htmlHead({ title: postTitle, description: postDescription, canonical: postUrl, image: imageUrl, structuredData: ownershipSchema })}
 <body class="blogBody">
 ${blogCss()}
 ${pageNav("blog")}
@@ -738,6 +805,7 @@ ${pageNav("blog")}
     <section class="articleBody">
       <p class="articleMeta">요약 기준: ${iso} 접수 공시 · 총 ${items.length.toLocaleString("ko-KR")}건 · <a href="/editorial-policy.html">LEE&amp;NOTE 편집·검수 기준</a></p>
       ${dailySummary}
+      ${factQa(ownershipFacts)}
       <p>${newEntries.length ? `오늘 신규 5% 보고 대상으로 확인된 주요 종목은 <strong>${esc(leadNames)}</strong> 등입니다.` : `오늘은 신규 진입보다 기존 주요주주의 지분 변동 공시가 중심이었습니다.`} 아래에서는 <span class="softKey">신규 진입</span>, <span class="softKey">지분율 증가와 하락</span>, <span class="softKey">지분변동금액</span>, <span class="softKey">오너·특수관계자 흐름</span>을 나눠 살펴봅니다.</p>
       ${themeSections}
       <div class="blogCta">
@@ -903,8 +971,17 @@ ${pageNav("blog")}
   const execThemeSections = execThemes.length
     ? execThemes.map((theme, index) => themeSection(theme, index + 1)).join("\n")
     : `<p>오늘 기준으로 블로그 표에 표시할 임원보고 데이터가 아직 충분하지 않습니다.</p>`;
+  const executiveFacts = [
+    { question: `${dotted} 임원보고공시는 몇 건인가요?`, answer: `${dotted} 접수 기준 총 ${execItems.length.toLocaleString("ko-KR")}건입니다.` },
+    { question: "임원보고에서 무엇을 확인할 수 있나요?", answer: "임원·주요주주의 보유주식수와 보유비율 변동, 제출인 및 보고사유를 확인할 수 있습니다." },
+    { question: "어떤 자료를 기준으로 정리했나요?", answer: "금융감독원 DART 전자공시의 당일 임원·주요주주 보고와 공개 가격 데이터를 기준으로 정리했습니다." },
+  ];
+  const executiveSchema = articleStructuredData({
+    title: execPostTitle, description: execPostDescription, canonical: execPostUrl, image: imageUrl,
+    section: "임원보고공시", rows: ["종목명", "보고자", "보유비율", "보유주식수", "지분변동주식수", "보고사유"], facts: executiveFacts,
+  });
 
-  await writeFile(path.join(execPostDir, "index.html"), `${htmlHead({ title: execPostTitle, description: execPostDescription, canonical: execPostUrl, image: imageUrl })}
+  await writeFile(path.join(execPostDir, "index.html"), `${htmlHead({ title: execPostTitle, description: execPostDescription, canonical: execPostUrl, image: imageUrl, structuredData: executiveSchema })}
 <body class="blogBody">
 ${blogCss()}
 ${pageNav("blog")}
@@ -924,6 +1001,7 @@ ${pageNav("blog")}
     <section class="articleBody">
       <p class="articleMeta">요약 기준: ${iso} 접수 공시 · 총 ${execItems.length.toLocaleString("ko-KR")}건 · <a href="/editorial-policy.html">LEE&amp;NOTE 편집·검수 기준</a></p>
       ${execSummary}
+      ${factQa(executiveFacts)}
       <p>임원보고는 지분율이 0.00%처럼 작게 보이더라도 실제 보유주식수 변화가 의미 있는 경우가 있습니다. 아래에서는 <span class="softKey">보유 증가</span>, <span class="softKey">보유 감소</span>, <span class="softKey">변동금액</span> 흐름을 나눠 살펴봅니다.</p>
       ${execThemeSections}
       <div class="blogCta">
@@ -986,8 +1064,18 @@ ${pageNav("blog")}
   const contractPostDescription = `${dotted} DART 단일판매·공급계약 공시에서 계약금액, 매출액 대비 비중, 계약상대방과 기간을 정리했습니다.`;
   const contractPostUrl = `https://leeandnote.com/blog/contracts/${iso}`;
   const contractLeadNames = contractItems.slice(0, 3).map((r) => r.name).join(", ");
+  const largestContract = contractItems[0];
+  const contractFacts = [
+    { question: `${dotted} 대형수주 공시는 몇 건인가요?`, answer: `${dotted} 접수 기준 총 ${contractItems.length.toLocaleString("ko-KR")}건입니다.` },
+    { question: "계약금액이 가장 큰 공시는 무엇인가요?", answer: largestContract ? `${largestContract.name}의 ${plainMoneyEok(largestContract.amount)} 규모 공시입니다.` : "조건에 맞는 대형수주 공시가 없습니다." },
+    { question: "대형수주 공시에서 무엇을 함께 봐야 하나요?", answer: "계약금액, 최근 매출액 대비 비중, 계약상대방, 계약기간과 DART 원문 조건을 함께 확인해야 합니다." },
+  ];
+  const contractSchema = articleStructuredData({
+    title: contractPostTitle, description: contractPostDescription, canonical: contractPostUrl, image: imageUrl,
+    section: "대형수주보고", rows: ["종목명", "계약금액", "최근 매출액 대비 비중", "계약상대방", "계약내용", "계약기간"], facts: contractFacts,
+  });
 
-  await writeFile(path.join(contractPostDir, "index.html"), `${htmlHead({ title: contractPostTitle, description: contractPostDescription, canonical: contractPostUrl, image: imageUrl })}
+  await writeFile(path.join(contractPostDir, "index.html"), `${htmlHead({ title: contractPostTitle, description: contractPostDescription, canonical: contractPostUrl, image: imageUrl, structuredData: contractSchema })}
 <body class="blogBody">
 ${blogCss()}
 ${pageNav("blog")}
@@ -1007,6 +1095,7 @@ ${pageNav("blog")}
     <section class="articleBody">
       <p class="articleMeta">요약 기준: ${iso} 접수 공시 · 총 ${contractItems.length.toLocaleString("ko-KR")}건 · <a href="/editorial-policy.html">LEE&amp;NOTE 편집·검수 기준</a></p>
       <div class="summaryBox">오늘 접수된 대형수주 공시는 총 <strong>${contractItems.length.toLocaleString("ko-KR")}건</strong>입니다.${contractLeadNames ? ` 주요 확인 종목은 <strong>${esc(contractLeadNames)}</strong> 등입니다.` : ""} 계약금액뿐 아니라 매출액 대비 비중과 계약기간을 함께 보는 것이 중요합니다.</div>
+      ${factQa(contractFacts)}
       ${contractInsightText(contractItems)}
       <h2>주요 대형수주 공시</h2>
       <p>금액 규모와 매출액 대비 비중이 함께 확인되는 공시만 추려 살펴봅니다. 같은 금액이라도 계약기간이 길면 연간 실적 기여도는 낮아질 수 있습니다.</p>

@@ -63,7 +63,7 @@ jobs:
         run: |
           $siteUrl = "${{ vars.SITE_URL }}"
           if (-not $siteUrl) {
-            $siteUrl = "https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/"
+            $siteUrl = "https://leeandnote.com/"
           }
           if (-not $siteUrl.EndsWith("/")) {
             $siteUrl = "$siteUrl/"
@@ -71,6 +71,33 @@ jobs:
           $today = Get-Date -Format "yyyy-MM-dd"
           @(
             "User-agent: *",
+            "Allow: /",
+            "",
+            "User-agent: Googlebot",
+            "Allow: /",
+            "",
+            "User-agent: Mediapartners-Google",
+            "Allow: /",
+            "",
+            "User-agent: Google-Display-Ads-Bot",
+            "Allow: /",
+            "",
+            "User-agent: OAI-SearchBot",
+            "Allow: /",
+            "",
+            "User-agent: GPTBot",
+            "Allow: /",
+            "",
+            "User-agent: ClaudeBot",
+            "Allow: /",
+            "",
+            "User-agent: Claude-User",
+            "Allow: /",
+            "",
+            "User-agent: PerplexityBot",
+            "Allow: /",
+            "",
+            "User-agent: Perplexity-User",
             "Allow: /",
             "",
             "Sitemap: ${siteUrl}sitemap.xml"
