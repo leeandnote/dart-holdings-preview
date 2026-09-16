@@ -7,7 +7,7 @@ import crypto from "node:crypto";
 import { renderYouTubeShort, uploadYouTubeShort } from "./youtube_short.mjs";
 
 const ROOT = process.cwd();
-const CONVEX_URL = "https://gregarious-lemming-92.convex.cloud";
+const CONVEX_URL = "https://quiet-cardinal-118.convex.cloud";
 const ymd = (process.argv[2] || kstYmd()).replace(/\D/g, "").slice(0, 8);
 const iso = `${ymd.slice(0, 4)}-${ymd.slice(4, 6)}-${ymd.slice(6, 8)}`;
 const dotted = `${ymd.slice(0, 4)}.${ymd.slice(4, 6)}.${ymd.slice(6, 8)}`;
@@ -267,6 +267,25 @@ async function loadExtraExecutiveRows() {
 }
 
 async function loadContractRows() {
+  try {
+    const rows = await convexQuery("dart:listContractDailyReportItems", { reportDate: ymd, limit: 500 });
+    if (Array.isArray(rows) && rows.length) {
+      return rows.map((row) => ({
+        "공시유형": "단일판매·공급계약",
+        "접수일": row.reportDate,
+        "종목명": row.corpName,
+        "종목코드": row.stockCode,
+        "시장": row.market,
+        "계약금액": row.amount,
+        "매출대비비율": row.salesRatio,
+        "계약상대방": row.counterparty,
+        "계약내용": row.content,
+        "보고서명": row.reportName,
+      }));
+    }
+  } catch (error) {
+    console.warn("Convex contract rows unavailable; using static disclosure signals", error);
+  }
   const filePath = contractDataArg ? path.resolve(contractDataArg.slice("--contract-data=".length)) : path.join(ROOT, "site", "data", "disclosure_signals.json");
   if (!existsSync(filePath)) return [];
   const payload = JSON.parse(await readFile(filePath, "utf8"));
