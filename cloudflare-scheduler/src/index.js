@@ -92,6 +92,26 @@ async function handleScheduled(controller, env) {
   return { action: "ignored", cron: controller.cron, reportDate };
 }
 
+async function proxyDart(request, env, url) {
+  if (!env.DART_PROXY_SECRET || request.headers.get("x-dart-proxy-secret") !== env.DART_PROXY_SECRET) {
+    return new Response("Unauthorized", { status: 401 });
+  }
+  const route = url.pathname.startsWith("/opendart/api/")
+    ? `https://opendart.fss.or.kr${url.pathname.replace("/opendart", "")}${url.search}`
+    : `https://dart.fss.or.kr${url.pathname.replace("/dart", "")}${url.search}`;
+  const response = await fetch(route, {
+    method: "GET",
+    headers: { "User-Agent": "leeandnote-cloudflare-dart-proxy/1.0" },
+  });
+  return new Response(response.body, {
+    status: response.status,
+    headers: {
+      "content-type": response.headers.get("content-type") || "application/octet-stream",
+      "cache-control": "no-store",
+    },
+  });
+}
+
 export default {
   async scheduled(controller, env, ctx) {
     ctx.waitUntil(handleScheduled(controller, env).then(console.log).catch((error) => {
@@ -100,7 +120,11 @@ export default {
     }));
   },
 
-  async fetch() {
+  async fetch(request, env) {
+    const url = new URL(request.url);
+    if (url.pathname.startsWith("/opendart/api/") || url.pathname.startsWith("/dart/report/")) {
+      return proxyDart(request, env, url);
+    }
     return Response.json({
       ok: true,
       scheduler: "leeandnote-publish-scheduler",
