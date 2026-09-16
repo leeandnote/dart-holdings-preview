@@ -2,9 +2,14 @@ name: Intraday DART text alert
 
 on:
   workflow_dispatch:
-  # Disabled: Convex cloud now owns DART polling and Telegram alerts.
-  # Leaving this workflow manual-only prevents duplicate public-channel messages
-  # and the old numbered "[장중 대량보유 공시 알림]" format.
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/intraday-alert.yml"
+      - "intraday_alert.ps1"
+  # Cloudflare Cron dispatches this workflow every 10 minutes during KST market hours.
+  # GitHub's own schedule remains off to prevent duplicate Telegram messages.
 
 permissions:
   contents: write

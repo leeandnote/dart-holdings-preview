@@ -1,5 +1,6 @@
 const PRIMARY_CRON = "10 11 * * *";
 const BACKUP_CRON = "30 11 * * *";
+const INTRADAY_CRON = "*/10 0-8 * * 1-5";
 
 function kstReportDate(timestamp) {
   return new Intl.DateTimeFormat("en-CA", {
@@ -43,6 +44,20 @@ async function dispatchPublish(env, reportDate) {
   return { action: "dispatched", reportDate };
 }
 
+async function dispatchIntraday(env) {
+  const workflow = env.GITHUB_INTRADAY_WORKFLOW || "intraday-alert.yml";
+  const url = `https://api.github.com/repos/${env.GITHUB_REPOSITORY}/actions/workflows/${workflow}/dispatches`;
+  const response = await fetch(url, {
+    method: "POST",
+    headers: { ...githubHeaders(env), "Content-Type": "application/json" },
+    body: JSON.stringify({ ref: env.GITHUB_REF }),
+  });
+  if (response.status !== 204) {
+    throw new Error(`GitHub intraday dispatch failed: HTTP ${response.status} ${await response.text()}`);
+  }
+  return { action: "intraday-dispatched", reportDate: kstReportDate(Date.now()) };
+}
+
 async function recentPublishRuns(env, timestamp) {
   const url = new URL(`https://api.github.com/repos/${env.GITHUB_REPOSITORY}/actions/workflows/${env.GITHUB_WORKFLOW}/runs`);
   url.searchParams.set("event", "workflow_dispatch");
@@ -69,6 +84,7 @@ async function handleScheduled(controller, env) {
   const reportDate = kstReportDate(controller.scheduledTime);
   if (controller.cron === PRIMARY_CRON) return dispatchPublish(env, reportDate);
   if (controller.cron === BACKUP_CRON) return backupPublish(env, controller.scheduledTime, reportDate);
+  if (controller.cron === INTRADAY_CRON) return dispatchIntraday(env);
   return { action: "ignored", cron: controller.cron, reportDate };
 }
 
@@ -86,6 +102,7 @@ export default {
       scheduler: "leeandnote-publish-scheduler",
       primary: PRIMARY_CRON,
       backup: BACKUP_CRON,
+      intraday: INTRADAY_CRON,
     });
   },
 };
