@@ -17,6 +17,7 @@ const contractState = {
 
 const contractNumber = new Intl.NumberFormat("ko-KR", { maximumFractionDigits: 1 });
 const contractPct = new Intl.NumberFormat("ko-KR", { maximumFractionDigits: 1, minimumFractionDigits: 1 });
+const CONTRACT_CONVEX_URL = "https://quiet-cardinal-118.convex.cloud";
 const contractColumns = [
   { key: "stock", label: "종목", sort: "corpName" },
   { key: "date", label: "공시일", sort: "date" },
@@ -154,16 +155,73 @@ function normalizeContractRow(row) {
   };
 }
 
-function loadContracts() {
+async function queryContractConvex(path, args = {}) {
+  const response = await fetch(`${CONTRACT_CONVEX_URL}/api/query`, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ path, args, format: "json" }),
+  });
+  const payload = await response.json().catch(() => null);
+  if (!response.ok || payload?.status !== "success") {
+    throw new Error(payload?.errorMessage || `Convex query failed: ${path}`);
+  }
+  return payload.value;
+}
+
+function convexContractToSignal(row) {
+  return {
+    "접수일": row.reportDate,
+    "시장": row.market,
+    "공시유형": "단일판매·공급계약",
+    "종목명": row.corpName,
+    "종목코드": row.stockCode,
+    "보고서명": row.reportName,
+    "계약금액": row.amount,
+    "매출대비비율": row.salesRatio,
+    "계약상대방": row.counterparty,
+    "계약내용": row.content,
+    "계약시작일": row.startDate,
+    "계약종료일": row.endDate,
+    "계약기간": [row.startDate, row.endDate].filter(Boolean).join(" ~ "),
+    DART_URL: row.url,
+  };
+}
+
+async function loadLiveContractSignals() {
+  const today = new Date();
+  const endDe = compactDate(today.toISOString().slice(0, 10));
+  const start = new Date(today);
+  start.setDate(start.getDate() - 120);
+  const bgnDe = compactDate(start.toISOString().slice(0, 10));
+  const rows = await queryContractConvex("dart:listContractDailyReportItemsRange", { bgnDe, endDe, limit: 3000 });
+  return Array.isArray(rows) ? rows.map(convexContractToSignal) : [];
+}
+
+async function refreshContracts() {
   const payload = window.__DISCLOSURE_SIGNALS__ || { rows: [] };
-  contractState.rows = (payload.rows || [])
+  let liveRows = [];
+  try {
+    liveRows = await loadLiveContractSignals();
+  } catch (error) {
+    console.warn("Live contract data unavailable; using static data", error);
+  }
+  const liveUrls = new Set(liveRows.map((row) => row.DART_URL).filter(Boolean));
+  const mergedRows = [...liveRows, ...(payload.rows || []).filter((row) => !liveUrls.has(row.DART_URL))];
+  contractState.rows = mergedRows
     .filter((row) => row["공시유형"] === "단일판매·공급계약")
     .map(normalizeContractRow)
     .filter((row) => row.corpName && row.stockCode)
     .sort((a, b) => String(b.date).localeCompare(String(a.date)) || ((b.amount || 0) - (a.amount || 0)));
-  $("period").textContent = `데이터 갱신일시: ${payload.generatedAt || "-"}`;
-  bindContracts();
+  $("period").textContent = liveRows.length
+    ? `실시간 데이터 · 최근 확인 ${new Date().toLocaleString("ko-KR", { timeZone: "Asia/Seoul" })}`
+    : `데이터 갱신일시: ${payload.generatedAt || "-"}`;
   renderContracts();
+}
+
+async function loadContracts() {
+  await refreshContracts();
+  bindContracts();
+  window.setInterval(refreshContracts, 10 * 60 * 1000);
 }
 
 function bindContracts() {
