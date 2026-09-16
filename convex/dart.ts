@@ -1860,6 +1860,41 @@ export const pollContractReportsInternal = internalAction({
   },
 });
 
+export const backfillContractDailyReportItems = action({
+  args: {
+    reportDate: v.union(v.string(), v.number()),
+    limit: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    const apiKey = env("DART_API_KEY");
+    const reportDate = String(args.reportDate).replace(/\D/g, "").slice(0, 8);
+    const reports = await listContractReports(apiKey, reportDate);
+    const candidates = uniqueContractRows(reports.map((item) => ({
+      receiptNo: item.rcept_no ?? "",
+      receiptDate: item.rcept_dt ?? reportDate,
+      corpCode: item.corp_code ?? "",
+      stockCode: item.stock_code ?? "",
+      corpName: item.corp_name ?? "",
+      market: marketName(item.corp_cls),
+      reportName: item.report_nm ?? "",
+      url: `https://dart.fss.or.kr/dsaf001/main.do?rcpNo=${item.rcept_no ?? ""}`,
+      correction: /기재정정|정정/.test(item.report_nm ?? ""),
+    })).filter((item) => item.receiptNo && item.corpCode && item.stockCode) as ContractAlertRow[]);
+    const rows = uniqueContractRows((await Promise.all(
+      candidates.slice(0, args.limit ?? 100).map((row) => enrichContract(apiKey, row)),
+    )) as ContractAlertRow[]).filter((row) => row.amount !== undefined || row.salesRatio !== undefined);
+    if (rows.length > 0) {
+      await ctx.runMutation(internal.dart.upsertContractDailyReportItems, { reportDate, rows });
+    }
+    return {
+      reportDate,
+      found: reports.length,
+      upserted: rows.length,
+      counterparties: rows.filter((row) => row.counterparty).length,
+    };
+  },
+});
+
 export const upsertContractDailyReportItems = internalMutation({
   args: {
     reportDate: v.string(),
