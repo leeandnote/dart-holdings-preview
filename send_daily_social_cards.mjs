@@ -833,7 +833,7 @@ async function postThreadsCarousel(cards) {
 
 async function waitForThreadsContainer(containerId) {
   const { accessToken } = await loadMetaConfig();
-  for (let attempt = 1; attempt <= 20; attempt += 1) {
+  for (let attempt = 1; attempt <= 60; attempt += 1) {
     const url = new URL(`https://graph.threads.net/v1.0/${containerId}`);
     url.searchParams.set("fields", "status,error_message");
     url.searchParams.set("access_token", accessToken);
@@ -898,7 +898,7 @@ async function waitForInstagramContainer(containerId) {
     if (["ERROR", "EXPIRED"].includes(body.status_code)) {
       throw new Error(`Instagram media processing failed: ${body.status || body.status_code}`);
     }
-    if (attempt === 20) throw new Error(`Instagram media processing timed out: ${body.status_code || response.status}`);
+    if (attempt === 60) throw new Error(`Instagram media processing timed out: ${body.status_code || response.status}`);
     await new Promise((resolve) => setTimeout(resolve, 3000));
   }
 }
