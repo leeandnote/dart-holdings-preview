@@ -25,7 +25,7 @@ const state = {
 
 const number = new Intl.NumberFormat("ko-KR", { maximumFractionDigits: 2, minimumFractionDigits: 2 });
 const canUseApi = window.location.protocol !== "file:";
-const CONVEX_URL = "https://gregarious-lemming-92.convex.cloud";
+const CONVEX_URL = "https://quiet-cardinal-118.convex.cloud";
 const holdingsKind = document.body?.dataset?.holdingsKind || "major";
 let columnFilterTimer = null;
 let composingColumnFilter = false;
