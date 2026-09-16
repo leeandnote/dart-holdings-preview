@@ -88,7 +88,11 @@ async function handleScheduled(controller, env) {
   const reportDate = kstReportDate(controller.scheduledTime);
   if (controller.cron === PRIMARY_CRON) return dispatchPublish(env, reportDate);
   if (controller.cron === BACKUP_CRON) return backupPublish(env, controller.scheduledTime, reportDate);
-  if (INTRADAY_CRONS.includes(controller.cron)) return dispatchIntraday(env);
+  // Convex owns intraday DART polling and Telegram deduplication. Keep these
+  // scheduled events as no-ops so the legacy GitHub workflow cannot duplicate alerts.
+  if (INTRADAY_CRONS.includes(controller.cron)) {
+    return { action: "intraday-handled-by-convex", reportDate };
+  }
   return { action: "ignored", cron: controller.cron, reportDate };
 }
 
