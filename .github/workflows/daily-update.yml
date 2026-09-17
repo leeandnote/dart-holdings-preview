@@ -51,7 +51,7 @@ jobs:
               }
             }
           }
-          ./daily_update.ps1 -ApiKey $env:DART_API_KEY -RefreshLookbackDays 0 -ObligationMaxRows 80 -PriceRecentDays 7 -PriceSleepMs 120
+          ./daily_update.ps1 -ApiKey $env:DART_API_KEY -RefreshLookbackDays 0 -ObligationMaxRows 80 -PriceRecentDays 7 -PriceSleepMs 120 -RefreshDisclosureSignals
           if (Test-Path "site/data/prices.json") {
             Remove-Item "site/data/prices.json" -Force
           }

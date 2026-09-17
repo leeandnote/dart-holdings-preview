@@ -6,7 +6,7 @@ import vm from "node:vm";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)));
 const siteDataDir = path.join(root, "site", "data");
 const reportDir = path.join(root, "site", "reports");
-const convexUrl = "https://gregarious-lemming-92.convex.cloud";
+const convexUrl = "https://quiet-cardinal-118.convex.cloud";
 fs.mkdirSync(reportDir, { recursive: true });
 
 function loadWindowScript(file, globals = {}) {
@@ -174,6 +174,11 @@ const priceChunks = loadPriceChunks(allTargetCodes);
 
 const liveRecentReceiptDate5 = await getLiveRecentReceiptDate5(todayKst);
 const dartMajorDbGapReport = await getDartMajorDbGaps(todayKst).catch((error) => ({ checks: [], gaps: [{ reportDate: todayKst, sourceCount: 0, dbCount: 0, level: "warn", error: error.message }] }));
+const liveContracts = await convexQuery("dart:listContractDailyReportItemsRange", {
+  bgnDe: offsetYmd(todayKst, -7),
+  endDe: todayKst,
+  limit: 1000,
+}).catch(() => []);
 const issues = [];
 if (liveRecentReceiptDate5 && recentReceiptDate5 !== liveRecentReceiptDate5) addIssue(issues, "error", "5%보고 정적 백업 미동기화", `Convex 최신 접수일은 ${displayDate(liveRecentReceiptDate5)}이나 정적 백업 최신 접수일은 ${displayDate(recentReceiptDate5)}입니다.`);
 const contractRows = (Array.isArray(disclosureSignals.rows) ? disclosureSignals.rows : []).filter((row) => row["공시유형"] === "단일판매·공급계약");
@@ -183,6 +188,16 @@ const invalidContracts = recentContracts.filter((row) => !isFiniteNumber(row["�
 const parseFailures = Number(disclosureSignals.parseFailures || 0);
 const excludedIncompleteContracts = Number(disclosureSignals.excludedIncompleteContracts || 0);
 const parseSuccesses = Number(disclosureSignals.parseSuccesses ?? (Number(disclosureSignals.parsedDocuments || 0) - parseFailures));
+const liveContractDate = maxDate(liveContracts.map((row) => row.reportDate));
+const latestLiveContracts = liveContracts.filter((row) => normalizeDate(row.reportDate) === liveContractDate);
+const liveMissingAmounts = latestLiveContracts.filter((row) => !isFiniteNumber(row.amount) || row.amount <= 0);
+const liveBadCounterparties = latestLiveContracts.filter((row) => {
+  const value = String(row.counterparty ?? "").trim();
+  return !value || value.length < 2 || /^(의 지정업체|지정업체|상대방)$/.test(value);
+});
+if (liveMissingAmounts.length) addIssue(issues, "error", "운영 대형수주 계약금액 누락", `${displayDate(liveContractDate)} 운영 DB 계약 ${latestLiveContracts.length}건 중 ${liveMissingAmounts.length}건의 계약금액이 누락되었습니다.`, liveMissingAmounts.map((row) => `${row.corpName} ${row.receiptNo}`));
+if (liveBadCounterparties.length) addIssue(issues, "warn", "운영 대형수주 계약상대방 파싱 이상", `${displayDate(liveContractDate)} 운영 DB 계약 ${latestLiveContracts.length}건 중 ${liveBadCounterparties.length}건의 계약상대방 값이 비어 있거나 비정상입니다.`, liveBadCounterparties.map((row) => `${row.corpName} ${row.receiptNo}: ${row.counterparty ?? "N/A"}`));
+if (liveContractDate && recentContractDate !== liveContractDate) addIssue(issues, "error", "대형수주 정적 백업 미동기화", `Convex 최신 접수일은 ${displayDate(liveContractDate)}이나 정적 백업 최신 접수일은 ${displayDate(recentContractDate)}입니다.`);
 if (Number(disclosureSignals.totalCandidates || 0) > 0 && parseSuccesses <= 0) addIssue(issues, "error", "대형수주 원문 파싱 전부 실패", `${disclosureSignals.totalCandidates}개 후보가 있으나 원문 파싱 성공 건수가 0입니다. 불완전한 계약 데이터의 배포를 중단합니다.`);
 if (recentContracts.length && invalidContracts.length) addIssue(issues, "error", "최신 대형수주 핵심 데이터 누락", `${displayDate(recentContractDate)} 계약 ${recentContracts.length}건 중 ${invalidContracts.length}건에서 계약금액 또는 매출대비비율이 누락되었습니다.`, invalidContracts.map((row) => `${row["종목명"]} ${row["접수번호"] || ""}`));
 if (excludedIncompleteContracts > 0) addIssue(issues, "warn", "검증 불완전 계약 제외", `${excludedIncompleteContracts}건의 계약 정정 공시는 계약금액 또는 매출대비비율을 확정하지 못해 사이트와 소셜 카드에서 제외했습니다.`);
