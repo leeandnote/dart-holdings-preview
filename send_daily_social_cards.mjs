@@ -913,20 +913,29 @@ async function waitForThreadsContainer(containerId) {
     if (body.status === "ERROR" || body.status === "EXPIRED") {
       throw new Error(`Threads media processing failed: ${body.error_message || body.status}`);
     }
-    if (attempt === 20) throw new Error(`Threads media processing timed out: ${body.status || response.status}`);
+    if (attempt === 60) throw new Error(`Threads media processing timed out: ${body.status || response.status}`);
     await new Promise((resolve) => setTimeout(resolve, 3000));
   }
 }
 
 async function postThreadsVideo(videoUrl, cards, caption) {
-  const containerId = await threadsFetch("/me/threads", {
-    media_type: "VIDEO",
-    video_url: videoUrl,
-    text: caption.slice(0, 500),
-  });
-  await waitForThreadsContainer(containerId);
-  const postId = await publishThreadsContainer(containerId);
-  return { postId, mediaType: "VIDEO" };
+  for (let attempt = 1; attempt <= 3; attempt += 1) {
+    try {
+      const containerId = await threadsFetch("/me/threads", {
+        media_type: "VIDEO",
+        video_url: videoUrl,
+        text: caption.slice(0, 500),
+      });
+      await waitForThreadsContainer(containerId);
+      const postId = await publishThreadsContainer(containerId);
+      return { postId, mediaType: "VIDEO" };
+    } catch (error) {
+      const message = String(error?.message || error);
+      if (!message.includes("Threads media processing failed: UNKNOWN") || attempt === 3) throw error;
+      await new Promise((resolve) => setTimeout(resolve, attempt * 15000));
+    }
+  }
+  throw new Error("Threads video retry loop ended unexpectedly.");
 }
 
 async function publishThreadsContainer(containerId) {
