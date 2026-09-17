@@ -1,0 +1,56 @@
+name: Daily Lee&Note publish fallback
+
+on:
+  schedule:
+    # 20:40 KST on weekdays. Cloudflare remains the primary 20:10 scheduler.
+    - cron: "40 11 * * 1-5"
+  workflow_dispatch:
+
+permissions:
+  actions: write
+  contents: read
+
+jobs:
+  dispatch-if-missing:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dispatch only when today's publish is missing
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          $kstNow = [DateTimeOffset]::UtcNow.ToOffset([TimeSpan]::FromHours(9))
+          $reportDate = $kstNow.ToString("yyyyMMdd")
+          $todayStartUtc = [DateTimeOffset]::new($kstNow.Date, [TimeSpan]::FromHours(9)).ToUniversalTime()
+          $headers = @{
+            Authorization = "Bearer $env:GH_TOKEN"
+            Accept = "application/vnd.github+json"
+            "X-GitHub-Api-Version" = "2022-11-28"
+            "User-Agent" = "leeandnote-github-fallback"
+          }
+          $runsUrl = "https://api.github.com/repos/$env:REPOSITORY/actions/workflows/daily-publish.yml/runs?event=workflow_dispatch&branch=main&per_page=30"
+          $runs = (Invoke-RestMethod -Uri $runsUrl -Headers $headers).workflow_runs
+          $recent = $runs | Where-Object {
+            [DateTimeOffset]::Parse($_.created_at) -ge $todayStartUtc -and
+            ($_.status -in @("queued", "in_progress") -or $_.conclusion -eq "success")
+          } | Select-Object -First 1
+          if ($recent) {
+            Write-Host "Publish already active/successful for $reportDate (run $($recent.id)); fallback skipped."
+            exit 0
+          }
+          $dispatchUrl = "https://api.github.com/repos/$env:REPOSITORY/actions/workflows/daily-publish.yml/dispatches"
+          $body = @{
+            ref = "main"
+            inputs = @{
+              report_date = $reportDate
+              send_telegram = "true"
+              post_x = "true"
+              post_threads = "true"
+              post_instagram = "true"
+              post_youtube = "true"
+              render_youtube_only = "false"
+            }
+          } | ConvertTo-Json -Depth 5
+          Invoke-RestMethod -Uri $dispatchUrl -Method Post -Headers $headers -ContentType "application/json" -Body $body
+          Write-Host "Fallback dispatched daily-publish.yml for $reportDate."
