@@ -190,7 +190,15 @@ if (-not $FullRefresh -and $ObligationMaxRows -gt 0) {
 
 if ($RefreshDisclosureSignals -or $FullRefresh) {
   Write-Host "DART earnings and contract disclosure signals: $DisclosureBgnDe ~ $EndDe"
-  & (Join-Path $root "disclosure_signals.ps1") -BgnDe $DisclosureBgnDe -EndDe $EndDe -ApiKey $ApiKey -MaxSearchPages 20 -MaxCandidates 120 -MaxDocuments 25
+  try {
+    & (Join-Path $root "disclosure_signals.ps1") -BgnDe $DisclosureBgnDe -EndDe $EndDe -ApiKey $ApiKey -MaxSearchPages 20 -MaxCandidates 120 -MaxDocuments 25
+  } catch {
+    Write-Warning "DART disclosure signal refresh failed; rebuilding contract fallback from production Convex: $($_.Exception.Message)"
+    $nodeCommand = Get-Command node -ErrorAction SilentlyContinue
+    if (-not $nodeCommand) { throw }
+    & $nodeCommand.Source (Join-Path $root "sync_convex_contracts_static.mjs")
+    if ($LASTEXITCODE -ne 0) { throw "Convex contract fallback failed with exit code $LASTEXITCODE" }
+  }
 } else {
   Write-Host "Skipping disclosure signal refresh for fast daily update."
 }
