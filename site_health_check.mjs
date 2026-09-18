@@ -184,7 +184,8 @@ if (liveRecentReceiptDate5 && recentReceiptDate5 !== liveRecentReceiptDate5) add
 const contractRows = (Array.isArray(disclosureSignals.rows) ? disclosureSignals.rows : []).filter((row) => row["공시유형"] === "단일판매·공급계약");
 const recentContractDate = maxDate(contractRows.map((row) => row["접수일"]));
 const recentContracts = contractRows.filter((row) => normalizeDate(row["접수일"]) === recentContractDate);
-const invalidContracts = recentContracts.filter((row) => !isFiniteNumber(row["계약금액"]) || row["계약금액"] <= 0 || !isFiniteNumber(row["매출대비비율"]) || row["매출대비비율"] < 0);
+const missingContractAmounts = recentContracts.filter((row) => !isFiniteNumber(row["계약금액"]) || row["계약금액"] <= 0);
+const missingContractRatios = recentContracts.filter((row) => !isFiniteNumber(row["매출대비비율"]) || row["매출대비비율"] < 0);
 const parseFailures = Number(disclosureSignals.parseFailures || 0);
 const excludedIncompleteContracts = Number(disclosureSignals.excludedIncompleteContracts || 0);
 const parseSuccesses = Number(disclosureSignals.parseSuccesses ?? (Number(disclosureSignals.parsedDocuments || 0) - parseFailures));
@@ -199,7 +200,8 @@ if (liveMissingAmounts.length) addIssue(issues, "error", "운영 대형수주 �
 if (liveBadCounterparties.length) addIssue(issues, "warn", "운영 대형수주 계약상대방 파싱 이상", `${displayDate(liveContractDate)} 운영 DB 계약 ${latestLiveContracts.length}건 중 ${liveBadCounterparties.length}건의 계약상대방 값이 비어 있거나 비정상입니다.`, liveBadCounterparties.map((row) => `${row.corpName} ${row.receiptNo}: ${row.counterparty ?? "N/A"}`));
 if (liveContractDate && recentContractDate !== liveContractDate) addIssue(issues, "error", "대형수주 정적 백업 미동기화", `Convex 최신 접수일은 ${displayDate(liveContractDate)}이나 정적 백업 최신 접수일은 ${displayDate(recentContractDate)}입니다.`);
 if (Number(disclosureSignals.totalCandidates || 0) > 0 && parseSuccesses <= 0) addIssue(issues, "error", "대형수주 원문 파싱 전부 실패", `${disclosureSignals.totalCandidates}개 후보가 있으나 원문 파싱 성공 건수가 0입니다. 불완전한 계약 데이터의 배포를 중단합니다.`);
-if (recentContracts.length && invalidContracts.length) addIssue(issues, "error", "최신 대형수주 핵심 데이터 누락", `${displayDate(recentContractDate)} 계약 ${recentContracts.length}건 중 ${invalidContracts.length}건에서 계약금액 또는 매출대비비율이 누락되었습니다.`, invalidContracts.map((row) => `${row["종목명"]} ${row["접수번호"] || ""}`));
+if (missingContractAmounts.length) addIssue(issues, "error", "최신 대형수주 계약금액 누락", `${displayDate(recentContractDate)} 계약 ${recentContracts.length}건 중 ${missingContractAmounts.length}건에서 계약금액이 누락되었습니다.`, missingContractAmounts.map((row) => `${row["종목명"]} ${row["접수번호"] || ""}`));
+if (missingContractRatios.length) addIssue(issues, "warn", "최신 대형수주 매출대비비율 확인 필요", `${displayDate(recentContractDate)} 계약 ${recentContracts.length}건 중 ${missingContractRatios.length}건은 원문에서 매출대비비율을 확정하지 못했습니다.`, missingContractRatios.map((row) => `${row["종목명"]} ${row["접수번호"] || ""}`));
 if (excludedIncompleteContracts > 0) addIssue(issues, "warn", "검증 불완전 계약 제외", `${excludedIncompleteContracts}건의 계약 정정 공시는 계약금액 또는 매출대비비율을 확정하지 못해 사이트와 소셜 카드에서 제외했습니다.`);
 function daysBetweenYmd(a, b) {
   const aa = normalizeDate(a);
@@ -296,7 +298,8 @@ const summary = {
     errors: issues.filter((i) => i.level === "error").length,
     warnings: issues.filter((i) => i.level === "warn").length,
     contractsLatest: recentContracts.length,
-    contractsInvalid: invalidContracts.length,
+    contractsMissingAmount: missingContractAmounts.length,
+    contractsMissingRatio: missingContractRatios.length,
     contractParseFailures: parseFailures,
     excludedIncompleteContracts,
   },
