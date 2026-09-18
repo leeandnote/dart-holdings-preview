@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 
 const root = path.dirname(fileURLToPath(import.meta.url));
 const dataDir = path.join(root, "site", "data");
-const convexUrl = "https://gregarious-lemming-92.convex.cloud";
+const convexUrl = "https://quiet-cardinal-118.convex.cloud";
 const now = new Date();
 const kst = new Date(now.getTime() + 9 * 60 * 60 * 1000);
 const endDe = kst.toISOString().slice(0, 10).replaceAll("-", "");

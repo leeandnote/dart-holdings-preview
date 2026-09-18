@@ -93,6 +93,11 @@ Invoke-Step "2b. Re-sync Convex holdings after contract refresh" {
   if ($LASTEXITCODE -ne 0) { throw "Post-contract holdings fallback sync failed" }
 }
 
+Invoke-Step "2c. Repair price gaps for newly synchronized holdings" {
+  & $node (Join-Path $root "repair_convex_price_gaps.mjs") --days $PriceDays
+  if ($LASTEXITCODE -ne 0) { throw "Post-sync price gap repair failed" }
+}
+
 Invoke-Step "3. Generate daily blog pages with backfill" {
   $targetDate = [datetime]::ParseExact($ReportDate, "yyyyMMdd", $null)
   for ($i = 0; $i -lt $BackfillDays; $i++) {

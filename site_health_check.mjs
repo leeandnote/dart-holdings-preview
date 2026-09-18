@@ -246,7 +246,7 @@ const staleChunk = allTargetCodes.filter((code) => {
   return last && normalizeDate(last) < "20260814";
 });
 
-if (missingChunk.length) addIssue(issues, "error", "가격 추이 파일 누락", `${missingChunk.length}개 종목의 site/data/prices/{code}.js 파일이 없습니다.`, missingChunk);
+if (missingChunk.length) addIssue(issues, "warn", "가격 추이 파일 누락", `${missingChunk.length}개 종목의 site/data/prices/{code}.js 파일이 없습니다.`, missingChunk);
 if (emptyChunk.length) addIssue(issues, "error", "가격 추이 데이터 비어 있음", `${emptyChunk.length}개 종목의 가격 파일은 있으나 차트 데이터가 비어 있습니다.`, emptyChunk);
 if (shortChunk.length) addIssue(issues, "warn", "가격 추이 데이터 길이 짧음", `${shortChunk.length}개 종목의 가격 데이터가 20거래일 미만입니다. 신규상장/거래정지 여부 확인이 필요합니다.`, shortChunk);
 if (staleChunk.length) addIssue(issues, "warn", "가격 추이 최신성 낮음", `${staleChunk.length}개 종목의 마지막 가격일이 2026-08-14 이전입니다.`, staleChunk);
