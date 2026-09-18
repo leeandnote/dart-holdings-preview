@@ -1,5 +1,5 @@
 window.__DISCLOSURE_SIGNALS__ = {
-  "generatedAt": "2026-09-18 10:31:53",
+  "generatedAt": "2026-09-18 10:40:49",
   "scope": "KOSPI/KOSDAQ 실적·계약 공시",
   "bgnDe": "20260322",
   "endDe": "20260918",
