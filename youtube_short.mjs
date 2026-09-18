@@ -95,7 +95,7 @@ async function verifyYouTubeChannel(accessToken) {
 export async function uploadYouTubeShort({ file, title, description, tags = [] }) {
   const accessToken = await youtubeAccessToken();
   const channel = await verifyYouTubeChannel(accessToken);
-  const privacyStatus = String(process.env.YOUTUBE_PRIVACY_STATUS || "private").toLowerCase();
+  const privacyStatus = String(process.env.YOUTUBE_PRIVACY_STATUS || "public").toLowerCase();
   if (!["private", "unlisted", "public"].includes(privacyStatus)) {
     throw new Error(`Invalid YOUTUBE_PRIVACY_STATUS: ${privacyStatus}`);
   }
