@@ -149,6 +149,7 @@ export default defineSchema({
     content: v.optional(v.string()),
     startDate: v.optional(v.string()),
     endDate: v.optional(v.string()),
+    periodText: v.optional(v.string()),
     correction: v.boolean(),
     url: v.string(),
     createdAt: v.number(),

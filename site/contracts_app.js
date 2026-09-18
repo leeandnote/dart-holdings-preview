@@ -182,7 +182,7 @@ function convexContractToSignal(row) {
     "계약내용": row.content,
     "계약시작일": row.startDate,
     "계약종료일": row.endDate,
-    "계약기간": [row.startDate, row.endDate].filter(Boolean).join(" ~ "),
+    "계약기간": row.periodText || [row.startDate, row.endDate].filter(Boolean).join(" ~ "),
     DART_URL: row.url,
   };
 }

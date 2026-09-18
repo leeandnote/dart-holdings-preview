@@ -100,6 +100,7 @@ type ContractAlertRow = {
   content?: string;
   startDate?: string;
   endDate?: string;
+  periodText?: string;
   correction?: boolean;
 };
 
@@ -1058,18 +1059,46 @@ function contractNumberAfterLabels(text: string, labels: string[]): number | und
 
 function contractDateAfter(text: string, label: string): string | undefined {
   const plain = plainTextWithCellSpaces(text);
-  const pattern = new RegExp(`${label}\\s*([0-9]{4}[-.][0-9]{2}[-.][0-9]{2})`);
-  return cleanContractValue(plain.match(pattern)?.[1]);
+  const pattern = new RegExp(`${label}\\s*([0-9]{4}[-.][0-9]{2}[-.][0-9]{2})`, "g");
+  const matches = [...plain.matchAll(pattern)];
+  return cleanContractValue(matches[matches.length - 1]?.[1]);
 }
 
+function contractRelativePeriod(text: string): string | undefined {
+  const plain = plainTextWithCellSpaces(text);
+  const patterns = [
+    /(?:계약기간은?\s*)?((?:실)?착공(?:예정)?일?(?:로)?부터\s*\d+\s*(?:개월|일))/g,
+    /(?:계약기간은?\s*)?(착공\s*후\s*\d+\s*(?:개월|일))/g,
+    /(?:계약기간은?\s*)?([A-Za-z가-힣]+일로부터\s*\d+\s*(?:개월|일))/g,
+  ];
+  const candidates = patterns.flatMap((pattern) => [...plain.matchAll(pattern)].map((match) => match[1]));
+  return cleanContractValue(candidates[candidates.length - 1]);
+}
+
+function latestContractRowValue(rows: string[][], label: string): string | undefined {
+  const normalizedLabel = normalizeText(label);
+  for (const cells of [...rows].reverse()) {
+    const index = cells.findIndex((cell) => normalizeText(cell).includes(normalizedLabel));
+    if (index < 0) continue;
+    for (const cell of cells.slice(index + 1)) {
+      const value = cleanSummaryValue(cell);
+      if (value) return value;
+    }
+  }
+  return undefined;
+}
 
 function contractTableValue(rows: string[][], labels: string[]): string | undefined {
   const normalizedLabels = labels.map((label) => normalizeText(label));
-  for (let rowIndex = 0; rowIndex < rows.length; rowIndex += 1) {
+  for (let rowIndex = rows.length - 1; rowIndex >= 0; rowIndex -= 1) {
     const cells = rows[rowIndex];
     const cellIndex = cells.findIndex((cell) => {
       const normalized = normalizeText(cell);
-      return normalizedLabels.some((label) => normalized.includes(label));
+      return normalizedLabels.some((label) =>
+        normalized === label ||
+        normalized.startsWith(`${label}(`) ||
+        normalized.startsWith(`${label}총액`),
+      );
     });
     if (cellIndex < 0) continue;
 
@@ -1119,15 +1148,16 @@ function extractContractInfo(text?: string): Partial<ContractAlertRow> {
     salesRatio = saneContractRatio(Math.round((amount / recentSales) * 1000) / 10);
   }
   const counterparty = normalizeContractCounterparty(
-    extractRowValue(rows, "계약상대방") ??
+    latestContractRowValue(rows, "계약상대방") ?? latestContractRowValue(rows, "계약상대") ??
       contractTextBetween(text, ["계약상대방", "계약상대"], ["- 최근", "- 주요사업", "- 회사와", "판매ㆍ공급지역", "판매·공급지역", "계약기간"], 260),
   );
   const content =
-    cleanContractValue(extractRowValue(rows, "판매ㆍ공급계약 내용")) ??
-    cleanContractValue(extractRowValue(rows, "판매·공급계약 내용")) ??
+    cleanContractValue(latestContractRowValue(rows, "판매ㆍ공급계약 내용")) ??
+    cleanContractValue(latestContractRowValue(rows, "판매·공급계약 내용")) ??
     contractTextBetween(text, ["판매ㆍ공급계약 내용", "판매·공급계약 내용", "체결계약명", "계약명"], ["2. 계약내역", "2. 계약 내용", "계약내역", "계약금액", "조건부 계약여부"], 360);
   const startDate = contractDateAfter(text, "시작일") ?? contractDateAfter(text, "계약기간\\s*시작일");
   const endDate = contractDateAfter(text, "종료일");
+  const periodText = !startDate && !endDate ? contractRelativePeriod(text) : undefined;
   return {
     amount,
     salesRatio,
@@ -1135,6 +1165,7 @@ function extractContractInfo(text?: string): Partial<ContractAlertRow> {
     content,
     startDate,
     endDate,
+    periodText,
   };
 }
 
@@ -1174,7 +1205,7 @@ function buildContractMessage(rows: ContractAlertRow[], _reportDate: string): st
     lines.push(`<b>계약금액:</b> ${escapeHtml(formatContractEok(row.amount))}`);
     lines.push(`<b>매출액 대비:</b> ${escapeHtml(formatContractRatio(row.salesRatio))}`);
     lines.push(`<b>계약상대방:</b> ${escapeHtml(row.counterparty || "영업비밀 보호 비공개")}`);
-    lines.push(`<b>계약기간:</b> ${escapeHtml(`${formatDate(row.startDate)} ~ ${formatDate(row.endDate)}`)}`);
+    lines.push(`<b>계약기간:</b> ${escapeHtml(row.periodText || `${formatDate(row.startDate)} ~ ${formatDate(row.endDate)}`)}`);
     lines.push(`<b>내용:</b> ${escapeHtml(row.content || row.reportName)}`);
     lines.push(`${escapeHtml(row.stockCode)} · ${escapeHtml(row.market)} · <a href="${row.url}">원문 보기</a>`);
     lines.push("");
@@ -1926,6 +1957,7 @@ export const upsertContractDailyReportItems = internalMutation({
       content: v.optional(v.string()),
       startDate: v.optional(v.string()),
       endDate: v.optional(v.string()),
+      periodText: v.optional(v.string()),
       correction: v.optional(v.boolean()),
     })),
   },
@@ -1950,6 +1982,7 @@ export const upsertContractDailyReportItems = internalMutation({
         content: row.content,
         startDate: row.startDate,
         endDate: row.endDate,
+        periodText: row.periodText,
         correction: row.correction ?? false,
         url: row.url,
       };

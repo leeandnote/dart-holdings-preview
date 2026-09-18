@@ -57,7 +57,7 @@ const contractRows = contracts.map((row) => ({
     : null,
   "매출대비비율": row.salesRatio ?? null,
   "계약상대방": row.counterparty ?? "",
-  "계약기간": [row.startDate, row.endDate].filter(Boolean).join(" ~ "),
+  "계약기간": row.periodText || [row.startDate, row.endDate].filter(Boolean).join(" ~ "),
   "계약시작일": row.startDate ?? "",
   "계약종료일": row.endDate ?? "",
   "계약내용": row.content ?? "",
