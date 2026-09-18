@@ -88,6 +88,11 @@ Invoke-Step "2. Refresh contract disclosure signals" {
   }
 }
 
+Invoke-Step "2b. Re-sync Convex holdings after contract refresh" {
+  & $node (Join-Path $root "sync_convex_holdings_fallback.mjs")
+  if ($LASTEXITCODE -ne 0) { throw "Post-contract holdings fallback sync failed" }
+}
+
 Invoke-Step "3. Generate daily blog pages with backfill" {
   $targetDate = [datetime]::ParseExact($ReportDate, "yyyyMMdd", $null)
   for ($i = 0; $i -lt $BackfillDays; $i++) {
