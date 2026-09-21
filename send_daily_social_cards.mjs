@@ -534,6 +534,7 @@ async function sendMediaGroup(cards, caption) {
   const response = await fetch(`https://api.telegram.org/bot${token}/sendMediaGroup`, { method: "POST", body: form });
   const body = await response.json();
   if (!response.ok || !body.ok) throw new Error(body.description || `Telegram sendMediaGroup HTTP ${response.status}`);
+  return body.result.map(({ message_id: messageId }) => messageId);
 }
 
 async function xFetch(pathname, options = {}, retry = true) {
@@ -977,7 +978,7 @@ async function waitForInstagramContainer(containerId) {
     if (["ERROR", "EXPIRED"].includes(body.status_code)) {
       throw new Error(`Instagram media processing failed: ${body.status || body.status_code}`);
     }
-    if (attempt === 60) throw new Error(`Instagram media processing timed out: ${body.status_code || response.status}`);
+    if (attempt === 20) throw new Error(`Instagram media processing timed out: ${body.status_code || response.status}`);
     await new Promise((resolve) => setTimeout(resolve, 3000));
   }
 }
@@ -1034,7 +1035,16 @@ async function postInstagramReel(videoUrl, cards, caption) {
     share_to_feed: "true",
   });
   await waitForInstagramContainer(containerId);
-  const postId = await instagramFetch(`/${userId}/media_publish`, { creation_id: containerId });
+  let postId;
+  for (let attempt = 1; attempt <= 6; attempt += 1) {
+    try {
+      postId = await instagramFetch(`/${userId}/media_publish`, { creation_id: containerId });
+      break;
+    } catch (error) {
+      if (!String(error?.message || error).includes("Media ID is not available") || attempt === 6) throw error;
+      await new Promise((resolve) => setTimeout(resolve, attempt * 10000));
+    }
+  }
   return { postId, mediaType: "REELS" };
 }
 
@@ -1096,8 +1106,12 @@ async function main() {
     const targetCards = onlyKinds ? cards.filter((card) => onlyKinds.has(card.kind)) : cards;
     validateCompleteBundle(targetCards);
     const commentary = buildDailyCommentary({ fiveRows, executiveRows: executiveModels, contractRows });
-    if (!dryRun && !skipTelegram && !xOnly && !threadsOnly && !instagramOnly && !youtubeOnly) await sendMediaGroup(targetCards, commentary.full);
+    if (!dryRun && !skipTelegram && !xOnly && !threadsOnly && !instagramOnly && !youtubeOnly) {
+      const messageIds = await sendMediaGroup(targetCards, commentary.full);
+      console.log(JSON.stringify({ channel: "telegram", messageIds }));
+    }
     const xPosts = postX && !dryRun ? await postXThread(targetCards, commentary.compact) : [];
+    if (xPosts.length) console.log(JSON.stringify({ channel: "x", posts: xPosts }));
     const needsVideo = postThreads || postInstagram || postYouTube;
     let youtubePost = null;
     let socialVideo = null;
@@ -1109,8 +1123,14 @@ async function main() {
     }
     if (!dryRun && (postThreads || postInstagram)) {
       await withPublicSocialVideo(socialVideo, async (videoUrl) => {
-        if (postThreads) threadsPost = await postThreadsVideo(videoUrl, targetCards, commentary.full);
-        if (postInstagram) instagramPost = await postInstagramReel(videoUrl, targetCards, commentary.full);
+        if (postThreads) {
+          threadsPost = await postThreadsVideo(videoUrl, targetCards, commentary.full);
+          console.log(JSON.stringify({ channel: "threads", post: threadsPost }));
+        }
+        if (postInstagram) {
+          instagramPost = await postInstagramReel(videoUrl, targetCards, commentary.full);
+          console.log(JSON.stringify({ channel: "instagram", post: instagramPost }));
+        }
       });
     }
     if (postYouTube) {
@@ -1125,6 +1145,7 @@ async function main() {
           ].join("\n\n"),
           tags: [...commentary.tags, "5%보고", "임원보고", "대형수주", "Shorts"],
         });
+        console.log(JSON.stringify({ channel: "youtube", post: youtubePost }));
       }
     }
     console.log(JSON.stringify({
