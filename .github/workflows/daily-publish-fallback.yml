@@ -2,8 +2,10 @@ name: Daily Lee&Note publish fallback
 
 on:
   schedule:
-    # 20:40 KST on weekdays. Cloudflare remains the primary 20:10 scheduler.
+    # Retry checks after Cloudflare's 20:10 KST primary dispatch.
+    - cron: "20 11 * * 1-5"
     - cron: "40 11 * * 1-5"
+    - cron: "0,20 12 * * 1-5"
   workflow_dispatch:
 
 permissions:
