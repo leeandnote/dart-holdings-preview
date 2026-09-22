@@ -23,8 +23,10 @@ jobs:
           REPOSITORY: ${{ github.repository }}
         run: |
           $kstNow = [DateTimeOffset]::UtcNow.ToOffset([TimeSpan]::FromHours(9))
-          $reportDate = $kstNow.ToString("yyyyMMdd")
-          $todayStartUtc = [DateTimeOffset]::new($kstNow.Date, [TimeSpan]::FromHours(9)).ToUniversalTime()
+          # A delayed evening schedule can start after KST midnight.
+          $reportDay = if ($kstNow.Hour -lt 6) { $kstNow.AddDays(-1) } else { $kstNow }
+          $reportDate = $reportDay.ToString("yyyyMMdd")
+          $todayStartUtc = [DateTimeOffset]::new($reportDay.Date, [TimeSpan]::FromHours(9)).ToUniversalTime()
           $headers = @{
             Authorization = "Bearer $env:GH_TOKEN"
             Accept = "application/vnd.github+json"

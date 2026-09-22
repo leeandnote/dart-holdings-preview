@@ -1,0 +1,32 @@
+name: Audit Lee&Note publish scheduler
+
+on:
+  workflow_dispatch:
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    env:
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+    steps:
+      - name: Check deployed Worker triggers and GitHub secret binding
+        shell: pwsh
+        run: |
+          if (-not $env:CLOUDFLARE_ACCOUNT_ID -or -not $env:CLOUDFLARE_API_TOKEN) {
+            throw "Cloudflare account ID or API token is missing."
+          }
+          $base = "https://api.cloudflare.com/client/v4/accounts/$env:CLOUDFLARE_ACCOUNT_ID/workers/scripts/leeandnote-publish-scheduler"
+          $headers = @{ Authorization = "Bearer $env:CLOUDFLARE_API_TOKEN" }
+          $schedules = Invoke-RestMethod -Uri "$base/schedules" -Headers $headers
+          if (-not $schedules.success) { throw "Could not read deployed Worker schedules." }
+          $crons = @($schedules.result.schedules | ForEach-Object cron)
+          Write-Host "Deployed Cron triggers: $($crons -join ', ')"
+          foreach ($expected in @("10 11 * * *", "30 11 * * *")) {
+            if ($expected -notin $crons) { throw "Missing publish Cron trigger: $expected" }
+          }
+          $secrets = Invoke-RestMethod -Uri "$base/secrets" -Headers $headers
+          if (-not $secrets.success) { throw "Could not read Worker secret binding names." }
+          $names = @($secrets.result | ForEach-Object name)
+          Write-Host "GitHub token binding present: $($names -contains 'GITHUB_TOKEN')"
+          if ("GITHUB_TOKEN" -notin $names) { throw "Worker GITHUB_TOKEN binding is missing." }
