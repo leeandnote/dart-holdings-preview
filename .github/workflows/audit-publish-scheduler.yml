@@ -11,6 +11,8 @@ jobs:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
     steps:
       - name: Check deployed Worker triggers and GitHub secret binding
+        id: api
+        continue-on-error: true
         shell: pwsh
         run: |
           if (-not $env:CLOUDFLARE_ACCOUNT_ID -or -not $env:CLOUDFLARE_API_TOKEN) {
@@ -30,3 +32,16 @@ jobs:
           $names = @($secrets.result | ForEach-Object name)
           Write-Host "GitHub token binding present: $($names -contains 'GITHUB_TOKEN')"
           if ("GITHUB_TOKEN" -notin $names) { throw "Worker GITHUB_TOKEN binding is missing." }
+
+      - name: Check existing Wrangler login without API token
+        if: steps.api.outcome == 'failure'
+        shell: pwsh
+        env:
+          WRANGLER_CONFIG_TOML_B64: ${{ secrets.WRANGLER_CONFIG_TOML_B64 }}
+        run: |
+          if (-not $env:WRANGLER_CONFIG_TOML_B64) { throw "Saved Wrangler login is missing." }
+          $configPath = Join-Path $HOME ".config/.wrangler/config/default.toml"
+          New-Item -ItemType Directory -Path (Split-Path -Parent $configPath) -Force | Out-Null
+          [IO.File]::WriteAllBytes($configPath, [Convert]::FromBase64String($env:WRANGLER_CONFIG_TOML_B64))
+          Remove-Item Env:CLOUDFLARE_API_TOKEN -ErrorAction SilentlyContinue
+          npx --yes wrangler deployments list --config cloudflare-scheduler/wrangler.toml
