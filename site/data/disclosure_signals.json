@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-24 00:05:02",
+  "generatedAt": "2026-09-26 00:14:32",
   "scope": "KOSPI/KOSDAQ 실적·계약 공시",
-  "bgnDe": "20260327",
-  "endDe": "20260923",
+  "bgnDe": "20260329",
+  "endDe": "20260925",
   "totalCandidates": 185,
   "parsedDocuments": 185,
   "parseFailures": 0,

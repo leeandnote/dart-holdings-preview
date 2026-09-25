@@ -1,10 +1,10 @@
 window.__DART_DATA__ = {
-  "generatedAt": "2026-09-24 00:03:54",
-  "generatedAtUtc": "2026-09-23T15:03:54.1426608Z",
+  "generatedAt": "2026-09-26 00:13:46",
+  "generatedAtUtc": "2026-09-25T15:13:46.2298794Z",
   "scope": "KOSPI/KOSDAQ 최근 1년 전체",
   "query": [],
-  "bgnDe": "20250923",
-  "endDe": "20260923",
+  "bgnDe": "20250925",
+  "endDe": "20260925",
   "corps": [
     {
       "name": "3S",
