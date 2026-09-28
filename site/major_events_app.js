@@ -248,16 +248,16 @@ function renderMajorEventCuration() {
 
 function renderMajorMetric(row) {
   if (row.type === "contract") {
-    return `<div class="majorMetricBox contract"><strong>${Number.isFinite(row.amount) ? `▲ ${formatEok(row.amount)}` : row.status}</strong><em>${Number.isFinite(row.ratio) ? `매출 대비 ${row.ratio.toLocaleString("ko-KR", { maximumFractionDigits: 1 })}%` : "금액·비중 원문 확인"}</em></div>`;
+    return `<div class="majorMetricValue"><strong>${Number.isFinite(row.amount) ? formatEok(row.amount) : row.status}</strong><em>${Number.isFinite(row.ratio) ? `매출 대비 ${row.ratio.toLocaleString("ko-KR", { maximumFractionDigits: 1 })}%` : "금액·비중 원문 확인"}</em></div>`;
   }
   if (row.type === "clinical") {
-    return `<div class="majorMetricBox clinical">${row.clinicalStage ? `<span>${majorEventEscape(row.clinicalStage)}</span>` : ""}<strong>${majorEventEscape(row.status)}</strong><em>임상 진행 단계</em></div>`;
+    return `<div class="majorMetricValue"><strong>${majorEventEscape(row.clinicalStage ? `${row.clinicalStage} · ${row.status}` : row.status)}</strong><em>임상 진행 단계</em></div>`;
   }
   if (row.type === "milestone") {
     const main = row.amount ? `▲ 약 ${formatEok(row.amount)}` : (row.foreignAmount?.label || row.status);
-    return `<div class="majorMetricBox milestone"><strong>${majorEventEscape(main)}</strong><em>${majorEventEscape(row.foreignAmount?.label || "기술료·마일스톤")}</em></div>`;
+    return `<div class="majorMetricValue"><strong>${majorEventEscape(main.replace(/^▲\s*/u, ""))}</strong><em>${majorEventEscape(row.foreignAmount?.label || "기술료·마일스톤")}</em></div>`;
   }
-  return `<div class="majorMetricBox other"><strong>${majorEventEscape(row.status)}</strong><em>${majorEventEscape(typeMeta(row.type).label)}</em></div>`;
+  return `<div class="majorMetricValue"><strong>${majorEventEscape(row.status)}</strong><em>${majorEventEscape(typeMeta(row.type).label)}</em></div>`;
 }
 
 function renderPriceCell(row) {
