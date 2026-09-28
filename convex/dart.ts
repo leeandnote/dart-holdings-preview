@@ -104,6 +104,21 @@ type ContractAlertRow = {
   correction?: boolean;
 };
 
+type MajorEventAlertRow = {
+  receiptNo: string;
+  receiptDate: string;
+  corpCode: string;
+  stockCode: string;
+  corpName: string;
+  market: string;
+  reportName: string;
+  url: string;
+  eventTitle: string;
+  eventType: string;
+  detail: string;
+  metric: string;
+};
+
 type BuyTradeInfo = {
   unitPrice?: number;
   tradeValue?: number;
@@ -998,6 +1013,20 @@ async function listContractReports(apiKey: string, reportDate: string): Promise<
   });
 }
 
+async function listMajorEventReports(apiKey: string, reportDate: string): Promise<DartListItem[]> {
+  const reports = await listDisclosureReports(apiKey, reportDate);
+  const seen = new Set<string>();
+  return reports.filter((item) => {
+    const receiptNo = item.rcept_no ?? "";
+    const reportName = item.report_nm ?? "";
+    if (!receiptNo || seen.has(receiptNo)) return false;
+    if (item.corp_cls !== "Y" && item.corp_cls !== "K") return false;
+    if (!/투자판단\s*관련\s*주요경영사항/.test(reportName.replace(/[ㆍ·]/g, ""))) return false;
+    seen.add(receiptNo);
+    return true;
+  });
+}
+
 function uniqueContractRows(rows: ContractAlertRow[]): ContractAlertRow[] {
   const seen = new Set<string>();
   const unique: ContractAlertRow[] = [];
@@ -1188,6 +1217,111 @@ function formatContractEok(value?: number): string {
 
 function formatContractRatio(value?: number): string {
   return value === undefined || !Number.isFinite(value) ? "확인불가" : `${value.toLocaleString("ko-KR", { maximumFractionDigits: 1 })}%`;
+}
+
+function majorEventType(text: string): string {
+  if (/임상|IND|시험계획|품목허가/i.test(text)) return "임상시험·IND";
+  if (/기술수출|라이선스|마일스톤|단계별기술료/i.test(text)) return "기술수출";
+  if (/소송|중재|가처분|판결|청구/i.test(text)) return "소송";
+  if (/단일판매|공급계약|수주|낙찰|계약체결/i.test(text)) return "단일판매·수주";
+  return "기타 주요경영사항";
+}
+
+function cleanMajorEventText(value?: string, maxLength = 180): string | undefined {
+  const cleaned = cleanContractValue(value)
+    ?.replace(/^\(?정정\)?\s*/i, "")
+    .replace(/^투자판단\s*관련\s*주요경영사항\s*/i, "")
+    .replace(/^[:：\-\/()\s]+/, "")
+    .replace(/\s+/g, " ")
+    .trim();
+  if (!cleaned) return undefined;
+  return cleaned.length > maxLength ? `${cleaned.slice(0, maxLength - 1).trim()}…` : cleaned;
+}
+
+function majorEventTitle(reportName: string, rows: string[][]): string {
+  const parenthetical = [...reportName.matchAll(/\(([^()]*)\)/g)]
+    .map((match) => cleanMajorEventText(match[1], 90))
+    .filter((value): value is string => Boolean(value && !/정정/.test(value)));
+  return cleanMajorEventText(
+    parenthetical[parenthetical.length - 1] ??
+      contractTableValue(rows, ["제목", "주요경영사항", "주요 내용", "주요내용"]) ??
+      reportName,
+    90,
+  ) ?? "주요경영사항 공시";
+}
+
+function majorEventMetric(type: string, text: string, rows: string[][]): string {
+  if (type === "단일판매·수주") {
+    const amount = saneContractAmount(contractNumberFromTable(rows, ["계약금액", "낙찰금액", "수주금액", "총 계약금액"]));
+    const ratio = saneContractRatio(contractNumberFromTable(rows, ["매출액대비", "매출액 대비", "최근매출액대비"]));
+    return [amount !== undefined ? formatContractEok(amount) : undefined, ratio !== undefined ? `매출비중 ${formatContractRatio(ratio)}` : undefined]
+      .filter(Boolean).join(" · ") || "원문 수치 확인";
+  }
+  if (type === "임상시험·IND") {
+    const plain = plainTextWithCellSpaces(text);
+    const stage = plain.match(/(?:미국|국내|한국|유럽|글로벌)?\s*(?:제\s*)?\d(?:\/\d[a-z]?)?\s*상/i)?.[0]?.replace(/\s+/g, " ");
+    const status = plain.match(/IND\s*(?:신청|승인)|임상시험계획\s*(?:신청|승인|변경승인)|품목허가\s*(?:신청|승인)/i)?.[0]?.replace(/\s+/g, " ");
+    return [stage, status].filter(Boolean).join(" · ") || "임상 진행단계 원문 확인";
+  }
+  if (type === "기술수출") {
+    const plain = plainTextWithCellSpaces(text);
+    const foreign = plain.match(/(?:USD|US\$|\$|EUR|€)\s*[\d,.]+\s*(?:M|million|백만)?/i)?.[0];
+    const amount = saneContractAmount(contractNumberFromTable(rows, ["수령금액", "계약금액", "마일스톤", "기술료"]));
+    return [amount !== undefined ? formatContractEok(amount) : undefined, foreign].filter(Boolean).join(" · ") || "수령액 원문 확인";
+  }
+  if (type === "소송") {
+    const amount = saneContractAmount(contractNumberFromTable(rows, ["청구금액", "소송가액", "소송금액"]));
+    return amount !== undefined ? formatContractEok(amount) : "소송 진행상황 원문 확인";
+  }
+  return cleanMajorEventText(contractTableValue(rows, ["핵심지표", "진행사항", "결정내용"]), 80) ?? "원문 확인";
+}
+
+function extractMajorEventInfo(text: string | undefined, reportName: string): Pick<MajorEventAlertRow, "eventTitle" | "eventType" | "detail" | "metric"> {
+  const source = text ?? reportName;
+  const rows = [...source.matchAll(/<TR\b[^>]*>.*?<\/TR>/gis)].map((match) => xmlCells(match[0]));
+  const eventTitle = majorEventTitle(reportName, rows);
+  const eventType = majorEventType(`${reportName} ${plainTextWithCellSpaces(source)}`);
+  const detail = cleanMajorEventText(
+    contractTableValue(rows, ["주요내용", "주요 내용", "계약상대방", "상대방", "적응증", "대상질환", "사업내용", "결정내용"]) ??
+      contractTextBetween(source, ["주요내용", "주요 내용"], ["기타 투자판단", "공시유보", "관련공시"], 260) ??
+      eventTitle,
+  ) ?? eventTitle;
+  return { eventTitle, eventType, detail, metric: majorEventMetric(eventType, source, rows) };
+}
+
+async function enrichMajorEvent(apiKey: string, item: DartListItem, reportDate: string): Promise<MajorEventAlertRow> {
+  const receiptNo = item.rcept_no ?? "";
+  const reportName = item.report_nm ?? "";
+  let documentText: string | undefined;
+  try {
+    documentText = await getDartDocumentText(apiKey, receiptNo);
+  } catch (error) {
+    console.warn(`Failed to enrich major event ${receiptNo}:`, error);
+  }
+  return {
+    receiptNo,
+    receiptDate: item.rcept_dt ?? reportDate,
+    corpCode: item.corp_code ?? "",
+    stockCode: item.stock_code ?? "",
+    corpName: item.corp_name ?? "",
+    market: marketName(item.corp_cls),
+    reportName,
+    url: `https://dart.fss.or.kr/dsaf001/main.do?rcpNo=${receiptNo}`,
+    ...extractMajorEventInfo(documentText, reportName),
+  };
+}
+
+function buildMajorEventMessage(row: MajorEventAlertRow): string {
+  return normalizeMessageHtml([
+    `<b>[투자판단공시 - ${escapeHtml(row.corpName)}]</b>`,
+    escapeHtml(nowKstText()),
+    "",
+    `<b>공시명:</b> ${escapeHtml(row.eventTitle)}`,
+    `<b>유형:</b> ${escapeHtml(row.eventType)}`,
+    `<b>주요내용:</b> ${escapeHtml(row.detail)}`,
+    `<b>핵심지표:</b> ${escapeHtml(row.metric)}`,
+    `${escapeHtml(row.stockCode)} · ${escapeHtml(row.market)} · <a href="${row.url}">원문 보기</a>`,
+  ].join("\n"));
 }
 
 function buildContractMessage(rows: ContractAlertRow[], _reportDate: string): string {
@@ -1904,6 +2038,65 @@ export const pollContractReportsInternal = internalAction({
   },
 });
 
+async function pollMajorEventReportsHandler(ctx: any, args: PollArgs): Promise<any> {
+  if (!args.force && !isKstMonitorWindow()) {
+    return { skipped: "outside KST monitor window", found: 0, enqueued: 0 };
+  }
+
+  const apiKey = env("DART_API_KEY");
+  const reportDate = args.reportDate ? String(args.reportDate).replace(/\D/g, "").slice(0, 8) : ymdKst();
+  const reports = await listMajorEventReports(apiKey, reportDate);
+  if (reports.length === 0) return { found: 0, enqueued: 0 };
+
+  const enriched = (await Promise.all(
+    reports.slice(0, args.limit ?? 20).map((item) => enrichMajorEvent(apiKey, item, reportDate)),
+  )).filter((row) => row.receiptNo && row.corpCode && row.stockCode);
+  const unseen: AlertRow[] = await ctx.runMutation(internal.dart.filterAndRecordDisclosures, {
+    force: args.force ?? false,
+    rows: enriched.map((row) => ({
+      receiptNo: row.receiptNo,
+      receiptDate: row.receiptDate,
+      corpCode: row.corpCode,
+      stockCode: row.stockCode,
+      corpName: row.corpName,
+      market: row.market,
+      reportName: row.reportName,
+      url: row.url,
+    })),
+  });
+  const unseenReceiptNos = new Set(unseen.map((row) => row.receiptNo));
+  const rows = enriched.filter((row) => unseenReceiptNos.has(row.receiptNo));
+
+  for (const row of rows) {
+    const id = await ctx.runMutation(internal.dart.createTelegramNotification, {
+      dedupeKey: `dart-major-event-convex-cron:${reportDate}:${row.receiptNo}`,
+      reportDate,
+      messageHtml: buildMajorEventMessage(row),
+      receiptNos: [row.receiptNo],
+    });
+    await ctx.scheduler.runAfter(0, sendPendingRef, { id });
+  }
+  return { found: reports.length, enqueued: rows.length };
+}
+
+export const pollMajorEventReports = action({
+  args: {
+    reportDate: v.optional(v.union(v.string(), v.number())),
+    force: v.optional(v.boolean()),
+    limit: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => await pollMajorEventReportsHandler(ctx, args),
+});
+
+export const pollMajorEventReportsInternal = internalAction({
+  args: {
+    reportDate: v.optional(v.union(v.string(), v.number())),
+    force: v.optional(v.boolean()),
+    limit: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => await pollMajorEventReportsHandler(ctx, args),
+});
+
 export const backfillContractDailyReportItems = action({
   args: {
     reportDate: v.union(v.string(), v.number()),
@@ -2015,6 +2208,20 @@ export const previewContractReportsMessage = action({
       })),
     )) as ContractAlertRow[]);
     return { reportDate, rows: rows.length, message: buildContractMessage(rows, reportDate) };
+  },
+});
+
+export const previewMajorEventMessages = action({
+  args: {
+    reportDate: v.optional(v.union(v.string(), v.number())),
+    limit: v.optional(v.number()),
+  },
+  handler: async (_ctx, args) => {
+    const apiKey = env("DART_API_KEY");
+    const reportDate = args.reportDate ? String(args.reportDate).replace(/\D/g, "").slice(0, 8) : ymdKst();
+    const reports = await listMajorEventReports(apiKey, reportDate);
+    const rows = await Promise.all(reports.slice(0, args.limit ?? 3).map((item) => enrichMajorEvent(apiKey, item, reportDate)));
+    return { reportDate, rows: rows.length, messages: rows.map(buildMajorEventMessage) };
   },
 });
 
