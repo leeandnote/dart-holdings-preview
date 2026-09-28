@@ -1239,11 +1239,15 @@ function cleanMajorEventText(value?: string, maxLength = 180): string | undefine
 }
 
 function majorEventTitle(reportName: string, rows: string[][]): string {
-  const parenthetical = [...reportName.matchAll(/\(([^()]*)\)/g)]
-    .map((match) => cleanMajorEventText(match[1], 90))
-    .filter((value): value is string => Boolean(value && !/정정/.test(value)));
+  const reportTitle = cleanMajorEventText(
+    reportName
+      .replace(/^\[?기재정정\]?\s*/i, "")
+      .replace(/^투자판단\s*관련\s*주요경영사항/i, "")
+      .replace(/^\s*\((.*)\)\s*$/, "$1"),
+    90,
+  );
   return cleanMajorEventText(
-    parenthetical[parenthetical.length - 1] ??
+    reportTitle ??
       contractTableValue(rows, ["제목", "주요경영사항", "주요 내용", "주요내용"]) ??
       reportName,
     90,
@@ -1259,7 +1263,7 @@ function majorEventMetric(type: string, text: string, rows: string[][]): string 
   }
   if (type === "임상시험·IND") {
     const plain = plainTextWithCellSpaces(text);
-    const stage = plain.match(/(?:미국|국내|한국|유럽|글로벌)?\s*(?:제\s*)?\d(?:\/\d[a-z]?)?\s*상/i)?.[0]?.replace(/\s+/g, " ");
+    const stage = plain.match(/(?:미국|국내|한국|유럽|글로벌)?\s*(?:제\s*)?\d(?:\/\d[a-z]?)?\s*상/i)?.[0]?.replace(/\s+/g, " ").trim();
     const status = plain.match(/IND\s*(?:신청|승인)|임상시험계획\s*(?:신청|승인|변경승인)|품목허가\s*(?:신청|승인)/i)?.[0]?.replace(/\s+/g, " ");
     return [stage, status].filter(Boolean).join(" · ") || "임상 진행단계 원문 확인";
   }
