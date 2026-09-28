@@ -297,6 +297,71 @@ async function loadContractRows() {
   });
 }
 
+async function loadMajorEventRows() {
+  const filePath = path.join(ROOT, "site", "data", "disclosure_signals.json");
+  if (!existsSync(filePath)) return [];
+  const payload = JSON.parse(await readFile(filePath, "utf8"));
+  return (payload.rows || []).filter((row) => {
+    const type = String(row["공시유형"] || "");
+    const date = String(row["접수일"] || "").replace(/\D/g, "").slice(0, 8);
+    return type === "투자판단관련주요경영사항" && date === ymd;
+  });
+}
+
+function majorEventKind(text) {
+  if (/임상|IND|시험계획|품목허가/i.test(text)) return "임상/IND";
+  if (/기술수출|라이선스|마일스톤|기술료/i.test(text)) return "기술수출";
+  if (/소송|중재|가처분|판결|청구/i.test(text)) return "소송";
+  if (/단일판매|공급계약|수주|낙찰|계약체결/i.test(text)) return "단일판매·수주";
+  return "주요경영사항";
+}
+
+function cleanMajorEventTitle(value) {
+  const text = String(value || "").replace(/\s+/g, " ").trim();
+  const parenthetical = [...text.matchAll(/\(([^()]*)\)/g)].map((match) => match[1]).filter((part) => !/정정/.test(part)).at(-1);
+  return cleanContractText(parenthetical || text.replace(/^\[?기재정정\]?\s*/, "").replace(/투자판단\s*관련\s*주요경영사항/gi, "").replace(/^[:：\-\/()\s]+/, ""), 38) || "주요경영사항 공시";
+}
+
+function majorEventMetric(text, kind) {
+  const source = String(text || "").replace(/\s+/g, " ");
+  if (kind === "임상/IND") {
+    const stage = source.match(/(?:미국|국내|한국|유럽|글로벌)?\s*(?:제\s*)?\d(?:\/\d[a-z]?)?\s*상/i)?.[0]?.replace(/\s+/g, " ");
+    const status = source.match(/IND\s*(?:신청|승인)|임상시험계획\s*(?:신청|승인|변경승인)/i)?.[0]?.replace(/\s+/g, " ");
+    return [stage, status].filter(Boolean).join(" · ") || "임상 단계 원문 확인";
+  }
+  const eok = source.match(/(?:약\s*)?[\d,.]+\s*억\s*원?/i)?.[0]?.replace(/\s+/g, "");
+  const foreign = source.match(/(?:USD|US\$|\$|EUR|€)\s*[\d,.]+\s*(?:M|million|백만)?/i)?.[0];
+  return [eok, foreign].filter(Boolean).join(" · ") || (kind === "소송" ? "소송 진행상황" : "핵심 수치 원문 확인");
+}
+
+function pickMajorEvents(rows) {
+  const seen = new Set();
+  return rows.map((row) => {
+    const source = `${row["보고서명"] || ""} ${row["주요내용"] || ""}`;
+    const kind = majorEventKind(source);
+    return {
+      name: row["종목명"] || "-",
+      code: row["종목코드"] || "-",
+      market: row["시장"] || "-",
+      kind,
+      title: cleanMajorEventTitle(row["보고서명"] || row["주요내용"]),
+      metric: majorEventMetric(source, kind),
+    };
+  }).filter((row) => {
+    const key = `${row.code}:${row.title}`;
+    if (row.name === "-" || seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  }).slice(0, 5);
+}
+
+function majorEventCardHtml({ rows, total }) {
+  const tableRows = rows.map((row) => `<tr><td><strong class="stock">${esc(row.name)}</strong><span>${esc(row.code)} · ${esc(row.market)}</span></td><td><b class="pill">${esc(row.kind)}</b><strong>${esc(row.title)}</strong></td><td><strong class="metric">${esc(row.metric)}</strong></td></tr>`).join("");
+  return `<!doctype html><html><head><meta charset="utf-8"><style>
+  *{box-sizing:border-box}body{margin:0;width:1080px;height:1920px;font-family:"Noto Sans CJK KR",Pretendard,sans-serif;color:#111c30}.card{position:relative;width:1080px;height:1920px;padding:214px 72px 168px;overflow:hidden;background:linear-gradient(180deg,#f8faff,#fff 56%,#f8fafc)}.orb{position:absolute;right:-116px;top:250px;width:520px;height:520px;border-radius:50%;background:radial-gradient(circle at 35% 32%,#f5f8ff,#c7d7fa 55%,#a9c0f2 82%);opacity:.74}.orbit{position:absolute;right:28px;top:394px;width:610px;height:178px;border:2px solid #3266d533;border-radius:50%;transform:rotate(-12deg)}header{position:relative;z-index:2;margin-bottom:54px}.meta{display:flex;justify-content:space-between;margin-bottom:34px}.date{font-size:35px;font-weight:900;color:#3266d5}.brand{font-size:30px;font-weight:900;color:#424b5b}.kicker{display:inline-flex;padding:11px 17px;border:1px solid #3266d555;border-radius:999px;background:#f1f5ff;color:#3266d5;font-size:23px;font-weight:900}.title{margin:23px 0 0;font-size:56px;font-weight:950}.subtitle{margin-top:18px;font-size:23px;color:#647085;font-weight:780}.panel{position:relative;z-index:2;border:1px solid #dbe2ec;border-radius:28px;background:#fff;overflow:hidden;box-shadow:0 28px 90px #0f172a14}.panelHead{display:flex;justify-content:space-between;padding:25px 30px;border-bottom:1px solid #e7ebf1}.panelHead strong{font-size:28px}.panelHead span{font-size:20px;color:#647085;font-weight:800}table{width:100%;border-collapse:collapse;table-layout:fixed}th{height:64px;background:#f6f8fb;color:#68758a;font-size:20px}td{height:172px;padding:20px 18px;text-align:center;border-bottom:1px solid #eef2f6;overflow:hidden}.stock{display:block;color:#3266d5;font-size:30px;font-weight:950}td span{display:block;margin-top:8px;color:#738096;font-size:18px;font-weight:740}td:nth-child(2){text-align:left}.pill{display:inline-block;padding:7px 14px;border:1px solid #b9c9ed;border-radius:999px;background:#f1f5ff;color:#3f5f9f;font-size:17px}.pill+strong{display:block;margin-top:13px;font-size:22px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.metric{font-size:25px;font-weight:900}.note{position:absolute;left:72px;bottom:236px;color:#8b95a1;font-size:18px;font-weight:700}.source{position:absolute;right:72px;bottom:186px;color:#a5adb8;font-size:16px;font-weight:800}col:nth-child(1){width:31%}col:nth-child(2){width:42%}col:nth-child(3){width:27%}
+  </style></head><body><main class="card"><div class="orb"></div><div class="orbit"></div><header><div class="meta"><div class="date">${dotted}</div><div class="brand">LEE &amp; NOTE</div></div><span class="kicker">MAJOR EVENT REPORT</span><h1 class="title">${dotted} 주요 투자판단공시</h1><p class="subtitle">임상·수주·기술수출 등 투자판단 핵심 사건을 정리했습니다.</p></header><section class="panel"><div class="panelHead"><strong>Daily DART 요약표</strong><span>총 ${total.toLocaleString("ko-KR")}건 중 핵심 ${rows.length}건</span></div><table><colgroup><col><col><col></colgroup><thead><tr><th>종목</th><th>유형 / 핵심 사건</th><th>핵심지표</th></tr></thead><tbody>${tableRows}</tbody></table></section><p class="note">공시 원문에서 핵심 사건과 수치를 추출한 요약 자료입니다. 특정 종목의 매수·매도 추천이 아닙니다.</p><div class="source">출처: DART 전자공시</div></main></body></html>`;
+}
+
 function pickContracts(rows) {
   const valid = rows
     .map((row) => ({
@@ -697,7 +762,9 @@ function xCaption(kind, rows = []) {
     ? "주요 5%보고공시"
     : kind === "executive"
       ? "주요 임원보고공시"
-      : "주요 대형수주보고";
+      : kind === "major-events"
+        ? "주요 투자판단공시"
+        : "주요 대형수주보고";
   const names = namesPhrase(rows);
   return `${dotted} ${title}\n${names ? `${names} 등` : "주요 공시 종목"}`;
 }
@@ -705,6 +772,7 @@ function xCaption(kind, rows = []) {
 function shortLabel(kind) {
   if (kind === "five") return "5%보고";
   if (kind === "executive") return "임원보고";
+  if (kind === "major-events") return "투자판단";
   return "대형수주";
 }
 
@@ -780,8 +848,8 @@ function validateCompleteBundle(cards) {
   const required = ["five", "executive", "contracts"];
   const present = new Set(cards.map((card) => card.kind));
   const missing = required.filter((kind) => !present.has(kind));
-  if (!allowPartial && (cards.length !== 3 || missing.length)) {
-    throw new Error(`Social publishing blocked: complete 3-card bundle required; missing=${missing.join(",") || "none"}, cards=${cards.length}`);
+  if (!allowPartial && ((cards.length !== 3 && cards.length !== 4) || missing.length)) {
+    throw new Error(`Social publishing blocked: complete base bundle required; missing=${missing.join(",") || "none"}, cards=${cards.length}`);
   }
 }
 
@@ -1068,17 +1136,19 @@ async function withPublicSocialVideo(videoFile, action) {
 }
 
 async function main() {
-  const [fiveRaw, execRaw, extraExecRaw, contractRaw] = await Promise.all([
+  const [fiveRaw, execRaw, extraExecRaw, contractRaw, majorEventRaw] = await Promise.all([
     convexQuery("dart:listDailyReportItems", { reportDate: ymd, limit: 500 }),
     convexQuery("dart:listExecutiveDailyReportItems", { reportDate: ymd, limit: 500 }),
     loadExtraExecutiveRows(),
     loadContractRows(),
+    loadMajorEventRows(),
   ]);
   const fiveRows = pickFive(fiveRaw.map(rowModel));
   const mergedExecRaw = [...extraExecRaw, ...execRaw];
   const executiveModels = mergedExecRaw.map(rowModel);
   const execRows = pickExecutive(executiveModels);
   const contractRows = pickContracts(contractRaw);
+  const majorEventRows = pickMajorEvents(majorEventRaw);
   if (contractRaw.length > 0 && contractRows.length === 0) {
     throw new Error(`${iso} contract disclosures exist, but every row is missing contract amount/ratio. Social publishing stopped.`);
   }
@@ -1102,6 +1172,11 @@ async function main() {
       const png = await renderPng(contractCardHtml({ rows: contractRows, total: contractRaw.length }), tempDir, `leeandnote-contract-${iso}`);
       sent.push(png);
       cards.push({ kind: "contracts", file: png, rows: contractRows });
+    }
+    if (majorEventRows.length) {
+      const png = await renderPng(majorEventCardHtml({ rows: majorEventRows, total: majorEventRaw.length }), tempDir, `leeandnote-major-events-${iso}`);
+      sent.push(png);
+      cards.push({ kind: "major-events", file: png, rows: majorEventRows });
     }
     const targetCards = onlyKinds ? cards.filter((card) => onlyKinds.has(card.kind)) : cards;
     validateCompleteBundle(targetCards);
@@ -1143,7 +1218,7 @@ async function main() {
             "공시 원문과 상세 데이터: https://leeandnote.com",
             "본 영상은 정보 제공 목적이며 투자 권유가 아닙니다.",
           ].join("\n\n"),
-          tags: [...commentary.tags, "5%보고", "임원보고", "대형수주", "Shorts"],
+          tags: [...commentary.tags, "5%보고", "임원보고", "대형수주", "투자판단공시", "Shorts"],
         });
         console.log(JSON.stringify({ channel: "youtube", post: youtubePost }));
       }

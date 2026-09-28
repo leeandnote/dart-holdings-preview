@@ -6,6 +6,7 @@ const crons = cronJobs();
 crons.interval("poll DART major holdings", { minutes: 10 }, internal.dart.pollMajorHoldingsInternal, {});
 crons.interval("poll DART executive holdings", { minutes: 10 }, internal.dart.pollExecutiveHoldingsInternal, {});
 crons.interval("poll DART contract reports", { minutes: 10 }, internal.dart.pollContractReportsInternal, {});
+crons.interval("poll DART major event reports", { minutes: 10 }, internal.dart.pollMajorEventReportsInternal, {});
 crons.daily(
   "final DART major holdings sweep",
   { hourUTC: 11, minuteUTC: 5 },
