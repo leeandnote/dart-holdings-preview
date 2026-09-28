@@ -22,6 +22,69 @@ async function convexQuery(queryPath, args = {}) {
   return payload.value || [];
 }
 
+async function dailyRows(queryPath, reportDate, limit = 300) {
+  return convexQuery(queryPath, { reportDate, limit });
+}
+
+function normalizeLocalFiveRow(row) {
+  const currentShares = firstNumber(row["보유주식수"]);
+  const shareDelta = firstNumber(row["증감주식수"]);
+  return {
+    corpName: row["종목명"],
+    stockCode: row["종목코드"],
+    market: row["시장"],
+    reporter: row["보고자"],
+    reporterType: row["보고구분"],
+    previousRate: row["직전지분율"],
+    currentRate: row["이번지분율"],
+    rateDelta: row["증감률"],
+    previousShares: currentShares !== null && shareDelta !== null ? currentShares - shareDelta : null,
+    currentShares,
+    shareDelta,
+    reason: row["보고사유"],
+    obligationDate: row["보고의무발생일"],
+    receiptDate: row["접수일"],
+    receiptNo: row["접수번호"],
+    url: row.DART_URL,
+  };
+}
+
+async function loadLocalFiveRows(reportDate) {
+  try {
+    const payload = JSON.parse(await readFile(path.join(ROOT, "data", "latest.json"), "utf8"));
+    const rows = Array.isArray(payload) ? payload : (payload.rows || []);
+    return rows
+      .filter((row) => String(row["접수일"] || row.receiptDate || "").replace(/\D/g, "") === reportDate)
+      .map(normalizeLocalFiveRow);
+  } catch {
+    return [];
+  }
+}
+
+async function loadExecutiveOverrides(reportDate) {
+  try {
+    const payload = JSON.parse(await readFile(path.join(ROOT, "data", "executive_overrides", `${reportDate}.json`), "utf8"));
+    return Array.isArray(payload) ? payload : (payload.rows || []);
+  } catch {
+    return [];
+  }
+}
+
+function uniqueDisclosureRows(rows) {
+  const seen = new Set();
+  return rows.filter((row) => {
+    const key = [
+      row.receiptNo, row.rcept_no, row["접수번호"],
+      row.reporter, row.reporterName, row["보고자"],
+      row.corpName, row["종목명"], row.stockCode, row["종목코드"],
+    ].filter(Boolean).join("|");
+    if (!key) return true;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
 function esc(value) {
   return String(value ?? "")
     .replaceAll("&", "&amp;")
@@ -647,7 +710,11 @@ function introSummary({ items, newEntries, increases, decreases, flow, insiders 
 }
 
 async function main() {
-  const raw = await convexQuery("dart:listDailyReportItems", { reportDate: ymd, limit: 300 });
+  const [convexRaw, localRaw] = await Promise.all([
+    dailyRows("dart:listDailyReportItems", ymd, 300),
+    loadLocalFiveRows(ymd),
+  ]);
+  const raw = uniqueDisclosureRows([...convexRaw, ...localRaw]);
   const items = raw.map(rowModel).filter((row) => row.name !== "-");
   const newEntries = items.filter((row) => (row.prev ?? 0) < 5 && (row.cur ?? 0) >= 5).sort((a, b) => Math.abs(b.delta ?? 0) - Math.abs(a.delta ?? 0));
   const increases = items.filter((row) => (row.delta ?? 0) > 0).sort((a, b) => (b.delta ?? 0) - (a.delta ?? 0));
@@ -902,8 +969,11 @@ ${pageNav("blog")}
 </html>
 `, "utf8");
 
-  const execRaw = await convexQuery("dart:listExecutiveDailyReportItems", { reportDate: ymd, limit: 300 });
-  const execItems = execRaw.map(rowModel).filter((row) => row.name !== "-");
+  const [execRaw, execOverrides] = await Promise.all([
+    dailyRows("dart:listExecutiveDailyReportItems", ymd, 300),
+    loadExecutiveOverrides(ymd),
+  ]);
+  const execItems = uniqueDisclosureRows([...execOverrides, ...execRaw]).map(rowModel).filter((row) => row.name !== "-");
   const execIncreases = execItems.filter((row) => (row.delta ?? 0) > 0 || (row.shareDelta ?? 0) > 0).sort((a, b) => Math.abs(b.shareDelta ?? 0) - Math.abs(a.shareDelta ?? 0));
   const execDecreases = execItems.filter((row) => (row.delta ?? 0) < 0 || (row.shareDelta ?? 0) < 0).sort((a, b) => Math.abs(b.shareDelta ?? 0) - Math.abs(a.shareDelta ?? 0));
   const execFlow = execItems.slice().sort((a, b) => Math.abs(b.value) - Math.abs(a.value));

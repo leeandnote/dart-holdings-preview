@@ -100,8 +100,40 @@ Invoke-Step "2c. Repair price gaps for newly synchronized holdings" {
 
 Invoke-Step "3. Generate daily blog pages with backfill" {
   $targetDate = [datetime]::ParseExact($ReportDate, "yyyyMMdd", $null)
+  $dates = [System.Collections.Generic.HashSet[string]]::new()
   for ($i = 0; $i -lt $BackfillDays; $i++) {
-    $dateText = $targetDate.AddDays(-$i).ToString("yyyyMMdd")
+    [void]$dates.Add($targetDate.AddDays(-$i).ToString("yyyyMMdd"))
+  }
+
+  foreach ($queryPath in @("dart:listDailyReportDates", "dart:listExecutiveDailyReportDates")) {
+    try {
+      $body = @{ path = $queryPath; args = @{}; format = "json" } | ConvertTo-Json -Depth 5
+      $response = Invoke-RestMethod -Uri "https://gregarious-lemming-92.convex.cloud/api/query" -Method Post -ContentType "application/json" -Body $body -TimeoutSec 30
+      if ($response.status -eq "success") {
+        foreach ($dateValue in @($response.value)) {
+          $normalized = ([string]$dateValue) -replace "\D", ""
+          if ($normalized.Length -eq 8) { [void]$dates.Add($normalized) }
+        }
+      }
+    } catch {
+      Write-Host "Could not read available dates from $queryPath. Calendar backfill continues: $($_.Exception.Message)" -ForegroundColor Yellow
+    }
+  }
+
+  $localLatest = Join-Path $root "site\data\latest.json"
+  if (Test-Path -LiteralPath $localLatest) {
+    try {
+      $localRows = (Get-Content -LiteralPath $localLatest -Raw -Encoding UTF8 | ConvertFrom-Json).rows
+      foreach ($row in @($localRows)) {
+        $normalized = ([string]$row.'접수일') -replace "\D", ""
+        if ($normalized.Length -eq 8) { [void]$dates.Add($normalized) }
+      }
+    } catch {
+      Write-Host "Could not read local 5% report dates: $($_.Exception.Message)" -ForegroundColor Yellow
+    }
+  }
+
+  foreach ($dateText in @($dates) | Sort-Object -Descending | Select-Object -First ([Math]::Max($BackfillDays * 3, 21))) {
     Write-Host "Generating blog pages for $dateText"
     & $node (Join-Path $root "generate_daily_blog.mjs") $dateText
     if ($LASTEXITCODE -ne 0) {
