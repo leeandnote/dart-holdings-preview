@@ -10032,6 +10032,19 @@ button {
 .contractAdvancedFilters.modalFilterPanel{display:grid!important;grid-template-columns:1fr!important;gap:12px!important;margin:0!important;padding:0!important;border:0!important;background:transparent!important}.contractAdvancedFilters.modalFilterPanel label{display:grid!important;gap:6px!important}.contractAdvancedFilters.modalFilterPanel label span{color:#64748b;font-size:12px;font-weight:850}.contractAdvancedFilters.modalFilterPanel .filterSelect{width:100%;height:40px;border-radius:8px;background:#fff}
 @media(max-width:900px){.contractTable{min-width:1100px!important}.contractTable col.contractCol-counterparty{width:230px!important}}@media(max-width:560px){.contractTableToolbar .searchInput{min-width:250px!important}.contractTable{min-width:1060px!important}}
 
+/* Contracts: give the stock identity a stable reading order and room for long names. */
+.contractTable{min-width:1195px!important}
+.contractTable col.contractCol-stock{width:190px!important}
+.contractTable th.contractCol-stock,
+.contractTable td.contractCol-stock{padding-left:18px!important;padding-right:14px!important}
+.contractTable td.contractCol-stock{text-align:left!important}
+.contractTable .contractStockIdentity{width:100%;justify-content:flex-start;gap:10px}
+.contractTable .contractStockIdentity .stockLogoComponent{flex:0 0 30px;width:30px;height:30px}
+.contractTable .contractStockMeta{display:grid;min-width:0;gap:3px;align-content:center}
+.contractTable .contractStock{display:-webkit-box!important;overflow:hidden;max-width:100%;font-size:15px!important;line-height:1.25!important;word-break:keep-all;overflow-wrap:anywhere;-webkit-box-orient:vertical;-webkit-line-clamp:2}
+.contractTable .contractStockMeta em{margin:0!important;white-space:nowrap;color:#6f7b8d!important;font-size:11px!important;font-weight:700!important}
+@media(max-width:900px){.contractTable{min-width:1175px!important}.contractTable col.contractCol-stock{width:180px!important}}
+
 /* Mobile-first readability for all disclosure tables */
 .contractMobileCards {
   display: none;

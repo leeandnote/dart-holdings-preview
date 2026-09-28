@@ -451,7 +451,7 @@ function renderContractCell(row, key) {
   const ratioClass = row.salesRatio >= 100 ? "mega" : row.salesRatio >= 50 ? "large" : "";
   const gauge = Math.max(0, Math.min(100, row.salesRatio || 0));
   const badge = row.salesRatio >= 100 ? `<span class="impactBadge mega">초대형</span>` : row.salesRatio >= 50 ? `<span class="impactBadge large">대형</span>` : "";
-  if (key === "stock") return `<div class="contractStockIdentity">${renderContractStockLogo(row)}<span><strong class="contractStock">${escapeHtml(row.corpName)}</strong><em>${escapeHtml(row.stockCode)} · ${escapeHtml(row.market)}</em></span></div>`;
+  if (key === "stock") return `<div class="contractStockIdentity">${renderContractStockLogo(row)}<span class="contractStockMeta"><strong class="contractStock" title="${escapeHtml(row.corpName)}">${escapeHtml(row.corpName)}</strong><em>${escapeHtml(row.stockCode)} · ${escapeHtml(row.market)}</em></span></div>`;
   if (key === "date") return `<span class="contractTextMain">${escapeHtml(row.dateText)}</span>${row.correction ? `<span class="contractCorrectionText">정정</span>` : ""}`;
   if (key === "counterparty") return `<span class="counterparty ${row.counterpartySecret ? "secret" : ""}">${escapeHtml(row.counterparty)}</span><em>${escapeHtml(row.content || row.reportName || "-")}</em>`;
   if (key === "amount") return `<strong>${formatMoney(row.amount)}</strong><a class="dartLink amountLink" href="${escapeHtml(row.url)}" target="_blank" rel="noopener">원문보기</a>`;
