@@ -1,4 +1,16 @@
-const majorEventState = { rows: [], search: "", market: "all", type: "all", from: "", to: "" };
+const majorEventColumns = [
+  { key: "stock", label: "종목" },
+  { key: "date", label: "접수일" },
+  { key: "type", label: "유형구분" },
+  { key: "event", label: "주요 사건 / 내용" },
+  { key: "metric", label: "핵심 지표 / 수치" },
+  { key: "price", label: "최근일 종가" },
+];
+const majorEventState = {
+  rows: [], search: "", market: "all", type: "all", from: "", to: "",
+  sort: "date", page: 1, pageSize: 10,
+  visibleColumns: new Set(majorEventColumns.map((column) => column.key)),
+};
 
 const majorEventEl = (id) => document.getElementById(id);
 const majorEventCompactDate = (value) => String(value || "").replace(/\D/g, "").slice(0, 8);
@@ -27,7 +39,14 @@ function cleanMajorEventTitle(reportName, summary) {
     .replace(/^\s*[-:：·]\s*/u, "")
     .trim();
   if (cleaned) return cleaned;
-  return compactText(summary).split(/[.!?。]/u)[0] || "주요경영사항";
+  const summaryText = compactText(summary);
+  const labeledTitle = summaryText.match(/(?:^|\s)(?:1\.\s*)?제목\s*[:：]?\s*(.{2,90}?)(?=\s*(?:2\.|주요내용|사실발생|$))/u)?.[1];
+  if (labeledTitle) return compactText(labeledTitle);
+  const fallback = summaryText
+    .replace(/^\s*\/?\s*\(\d{4}[.-]\d{2}[.-]\d{2}\)\s*/u, "")
+    .replace(/^\s*(?:1\.\s*)?제목\s*[:：]?\s*/u, "")
+    .replace(/^\s*[-:：·/]\s*/u, "");
+  return fallback.split(/[.!?。/]/u)[0].trim() || "주요경영사항";
 }
 
 function classifyMajorEvent(text) {
@@ -101,7 +120,9 @@ function eventSecondary(row, text) {
   const fallback = compactText(text)
     .replace(/\[(?:기재|첨부|본문)?정정\]\s*/gu, "")
     .replace(/투자판단\s*관련\s*주요경영사항(?:\s*\([^)]+\))?/giu, "")
-    .replace(/^\s*[-:：·]\s*/u, "");
+    .replace(/^\s*\/?\s*\(\d{4}[.-]\d{2}[.-]\d{2}\)\s*/u, "")
+    .replace(/^\s*(?:1\.\s*)?제목\s*[:：]?\s*/u, "")
+    .replace(/^\s*[-:：·/]\s*/u, "");
   return compactText(counterparty || indication || fallback).slice(0, 82);
 }
 
@@ -146,13 +167,20 @@ function filteredMajorEvents() {
   const query = majorEventState.search.trim().toLowerCase();
   const from = majorEventCompactDate(majorEventState.from);
   const to = majorEventCompactDate(majorEventState.to);
-  return majorEventState.rows.filter((row) => {
+  const rows = majorEventState.rows.filter((row) => {
     if (majorEventState.market !== "all" && row.market !== majorEventState.market) return false;
     if (majorEventState.type !== "all" && row.type !== majorEventState.type) return false;
     if (from && row.date < from) return false;
     if (to && row.date > to) return false;
     if (query && !`${row.corpName} ${row.stockCode} ${row.reportName} ${row.summary} ${row.secondary} ${typeMeta(row.type).label}`.toLowerCase().includes(query)) return false;
     return true;
+  });
+  return rows.sort((a, b) => {
+    if (majorEventState.sort === "amount") return (b.amount || -1) - (a.amount || -1) || b.date.localeCompare(a.date);
+    if (majorEventState.sort === "ratio") return (b.ratio || -1) - (a.ratio || -1) || b.date.localeCompare(a.date);
+    if (majorEventState.sort === "price") return (b.price.close || -1) - (a.price.close || -1) || b.date.localeCompare(a.date);
+    if (majorEventState.sort === "corpName") return a.corpName.localeCompare(b.corpName, "ko") || b.date.localeCompare(a.date);
+    return b.date.localeCompare(a.date) || b.receiptNo.localeCompare(a.receiptNo);
   });
 }
 
@@ -239,6 +267,31 @@ function renderPriceCell(row) {
   return `<div class="majorPrice"><strong>${formatPrice(row.price.close)}</strong><em class="${changeClass}">${changeText}</em></div>`;
 }
 
+function visibleMajorEventColumns() {
+  const columns = majorEventColumns.filter((column) => majorEventState.visibleColumns.has(column.key));
+  return columns.length ? columns : majorEventColumns;
+}
+
+function renderMajorEventCell(row, key) {
+  if (key === "stock") return `<div class="majorStockCell">${renderStockLogo(row)}<span><strong title="${majorEventEscape(row.corpName)}">${majorEventEscape(row.corpName)}</strong><em>${majorEventEscape(row.stockCode)} · ${majorEventEscape(row.market)}</em></span></div>`;
+  if (key === "date") return `<div class="majorDateCell"><strong>${majorEventDisplayDate(row.date, "-")}</strong><a href="${majorEventEscape(row.url)}" target="_blank" rel="noopener noreferrer">원문보기</a></div>`;
+  if (key === "type") return `<span class="majorTypeBadge ${row.type}">${majorEventEscape(typeMeta(row.type).label)}</span>`;
+  if (key === "event") return `<div class="majorEventContent"><strong title="${majorEventEscape(row.title)}">${majorEventEscape(row.title)}</strong><em title="${majorEventEscape(row.secondary)}">${majorEventEscape(row.secondary)}</em></div>`;
+  if (key === "metric") return renderMajorMetric(row);
+  if (key === "price") return renderPriceCell(row);
+  return "-";
+}
+
+function renderMajorEventPagination(totalRows, totalPages) {
+  const start = totalRows ? (majorEventState.page - 1) * majorEventState.pageSize + 1 : 0;
+  const end = Math.min(totalRows, majorEventState.page * majorEventState.pageSize);
+  const first = Math.max(1, Math.min(majorEventState.page - 2, totalPages - 4));
+  const last = Math.min(totalPages, first + 4);
+  const pages = [];
+  for (let page = first; page <= last; page += 1) pages.push(page);
+  return `<nav class="pagination" aria-label="투자판단 테이블 페이지 이동"><span class="pageSummary">${start.toLocaleString("ko-KR")}-${end.toLocaleString("ko-KR")} / ${totalRows.toLocaleString("ko-KR")}건</span><div class="pageControls"><button class="pageButton" data-major-event-page="${majorEventState.page - 1}" ${majorEventState.page <= 1 ? "disabled" : ""}>이전</button>${pages.map((page) => `<button class="pageButton ${page === majorEventState.page ? "active" : ""}" data-major-event-page="${page}">${page}</button>`).join("")}<button class="pageButton" data-major-event-page="${majorEventState.page + 1}" ${majorEventState.page >= totalPages ? "disabled" : ""}>다음</button></div></nav>`;
+}
+
 function renderMajorEvents() {
   const rows = filteredMajorEvents();
   const target = majorEventEl("majorEventList");
@@ -246,14 +299,112 @@ function renderMajorEvents() {
     target.innerHTML = '<div class="emptyState">조건에 맞는 투자판단 관련 주요경영사항 공시가 없습니다.</div>';
     return;
   }
-  target.innerHTML = `<div class="contractTableWrap"><table class="majorEventTable"><colgroup><col class="majorCol-stock"><col class="majorCol-date"><col class="majorCol-type"><col class="majorCol-event"><col class="majorCol-metric"><col class="majorCol-price"></colgroup><thead><tr><th>종목</th><th>접수일</th><th>유형구분</th><th>주요 사건 / 내용</th><th>핵심 지표 / 수치</th><th>최근일 종가</th></tr></thead><tbody>${rows.map((row) => `<tr>
-    <td><div class="majorStockCell">${renderStockLogo(row)}<span><strong title="${majorEventEscape(row.corpName)}">${majorEventEscape(row.corpName)}</strong><em>${majorEventEscape(row.stockCode)} · ${majorEventEscape(row.market)}</em></span></div></td>
-    <td><div class="majorDateCell"><strong>${majorEventDisplayDate(row.date, "-")}</strong><a href="${majorEventEscape(row.url)}" target="_blank" rel="noopener noreferrer">원문보기</a></div></td>
-    <td><span class="majorTypeBadge ${row.type}">${majorEventEscape(typeMeta(row.type).label)}</span></td>
-    <td><div class="majorEventContent"><strong title="${majorEventEscape(row.title)}">${majorEventEscape(row.title)}</strong><em title="${majorEventEscape(row.secondary)}">${majorEventEscape(row.secondary)}</em></div></td>
-    <td>${renderMajorMetric(row)}</td>
-    <td>${renderPriceCell(row)}</td>
-  </tr>`).join("")}</tbody></table></div><p class="tableCount">총 ${rows.length.toLocaleString("ko-KR")}건</p>`;
+  const totalPages = Math.max(1, Math.ceil(rows.length / majorEventState.pageSize));
+  majorEventState.page = Math.min(Math.max(1, majorEventState.page), totalPages);
+  const start = (majorEventState.page - 1) * majorEventState.pageSize;
+  const pageRows = rows.slice(start, start + majorEventState.pageSize);
+  const columns = visibleMajorEventColumns();
+  target.innerHTML = `<div class="contractTableWrap"><table class="majorEventTable"><colgroup>${columns.map((column) => `<col class="majorCol-${column.key}">`).join("")}</colgroup><thead><tr>${columns.map((column) => `<th>${majorEventEscape(column.label)}</th>`).join("")}</tr></thead><tbody>${pageRows.map((row) => `<tr>${columns.map((column) => `<td class="majorCol-${column.key}">${renderMajorEventCell(row, column.key)}</td>`).join("")}</tr>`).join("")}</tbody></table></div>${renderMajorEventPagination(rows.length, totalPages)}`;
+  target.querySelectorAll("[data-major-event-page]").forEach((button) => button.addEventListener("click", () => {
+    const page = Number(button.dataset.majorEventPage);
+    if (!Number.isFinite(page) || page < 1 || page > totalPages) return;
+    majorEventState.page = page;
+    renderMajorEvents();
+  }));
+}
+
+function setupMajorEventColumns() {
+  const panel = majorEventEl("majorEventColumnPanel");
+  if (!panel) return;
+  panel.innerHTML = majorEventColumns.map((column) => `<label><input type="checkbox" value="${column.key}" ${majorEventState.visibleColumns.has(column.key) ? "checked" : ""}> <span>${majorEventEscape(column.label)}</span></label>`).join("");
+  panel.querySelectorAll("input").forEach((checkbox) => checkbox.addEventListener("change", () => {
+    const checked = Array.from(panel.querySelectorAll("input:checked")).map((item) => item.value);
+    if (!checked.length) {
+      checkbox.checked = true;
+      return;
+    }
+    majorEventState.visibleColumns = new Set(checked);
+    majorEventState.page = 1;
+    renderMajorEvents();
+  }));
+}
+
+function setMajorEventModal(id, open) {
+  majorEventEl(id)?.classList.toggle("hidden", !open);
+}
+
+function plainMajorEventCell(row, key) {
+  if (key === "stock") return `${row.corpName}\n${row.stockCode} · ${row.market}`;
+  if (key === "date") return majorEventDisplayDate(row.date, "-");
+  if (key === "type") return typeMeta(row.type).label;
+  if (key === "event") return `${row.title}\n${row.secondary}`;
+  if (key === "metric") {
+    if (row.type === "contract") return `${formatEok(row.amount)}\n${Number.isFinite(row.ratio) ? `매출 대비 ${row.ratio}%` : row.status}`;
+    if (row.type === "clinical") return `${row.clinicalStage || "-"}\n${row.status}`;
+    if (row.type === "milestone") return `${row.amount ? formatEok(row.amount) : row.foreignAmount?.label || "-"}\n${row.foreignAmount?.label || row.status}`;
+    return row.status;
+  }
+  if (key === "price") return `${formatPrice(row.price.close)}\n${Number.isFinite(row.price.changeRate) ? `${row.price.changeRate}%` : "-"}`;
+  return "-";
+}
+
+function downloadMajorEventBlob(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+function downloadMajorEventsExcel() {
+  const rows = filteredMajorEvents();
+  const columns = visibleMajorEventColumns();
+  const header = columns.map((column) => column.label).concat("DART_URL");
+  const body = rows.map((row) => columns.map((column) => plainMajorEventCell(row, column.key)).concat(row.url));
+  const html = `<html><head><meta charset="utf-8"></head><body><table><thead><tr>${header.map((item) => `<th>${majorEventEscape(item)}</th>`).join("")}</tr></thead><tbody>${body.map((line) => `<tr>${line.map((item) => `<td>${majorEventEscape(item)}</td>`).join("")}</tr>`).join("")}</tbody></table></body></html>`;
+  downloadMajorEventBlob(new Blob(["\ufeff" + html], { type:"application/vnd.ms-excel;charset=utf-8" }), `투자판단공시_${majorEventDisplayDate(majorEventState.rows[0]?.date, "")}_${rows.length}건.xls`);
+}
+
+function downloadMajorEventsImage() {
+  const rows = filteredMajorEvents();
+  const start = (majorEventState.page - 1) * majorEventState.pageSize;
+  const pageRows = rows.slice(start, start + majorEventState.pageSize);
+  const width = 1320;
+  const rowHeight = 58;
+  const canvas = document.createElement("canvas");
+  const scale = Math.min(2, Math.max(1, window.devicePixelRatio || 1));
+  canvas.width = width * scale;
+  canvas.height = (120 + pageRows.length * rowHeight) * scale;
+  const ctx = canvas.getContext("2d");
+  ctx.scale(scale, scale);
+  ctx.fillStyle = "#fff";
+  ctx.fillRect(0, 0, width, canvas.height / scale);
+  ctx.fillStyle = "#111827";
+  ctx.font = "800 24px Pretendard, Arial, sans-serif";
+  ctx.fillText("투자판단 관련 주요경영사항", 28, 38);
+  ctx.fillStyle = "#1e2530";
+  ctx.fillRect(28, 60, width - 56, 42);
+  ctx.fillStyle = "#fff";
+  ctx.font = "800 12px Pretendard, Arial, sans-serif";
+  ["종목", "접수일", "유형", "주요 사건", "핵심 지표", "최근일 종가"].forEach((label, index) => ctx.fillText(label, [48,240,370,510,910,1140][index], 86));
+  pageRows.forEach((row, index) => {
+    const y = 102 + index * rowHeight;
+    ctx.fillStyle = index % 2 ? "#fff" : "#fafbfc";
+    ctx.fillRect(28, y, width - 56, rowHeight);
+    ctx.fillStyle = "#111827";
+    ctx.font = "800 12px Pretendard, Arial, sans-serif";
+    [row.corpName, majorEventDisplayDate(row.date, "-"), typeMeta(row.type).label, row.title, plainMajorEventCell(row, "metric").split("\n")[0], formatPrice(row.price.close)].forEach((text, cellIndex) => {
+      const x = [48,240,370,510,910,1140][cellIndex];
+      const max = [170,110,120,370,200,140][cellIndex];
+      let output = String(text || "-");
+      while (output.length > 1 && ctx.measureText(output + "…").width > max) output = output.slice(0, -1);
+      ctx.fillText(output + (output !== text ? "…" : ""), x, y + 34);
+    });
+  });
+  canvas.toBlob((blob) => blob && downloadMajorEventBlob(blob, `투자판단공시_${majorEventState.page}페이지.png`), "image/png");
 }
 
 function initializeMajorEvents() {
@@ -265,11 +416,20 @@ function initializeMajorEvents() {
   const first = majorEventState.rows.at(-1)?.date;
   const last = majorEventState.rows[0]?.date;
   majorEventEl("majorEventPeriod").textContent = first && last ? `수록기간 ${majorEventDisplayDate(first)} ~ ${majorEventDisplayDate(last)} · ${majorEventState.rows.length.toLocaleString("ko-KR")}건` : "수집된 공시가 없습니다.";
-  majorEventEl("majorEventSearch").addEventListener("input", (event) => { majorEventState.search = event.target.value; renderMajorEvents(); });
-  majorEventEl("majorEventMarket").addEventListener("change", (event) => { majorEventState.market = event.target.value; renderMajorEvents(); });
-  majorEventEl("majorEventType").addEventListener("change", (event) => { majorEventState.type = event.target.value; renderMajorEvents(); });
-  majorEventEl("majorEventFrom").addEventListener("change", (event) => { majorEventState.from = event.target.value; renderMajorEvents(); });
-  majorEventEl("majorEventTo").addEventListener("change", (event) => { majorEventState.to = event.target.value; renderMajorEvents(); });
+  majorEventEl("majorEventSearch").addEventListener("input", (event) => { majorEventState.search = event.target.value; majorEventState.page = 1; renderMajorEvents(); });
+  majorEventEl("majorEventMarket").addEventListener("change", (event) => { majorEventState.market = event.target.value; majorEventState.page = 1; renderMajorEvents(); });
+  majorEventEl("majorEventType").addEventListener("change", (event) => { majorEventState.type = event.target.value; majorEventState.page = 1; renderMajorEvents(); });
+  majorEventEl("majorEventFrom").addEventListener("change", (event) => { majorEventState.from = event.target.value; majorEventState.page = 1; renderMajorEvents(); });
+  majorEventEl("majorEventTo").addEventListener("change", (event) => { majorEventState.to = event.target.value; majorEventState.page = 1; renderMajorEvents(); });
+  majorEventEl("majorEventSort").addEventListener("change", (event) => { majorEventState.sort = event.target.value; majorEventState.page = 1; renderMajorEvents(); });
+  majorEventEl("majorEventPageSize").addEventListener("change", (event) => { majorEventState.pageSize = Number(event.target.value) || 10; majorEventState.page = 1; renderMajorEvents(); });
+  majorEventEl("majorEventFilterBtn").addEventListener("click", () => setMajorEventModal("majorEventFilterModal", true));
+  majorEventEl("majorEventColumnsBtn").addEventListener("click", () => setMajorEventModal("majorEventColumnsModal", true));
+  majorEventEl("majorEventXlsBtn").addEventListener("click", downloadMajorEventsExcel);
+  majorEventEl("majorEventImgBtn").addEventListener("click", downloadMajorEventsImage);
+  document.querySelectorAll("[data-major-event-close]").forEach((button) => button.addEventListener("click", () => setMajorEventModal(button.dataset.majorEventClose, false)));
+  document.querySelectorAll(".modalOverlay").forEach((modal) => modal.addEventListener("click", (event) => { if (event.target === modal) modal.classList.add("hidden"); }));
+  setupMajorEventColumns();
   renderMajorEventCuration();
   renderMajorEvents();
 }
