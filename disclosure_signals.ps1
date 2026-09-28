@@ -75,6 +75,7 @@ function Invoke-DartJson([string]$Path, [hashtable]$Params) {
 function Get-DisclosureType([string]$ReportName) {
   $name = [string]$ReportName
   if ($name -like "*해지*") { return "" }
+  if ($name -match "투자판단\s*관련\s*주요경영사항") { return "major_event" }
   if ($name -like "*단일판매*" -or $name -like "*공급계약*") { return "contract" }
   if (($name -like "*영업*" -and $name -like "*실적*") -or $name -like "*잠정실적*" -or $name -like "*매출액또는손익구조*") { return "earnings" }
   return ""
@@ -377,6 +378,7 @@ function New-DisclosureRow($Item, [string]$Text) {
   $netProfit = $null
   $turnaround = ""
   $contractFields = $null
+  $majorEventSummary = ""
 
   if ($type -eq "contract") {
     $primaryText = Get-PrimaryContractText $Text
@@ -394,11 +396,26 @@ function New-DisclosureRow($Item, [string]$Text) {
     $netProfit = Get-NumberAfter $Text @("당기순이익", "당기 순이익", "순이익")
     $turnaround = Get-TurnaroundFlag $Text
   }
+  elseif ($type -eq "major_event") {
+    $majorEventSummary = Get-TextBetweenLabels $Text @(
+      "투자판단 관련 주요경영사항",
+      "투자판단관련 주요경영사항",
+      "주요내용",
+      "주요 내용"
+    ) @(
+      "사실발생(확인)일",
+      "사실발생 확인일",
+      "결정일",
+      "이사회결의일",
+      "기타 투자판단과 관련한 중요사항"
+    ) 420
+    if (-not $majorEventSummary) { $majorEventSummary = [string]$Item.report_nm }
+  }
 
   return [pscustomobject]@{
     접수일 = Normalize-Date ([string]$Item.rcept_dt)
     시장 = $(if ($Item.corp_cls -eq "Y") { "KOSPI" } elseif ($Item.corp_cls -eq "K") { "KOSDAQ" } else { "" })
-    공시유형 = $(if ($type -eq "contract") { "단일판매·공급계약" } else { "영업실적" })
+    공시유형 = $(if ($type -eq "contract") { "단일판매·공급계약" } elseif ($type -eq "major_event") { "투자판단관련주요경영사항" } else { "영업실적" })
     종목명 = [string]$Item.corp_name
     종목코드 = [string]$Item.stock_code
     보고서명 = [string]$Item.report_nm
@@ -415,6 +432,7 @@ function New-DisclosureRow($Item, [string]$Text) {
     영업이익 = $operatingProfit
     당기순이익 = $netProfit
     턴어라운드 = $turnaround
+    주요내용 = $majorEventSummary
     접수번호 = [string]$Item.rcept_no
     DART_URL = "https://dart.fss.or.kr/dsaf001/main.do?rcpNo=$($Item.rcept_no)"
   }

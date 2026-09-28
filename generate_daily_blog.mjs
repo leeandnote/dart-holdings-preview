@@ -486,6 +486,7 @@ function pageNav(active = "") {
     <a class="navLink" href="/5percent"><span class="navIcon disclosureIcon"></span>5%보고</a>
     <a class="navLink" href="/executives"><span class="navIcon disclosureIcon"></span>임원보고</a>
     <a class="navLink" href="/contracts"><span class="navIcon disclosureIcon"></span>대형수주보고</a>
+    <a class="navLink" href="/major-events"><span class="navIcon disclosureIcon"></span>투자판단</a>
     <a class="navLink${blogActive}" href="/blog/"${blogActive ? ' aria-current="page"' : ""}><span class="navIcon disclosureIcon"></span>블로그</a>
   </nav>
 </header>`;

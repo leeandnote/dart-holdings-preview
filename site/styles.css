@@ -17,6 +17,28 @@
   --ink: #111827;
 }
 
+.majorEventTable th:nth-child(1),.majorEventTable td:nth-child(1){width:18%}
+.majorEventTable th:nth-child(2),.majorEventTable td:nth-child(2){width:12%}
+.majorEventTable th:nth-child(3),.majorEventTable td:nth-child(3){width:25%}
+.majorEventTable th:nth-child(4),.majorEventTable td:nth-child(4){width:37%}
+.majorEventTable th:nth-child(5),.majorEventTable td:nth-child(5){width:8%}
+.majorEventTable .stockCell{display:flex;align-items:center;gap:10px;text-align:left}
+.majorEventTable .stockCell strong,.majorEventTable .stockCell small{display:block}
+.majorEventTable .stockCell small{margin-top:4px;color:#7b8490;font-size:11px}
+.majorEventReport,.majorEventSummary{text-align:left!important;line-height:1.5;word-break:keep-all}
+.majorEventSummary{color:#526071!important}
+.correctionText{display:block;margin-top:4px;color:#8a94a3;font-size:11px;font-weight:650}
+.originalLink{color:#667085;font-size:12px;font-weight:700;text-decoration:none}
+.originalLink:hover{color:#ff5520;text-decoration:underline}
+.tableCount{margin:12px 4px 0;color:#667085;font-size:13px;font-weight:700}
+.emptyState{padding:52px 20px;border:1px solid #e5e9ef;border-radius:8px;background:#fff;color:#667085;text-align:center}
+
+@media (max-width: 760px){
+  .majorEventTable{min-width:900px}
+  body[data-page-kind="major-events"] .contractTableToolbar{grid-template-columns:1fr 1fr}
+  body[data-page-kind="major-events"] .searchInput{grid-column:1/-1}
+}
+
 * {
   box-sizing: border-box;
 }

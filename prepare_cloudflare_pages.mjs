@@ -64,6 +64,7 @@ if (fs.existsSync(publicLogosDir)) {
 makeCleanRoute("5percent.html", "5percent");
 makeCleanRoute("executives.html", "executives");
 makeCleanRoute("contracts.html", "contracts");
+makeCleanRoute("major-events.html", "major-events");
 
 const latestJsonPath = path.join(siteDir, "data", "latest.json");
 if (fs.existsSync(latestJsonPath)) {
