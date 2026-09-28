@@ -17,24 +17,25 @@
   --ink: #111827;
 }
 
-.majorEventTable th:nth-child(1),.majorEventTable td:nth-child(1){width:18%}
-.majorEventTable th:nth-child(2),.majorEventTable td:nth-child(2){width:12%}
-.majorEventTable th:nth-child(3),.majorEventTable td:nth-child(3){width:25%}
-.majorEventTable th:nth-child(4),.majorEventTable td:nth-child(4){width:37%}
-.majorEventTable th:nth-child(5),.majorEventTable td:nth-child(5){width:8%}
-.majorEventTable .stockCell{display:flex;align-items:center;gap:10px;text-align:left}
-.majorEventTable .stockCell strong,.majorEventTable .stockCell small{display:block}
-.majorEventTable .stockCell small{margin-top:4px;color:#7b8490;font-size:11px}
-.majorEventReport,.majorEventSummary{text-align:left!important;line-height:1.5;word-break:keep-all}
-.majorEventSummary{color:#526071!important}
-.correctionText{display:block;margin-top:4px;color:#8a94a3;font-size:11px;font-weight:650}
-.originalLink{color:#667085;font-size:12px;font-weight:700;text-decoration:none}
-.originalLink:hover{color:#ff5520;text-decoration:underline}
+.majorEventCuration{margin-bottom:20px;padding:16px;border:1px solid rgba(250,73,5,.24);border-top:3px solid var(--orange);border-radius:10px;background:linear-gradient(180deg,#fff9f6 0%,#fff 60%);box-shadow:0 12px 28px rgba(250,73,5,.07),0 6px 18px rgba(15,23,42,.04)}
+.majorCurationHead{display:flex;align-items:end;justify-content:space-between;margin-bottom:10px}.majorCurationHead h2{margin:0;color:var(--ink);font-size:18px;font-weight:900}.majorCurationHead p{margin:4px 0 0;color:var(--muted);font-size:12px;font-weight:650}
+.majorCurationGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.majorCurationCard{min-width:0;padding:11px;border:1px solid #e2e8f0;border-radius:8px;background:#fff;box-shadow:0 1px 0 rgba(15,23,42,.03)}.majorCurationCard.contract{border-left:4px solid #ff5520}.majorCurationCard.ratio{border-left:4px solid #e03131}.majorCurationCard.pipeline{border-left:4px solid #2563eb;background:linear-gradient(180deg,#f8fbff 0%,#fff 46%)}
+.majorCurationCardHead{display:flex;align-items:center;gap:7px;min-width:0}.majorCurationCardHead span{display:inline-flex;flex:0 0 auto;align-items:center;justify-content:center;height:21px;padding:0 7px;border:1px solid rgba(250,73,5,.22);border-radius:999px;background:#fff2ed;color:var(--orange);font-size:10px;font-weight:900}.majorCurationCard.ratio .majorCurationCardHead span{border-color:#ffd3d3;background:#fff0f0;color:#e03131}.majorCurationCard.pipeline .majorCurationCardHead span{border-color:#c9dbfb;background:#eef5ff;color:#2563eb}.majorCurationCardHead h3{margin:0;overflow:hidden;color:#111827;font-size:13.5px;font-weight:900;text-overflow:ellipsis;white-space:nowrap}.majorCurationCard>p{margin:5px 0 9px;color:#768195;font-size:11px;font-weight:650}
+.majorCurationList{display:grid;gap:6px}.majorCurationItem{display:grid;grid-template-columns:24px minmax(0,1fr) minmax(94px,38%);gap:8px;align-items:center;padding:7px 8px;border:1px solid #e8edf3;border-radius:7px;background:#fbfcfd}.majorCurationRank{display:grid;width:23px;height:23px;place-items:center;border-radius:50%;background:#eef2f7;color:#526071;font-size:11px;font-weight:900}.majorCurationName,.majorCurationMetric{display:block;min-width:0}.majorCurationName strong,.majorCurationName em,.majorCurationMetric strong,.majorCurationMetric em{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.majorCurationName strong{color:#111827;font-size:12px;font-weight:900}.majorCurationName em{margin-top:2px;color:#667085;font-size:10px;font-style:normal;font-weight:600}.majorCurationMetric{text-align:right}.majorCurationMetric strong{color:#e03131;font-size:12px;font-weight:900}.majorCurationCard.pipeline .majorCurationMetric strong{color:#2563eb}.majorCurationMetric em{margin-top:2px;color:#667085;font-size:10px;font-style:normal;font-weight:650}.majorCurationEmpty{padding:24px 8px;color:#7b8493;font-size:12px;font-weight:700;text-align:center}
+.majorEventTable{width:100%;min-width:1180px;border-collapse:collapse;table-layout:fixed}.majorEventTable col.majorCol-stock{width:180px}.majorEventTable col.majorCol-date{width:120px}.majorEventTable col.majorCol-type{width:145px}.majorEventTable col.majorCol-event{width:330px}.majorEventTable col.majorCol-metric{width:210px}.majorEventTable col.majorCol-price{width:150px}.majorEventTable th{height:54px;padding:10px 12px;border-right:1px solid rgba(255,255,255,.08);background:#1e2530;color:#fff;font-size:13px;font-weight:900;text-align:center}.majorEventTable td{height:72px;padding:10px 12px;border-bottom:1px solid #e6ebf2;color:#111827;font-size:13px;line-height:1.35;text-align:center;vertical-align:middle}.majorEventTable tbody tr:last-child td{border-bottom:0}.majorEventTable tbody tr:hover{background:#fbfcfe}
+.majorStockCell{display:flex;align-items:center;gap:10px;min-width:0;text-align:left}.majorStockCell>span:last-child{display:grid;min-width:0;gap:3px}.majorStockCell strong{display:-webkit-box;overflow:hidden;color:#111827;font-size:14px;font-weight:900;line-height:1.25;word-break:keep-all;overflow-wrap:anywhere;-webkit-box-orient:vertical;-webkit-line-clamp:2}.majorStockCell em{color:#718096;font-size:11px;font-style:normal;font-weight:700;white-space:nowrap}.majorStockCell .stockLogoComponent{flex:0 0 30px;width:30px;height:30px}
+.majorDateCell{display:grid;justify-items:center;gap:5px}.majorDateCell strong{font-size:13px;font-weight:850}.majorDateCell a{color:#7b8493;font-size:11px;font-weight:700;text-decoration:none}.majorDateCell a:hover{color:#ff5520;text-decoration:underline}
+.majorTypeBadge{display:inline-flex;align-items:center;justify-content:center;min-height:27px;max-width:100%;padding:3px 9px;border:1px solid #dbe2ea;border-radius:999px;background:#f6f8fa;color:#526071;font-size:11px;font-weight:850;line-height:1.2}.majorTypeBadge.contract{border-color:#ffc9b6;background:#fff5f0;color:#d9480f}.majorTypeBadge.clinical{border-color:#c9dbfb;background:#eef5ff;color:#1c64d1}.majorTypeBadge.milestone{border-color:#c6eadf;background:#eefaf6;color:#087f5b}.majorTypeBadge.litigation{border-color:#e4d2f4;background:#faf5ff;color:#7048a8}
+.majorEventContent{display:grid;min-width:0;gap:5px;text-align:left}.majorEventContent strong,.majorEventContent em{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.majorEventContent strong{color:#172033;font-size:14px;font-weight:900}.majorEventContent em{color:#667085;font-size:12px;font-style:normal;font-weight:600}
+.majorMetricBox{display:grid;justify-items:center;gap:4px;min-height:50px;padding:7px 9px;border:1px solid #e2e8f0;border-radius:7px;background:#f8fafc}.majorMetricBox strong{font-size:13px;font-weight:900}.majorMetricBox em{color:#6f7b8d;font-size:10.5px;font-style:normal;font-weight:700}.majorMetricBox span{display:inline-flex;align-items:center;min-height:20px;padding:2px 7px;border-radius:999px;background:#e8f1ff;color:#1c64d1;font-size:10px;font-weight:900}.majorMetricBox.contract strong{color:#e03131}.majorMetricBox.milestone strong{color:#087f5b}.majorMetricBox.clinical{background:#f8fbff}.majorMetricBox.milestone{background:#f3fbf8}.majorMetricBox.other{background:#fafbfc}
+.majorPrice{display:grid;justify-items:end;gap:4px;text-align:right}.majorPrice strong{font-size:14px;font-weight:900}.majorPrice em{font-size:11px;font-style:normal;font-weight:800}.majorPrice .positive{color:#e03131}.majorPrice .negative{color:#1c64d1}.majorPrice .neutral{color:#7b8493}
 .tableCount{margin:12px 4px 0;color:#667085;font-size:13px;font-weight:700}
 .emptyState{padding:52px 20px;border:1px solid #e5e9ef;border-radius:8px;background:#fff;color:#667085;text-align:center}
 
+@media (max-width: 900px){.majorCurationGrid{grid-auto-flow:column;grid-auto-columns:minmax(290px,82vw);grid-template-columns:none;overflow-x:auto;padding-bottom:6px;scroll-snap-type:x proximity}.majorCurationCard{scroll-snap-align:start}}
 @media (max-width: 760px){
-  .majorEventTable{min-width:900px}
+  .majorEventCuration{padding:13px}
+  .majorEventTable{min-width:1080px}
   body[data-page-kind="major-events"] .contractTableToolbar{grid-template-columns:1fr 1fr}
   body[data-page-kind="major-events"] .searchInput{grid-column:1/-1}
 }
@@ -10315,5 +10316,12 @@ button {
   .contractTableToolbar {
     margin-left: 0 !important;
     margin-right: 0 !important;
+  }
+}
+
+@media (max-width: 640px) {
+  body[data-page-kind="major-events"] .contractTableWrap {
+    display: block !important;
+    overflow-x: auto;
   }
 }

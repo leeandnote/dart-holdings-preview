@@ -14,7 +14,7 @@
   <meta property="og:url" content="https://leeandnote.com/major-events">
   <meta property="og:image" content="https://leeandnote.com/assets/leeandnote-mark.png">
   <link rel="icon" href="/assets/favicon.ico" sizes="any">
-  <link rel="stylesheet" href="/styles.css?v=20260928-major-events1">
+  <link rel="stylesheet" href="/styles.css?v=20260928-major-events2">
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5230074340613849" crossorigin="anonymous"></script>
   <script type="application/ld+json">
   {"@context":"https://schema.org","@type":"WebPage","name":"투자판단관련주요경영사항","url":"https://leeandnote.com/major-events","description":"한국 상장사의 투자판단 관련 주요경영사항 공시 데이터베이스","isPartOf":{"@type":"WebSite","name":"LEE&NOTE","url":"https://leeandnote.com/"}}
@@ -36,13 +36,15 @@
       <div><p class="eyebrow">한국주식 DART전자공시 데이터베이스</p><h1 class="homeTitle">투자판단 관련 주요경영사항</h1><p id="majorEventPeriod" class="muted">데이터를 불러오는 중</p></div>
     </section>
     <div class="contentShell">
+      <section id="majorEventCuration" class="majorEventCuration" aria-label="핵심 변동 큐레이션"></section>
       <section class="issueList" aria-label="투자판단 관련 주요경영사항 목록">
-        <div class="panelHead"><h2>최근 투자판단 공시</h2><p>임상, 소송, 사업 결정 등 투자판단에 영향을 줄 수 있는 주요경영사항을 접수일 기준으로 정리합니다.</p></div>
+        <div class="panelHead"><h2>일별 투자판단 공시 테이블</h2><p>사건 유형과 핵심 수치를 공시 원문에서 추출해 비교합니다.</p></div>
         <section class="contractTableToolbar" aria-label="공시 필터">
           <input id="majorEventSearch" class="searchInput" type="search" placeholder="종목명, 종목코드, 공시명, 주요내용 검색" aria-label="검색">
           <input id="majorEventFrom" class="dateInput" type="date" aria-label="시작일">
           <input id="majorEventTo" class="dateInput" type="date" aria-label="종료일">
           <select id="majorEventMarket" class="filterSelect" aria-label="시장"><option value="all">전체 시장</option><option value="KOSPI">KOSPI</option><option value="KOSDAQ">KOSDAQ</option></select>
+          <select id="majorEventType" class="filterSelect" aria-label="유형"><option value="all">전체 유형</option><option value="contract">단일판매·수주</option><option value="clinical">임상/IND</option><option value="milestone">기술수출/마일스톤</option><option value="litigation">소송/분쟁</option><option value="other">기타 주요경영사항</option></select>
         </section>
         <div id="majorEventList"></div>
       </section>
@@ -57,7 +59,8 @@
     <footer class="siteFooter"><p>본 서비스는 DART 공시를 기반으로 한 정보 제공 서비스이며, 특정 종목의 매수·매도 추천이 아닙니다.</p><nav aria-label="사이트 정책"><a href="/disclaimer.html">투자유의사항</a><a href="/privacy.html">개인정보처리방침</a><a href="/terms.html">이용약관</a><a href="/contact.html">문의</a></nav></footer>
   </main>
   <script src="/data/disclosure_signals.js"></script>
+  <script src="/data/current_prices.js"></script>
   <script src="/stock-logo.js?v=20260915-logo1"></script>
-  <script src="/major_events_app.js?v=20260928-major-events1"></script>
+  <script src="/major_events_app.js?v=20260928-major-events2"></script>
 </body>
 </html>
