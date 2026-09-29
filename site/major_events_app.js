@@ -93,6 +93,7 @@ function extractClinicalStage(text) {
 
 function extractStatus(text, type) {
   if (/변경\s*승인\s*신청|변경승인신청/u.test(text)) return "변경승인 신청";
+  if (/승인\s*신청(?:등결정)?|승인신청(?:등결정)?/u.test(text)) return "IND 신청";
   if (/시험계획[^.]{0,20}승인|IND[^.]{0,14}승인/i.test(text)) return "IND 승인";
   if (/시험계획[^.]{0,20}신청|IND[^.]{0,14}신청/i.test(text)) return "IND 신청";
   if (/마일스톤[^.]{0,22}(?:수령|지급)/u.test(text)) return "마일스톤 수령";
