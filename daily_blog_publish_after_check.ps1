@@ -141,6 +141,9 @@ Invoke-Step "3. Generate daily blog pages with backfill" {
       throw "Blog generation failed for $dateText"
     }
   }
+
+  & $node (Join-Path $root "generate_issue_analysis.mjs")
+  if ($LASTEXITCODE -ne 0) { throw "Issue analysis generation failed" }
 }
 
 Invoke-Step "4. Build Cloudflare Pages output" {

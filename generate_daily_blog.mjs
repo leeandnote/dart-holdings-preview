@@ -868,6 +868,7 @@ ${pageNav("blog")}
         <a class="active" href="/blog/5percent/">5%보고</a>
         <a href="/blog/executives/">임원보고</a>
         <a href="/blog/contracts/">대형수주</a>
+        <a href="/blog/issues/">이슈 분석</a>
       </nav>
     </header>
     <section class="articleBody">
@@ -903,6 +904,7 @@ ${pageNav("blog")}
     <a href="/blog/5percent/">5%보고</a>
     <a href="/blog/executives/">임원보고</a>
     <a href="/blog/contracts/">대형수주</a>
+    <a href="/blog/issues/">이슈 분석</a>
   </div>`;
   await writeFile(path.join(indexDir, "index.html"), `${htmlHead({ title: indexTitle, description: indexDesc, canonical: "https://leeandnote.com/blog/", image: imageUrl })}
 <body class="blogBody">
@@ -954,6 +956,7 @@ ${pageNav("blog")}
     <a class="active" href="/blog/5percent/">5%보고</a>
     <a href="/blog/executives/">임원보고</a>
     <a href="/blog/contracts/">대형수주</a>
+    <a href="/blog/issues/">이슈 분석</a>
   </div>
   <section class="insightGrid" aria-label="5%보고 인사이트 목록">
     <a class="insightCard" href="/blog/5percent/${iso}/">
@@ -1067,6 +1070,7 @@ ${pageNav("blog")}
         <a href="/blog/5percent/">5%보고</a>
         <a class="active" href="/blog/executives/">임원보고</a>
         <a href="/blog/contracts/">대형수주</a>
+        <a href="/blog/issues/">이슈 분석</a>
       </nav>
     </header>
     <section class="articleBody">
@@ -1111,6 +1115,7 @@ ${pageNav("blog")}
     <a href="/blog/5percent/">5%보고</a>
     <a class="active" href="/blog/executives/">임원보고</a>
     <a href="/blog/contracts/">대형수주</a>
+    <a href="/blog/issues/">이슈 분석</a>
   </div>
   <section class="insightGrid" aria-label="임원보고 인사이트 목록">
     <a class="insightCard" href="/blog/executives/${iso}/">
@@ -1161,6 +1166,7 @@ ${pageNav("blog")}
         <a href="/blog/5percent/">5%보고</a>
         <a href="/blog/executives/">임원보고</a>
         <a class="active" href="/blog/contracts/">대형수주</a>
+        <a href="/blog/issues/">이슈 분석</a>
       </nav>
     </header>
     <section class="articleBody">
@@ -1207,6 +1213,7 @@ ${pageNav("blog")}
     <a href="/blog/5percent/">5%보고</a>
     <a href="/blog/executives/">임원보고</a>
     <a class="active" href="/blog/contracts/">대형수주</a>
+    <a href="/blog/issues/">이슈 분석</a>
   </div>
   <section class="insightGrid" aria-label="대형수주 인사이트 목록">
     <a class="insightCard" href="/blog/contracts/${iso}/">
@@ -1374,6 +1381,7 @@ ${pageNav("blog")}
     <a class="active" href="/blog/5percent/">5%보고</a>
     <a href="/blog/executives/">임원보고</a>
     <a href="/blog/contracts/">대형수주</a>
+    <a href="/blog/issues/">이슈 분석</a>
   </div>
   ${fiveStatusNotice}
   <section class="insightGrid" aria-label="5%보고 인사이트 목록">
@@ -1399,6 +1407,7 @@ ${pageNav("blog")}
     <a href="/blog/5percent/">5%보고</a>
     <a class="active" href="/blog/executives/">임원보고</a>
     <a href="/blog/contracts/">대형수주</a>
+    <a href="/blog/issues/">이슈 분석</a>
   </div>
   <section class="insightGrid" aria-label="임원보고 인사이트 목록">
     ${execPostCards || "<p>아직 발행된 임원보고 인사이트가 없습니다.</p>"}
@@ -1423,6 +1432,7 @@ ${pageNav("blog")}
     <a href="/blog/5percent/">5%보고</a>
     <a href="/blog/executives/">임원보고</a>
     <a class="active" href="/blog/contracts/">대형수주</a>
+    <a href="/blog/issues/">이슈 분석</a>
   </div>
   <section class="insightGrid" aria-label="대형수주 인사이트 목록">
     ${contractPostCards || "<p>아직 발행된 대형수주 인사이트가 없습니다.</p>"}
