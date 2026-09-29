@@ -352,6 +352,11 @@ function decodeDartBytes(bytes: Uint8Array): string {
     if (text.includes("이번보고서")) value += 5;
     if (text.includes("소유")) value += 3;
     if (text.includes("보유")) value += 3;
+    if (text.includes("주요내용")) value += 5;
+    if (text.includes("제목")) value += 3;
+    if (text.includes("매출액")) value += 3;
+    if (text.includes("발주처")) value += 3;
+    value += (text.match(/[가-힣]/g) ?? []).length / 100;
     value -= (candidate.match(/�/g) ?? []).length * 2;
     return value;
   };
@@ -718,9 +723,10 @@ function extractDocumentSummaryInfo(text?: string): DocumentSummaryInfo {
 }
 
 async function getDartViewerDocumentText(receiptNo: string): Promise<string | undefined> {
-  const mainUrl = `https://dart.fss.or.kr/dsaf001/main.do?rcpNo=${receiptNo}`;
+  const mainUrl = dartRequestUrl("https://dart.fss.or.kr/dsaf001/main.do", "/dart/dsaf001/main.do");
+  mainUrl.searchParams.set("rcpNo", receiptNo);
   const mainResponse = await fetch(mainUrl, {
-    headers: { "user-agent": "leeandnote-convex-dart-monitor/1.0" },
+    headers: dartRequestHeaders(),
   });
   if (!mainResponse.ok) return undefined;
   const mainHtml = await mainResponse.text();
@@ -772,10 +778,15 @@ async function getDartDocumentText(apiKey: string, receiptNo: string): Promise<s
   const bytes = new Uint8Array(await response.arrayBuffer());
   try {
     const files = unzipSync(bytes);
-    const first = Object.values(files)[0];
-    return first ? decodeDartBytes(first) : undefined;
+    const documents = Object.entries(files)
+      .filter(([name]) => /\.(?:xml|html?|txt)$/i.test(name))
+      .map(([, contents]) => decodeDartBytes(contents))
+      .filter((text) => text.trim().length > 0);
+    return documents.length > 0 ? documents.join("\n") : undefined;
   } catch (error) {
     console.warn(`Failed to unzip DART document ${receiptNo}; trying raw XML text:`, error);
+    const viewerText = await getDartViewerDocumentText(receiptNo);
+    if (viewerText) return viewerText;
     let rawText = "";
     try {
       rawText = new TextDecoder("utf-8").decode(bytes);
@@ -785,9 +796,6 @@ async function getDartDocumentText(apiKey: string, receiptNo: string): Promise<s
       } catch {
         rawText = strFromU8(bytes);
       }
-    }
-    if (rawText.includes("파일이 존재하지 않습니다") || rawText.includes("<status>014</status>")) {
-      return await getDartViewerDocumentText(receiptNo);
     }
     return rawText;
   }
@@ -1238,17 +1246,62 @@ function cleanMajorEventText(value?: string, maxLength = 180): string | undefine
   return cleaned.length > maxLength ? `${cleaned.slice(0, maxLength - 1).trim()}…` : cleaned;
 }
 
-function majorEventTitle(reportName: string, rows: string[][]): string {
+function majorEventTableValue(rows: string[][], labels: string[]): string | undefined {
+  const normalizedLabels = labels.map((label) => normalizeText(label));
+  for (let rowIndex = rows.length - 1; rowIndex >= 0; rowIndex -= 1) {
+    const cells = rows[rowIndex];
+    const cellIndex = cells.findIndex((cell) => {
+      const normalized = normalizeText(cell).replace(/^\d+[.)]?/, "");
+      return normalizedLabels.some((label) =>
+        normalized === label || normalized.startsWith(`${label}(`),
+      );
+    });
+    if (cellIndex < 0) continue;
+    for (const cell of cells.slice(cellIndex + 1)) {
+      const value = cleanContractValue(cell);
+      if (value) return value;
+    }
+  }
+  return undefined;
+}
+
+function majorEventAmount(text: string, rows: string[][]): number | undefined {
+  const fromTable = saneContractAmount(contractNumberFromTable(rows, [
+    "계약금액", "낙찰금액", "수주금액", "공사예정금액", "총 계약금액",
+  ]));
+  if (fromTable !== undefined) return fromTable;
+
+  const plain = plainTextWithCellSpaces(text);
+  for (const label of ["공사예정금액", "수주금액", "낙찰금액", "계약금액"]) {
+    const match = plain.match(new RegExp(`${label}\\s*[:：]?\\s*(?:약\\s*)?([\\d,.]+)\\s*(억원|백만원|만원|원)`));
+    if (!match) continue;
+    const numeric = Number(match[1].replace(/,/g, ""));
+    if (!Number.isFinite(numeric)) continue;
+    const multiplier = match[2] === "억원" ? 100000000 : match[2] === "백만원" ? 1000000 : match[2] === "만원" ? 10000 : 1;
+    return saneContractAmount(numeric * multiplier);
+  }
+  return undefined;
+}
+
+function majorEventRatio(text: string, rows: string[][]): number | undefined {
+  const fromTable = saneContractRatio(contractNumberFromTable(rows, ["매출액대비", "매출액 대비", "최근매출액대비"]));
+  if (fromTable !== undefined) return fromTable;
+  const match = plainTextWithCellSpaces(text).match(/(?:최근\s*)?매출액\s*대비\s*[:：]?\s*(?:약\s*)?([\d,.]+)\s*%/i);
+  return saneContractRatio(match ? Number(match[1].replace(/,/g, "")) : undefined);
+}
+
+function majorEventTitle(reportName: string, rows: string[][], source: string): string {
   const reportTitle = cleanMajorEventText(
     reportName
-      .replace(/^\[?기재정정\]?\s*/i, "")
+      .replace(/^\[기재정정\]\s*/i, "")
       .replace(/^투자판단\s*관련\s*주요경영사항/i, "")
       .replace(/^\s*\((.*)\)\s*$/, "$1"),
     90,
   );
   return cleanMajorEventText(
     reportTitle ??
-      contractTableValue(rows, ["제목", "주요경영사항", "주요 내용", "주요내용"]) ??
+      contractTextBetween(source, ["1. 제목", "제목"], ["2. 주요내용", "주요내용"], 180) ??
+      majorEventTableValue(rows, ["제목", "주요경영사항", "주요 내용", "주요내용"]) ??
       reportName,
     90,
   ) ?? "주요경영사항 공시";
@@ -1256,8 +1309,8 @@ function majorEventTitle(reportName: string, rows: string[][]): string {
 
 function majorEventMetric(type: string, text: string, rows: string[][]): string {
   if (type === "단일판매·수주") {
-    const amount = saneContractAmount(contractNumberFromTable(rows, ["계약금액", "낙찰금액", "수주금액", "총 계약금액"]));
-    const ratio = saneContractRatio(contractNumberFromTable(rows, ["매출액대비", "매출액 대비", "최근매출액대비"]));
+    const amount = majorEventAmount(text, rows);
+    const ratio = majorEventRatio(text, rows);
     return [amount !== undefined ? formatContractEok(amount) : undefined, ratio !== undefined ? `매출비중 ${formatContractRatio(ratio)}` : undefined]
       .filter(Boolean).join(" · ") || "원문 수치 확인";
   }
@@ -1283,10 +1336,10 @@ function majorEventMetric(type: string, text: string, rows: string[][]): string 
 function extractMajorEventInfo(text: string | undefined, reportName: string): Pick<MajorEventAlertRow, "eventTitle" | "eventType" | "detail" | "metric"> {
   const source = text ?? reportName;
   const rows = [...source.matchAll(/<TR\b[^>]*>.*?<\/TR>/gis)].map((match) => xmlCells(match[0]));
-  const eventTitle = majorEventTitle(reportName, rows);
+  const eventTitle = majorEventTitle(reportName, rows, source);
   const eventType = majorEventType(`${reportName} ${plainTextWithCellSpaces(source)}`);
   const detail = cleanMajorEventText(
-    contractTableValue(rows, ["주요내용", "주요 내용", "계약상대방", "상대방", "적응증", "대상질환", "사업내용", "결정내용"]) ??
+    majorEventTableValue(rows, ["주요내용", "주요 내용", "계약상대방", "상대방", "적응증", "대상질환", "사업내용", "결정내용"]) ??
       contractTextBetween(source, ["주요내용", "주요 내용"], ["기타 투자판단", "공시유보", "관련공시"], 260) ??
       eventTitle,
   ) ?? eventTitle;
@@ -2266,6 +2319,38 @@ export const previewMajorEventMessages = action({
     const rows = await Promise.all(reports.slice(0, args.limit ?? 3).map((item) => enrichMajorEvent(apiKey, item, reportDate)));
     return { reportDate, rows: rows.length, messages: rows.map(buildMajorEventMessage) };
   },
+});
+
+async function backfillMajorEventDailyReportItemsHandler(ctx: any, args: {
+  reportDate?: string | number;
+  limit?: number;
+}) {
+  const apiKey = env("DART_API_KEY");
+  const reportDate = args.reportDate ? String(args.reportDate).replace(/\D/g, "").slice(0, 8) : ymdKst();
+  const reports = await listMajorEventReports(apiKey, reportDate);
+  const rows = (await Promise.all(
+    reports.slice(0, args.limit ?? 100).map((item) => enrichMajorEvent(apiKey, item, reportDate)),
+  )).filter((row) => row.receiptNo && row.corpCode && row.stockCode);
+  if (rows.length > 0) {
+    await ctx.runMutation(internal.dart.upsertMajorEventDailyReportItems, { reportDate, rows });
+  }
+  return { reportDate, found: reports.length, upserted: rows.length };
+}
+
+export const backfillMajorEventDailyReportItems = action({
+  args: {
+    reportDate: v.optional(v.union(v.string(), v.number())),
+    limit: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => await backfillMajorEventDailyReportItemsHandler(ctx, args),
+});
+
+export const backfillMajorEventDailyReportItemsInternal = internalAction({
+  args: {
+    reportDate: v.optional(v.union(v.string(), v.number())),
+    limit: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => await backfillMajorEventDailyReportItemsHandler(ctx, args),
 });
 
 async function backfillExecutiveDailyReportItemsHandler(ctx: any, args: {
