@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { spawnSync } from "node:child_process";
 
 const root = path.dirname(fileURLToPath(import.meta.url));
 const publicDaysArg = process.argv.find((arg) => arg.startsWith("--days="));
@@ -8,6 +9,9 @@ const publicDays = Number(publicDaysArg?.split("=")[1] || 90);
 const siteDir = path.join(root, "site");
 const distDir = path.join(root, "public_dist");
 const deployDir = path.join(root, "deploy");
+
+const disclosurepedia = spawnSync(process.execPath, [path.join(root, "generate_disclosurepedia.mjs")], { cwd: root, stdio: "inherit" });
+if (disclosurepedia.status !== 0) throw new Error("Disclosurepedia generation failed.");
 
 function firstValue(obj, names) {
   for (const name of names) {
