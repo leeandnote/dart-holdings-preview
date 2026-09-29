@@ -1,1 +1,1 @@
-window.__PRICE_DATA__ = {"generatedAt":"2026-09-29 03:15:19","source":"Yahoo Finance chart API recent merge","range":"1mo","interval":"1d","completeCloseCutoff":"2026-09-29","stockCount":1588,"errorCount":0,"errors":[],"prices":{}}; window.__PRICE_CHUNKS__ = window.__PRICE_CHUNKS__ || {};
+window.__PRICE_DATA__ = {"generatedAt":"2026-09-30 01:35:43","source":"Yahoo Finance chart API recent merge","range":"1mo","interval":"1d","completeCloseCutoff":"2026-09-30","stockCount":1596,"errorCount":0,"errors":[],"prices":{}}; window.__PRICE_CHUNKS__ = window.__PRICE_CHUNKS__ || {};
