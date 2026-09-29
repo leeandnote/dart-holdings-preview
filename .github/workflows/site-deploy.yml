@@ -8,6 +8,8 @@ on:
     paths:
       - "site/**"
       - "prepare_cloudflare_pages.mjs"
+      - "generate_daily_blog.mjs"
+      - "generate_blog_archive.mjs"
       - "package.json"
       - "pnpm-lock.yaml"
       - ".github/workflows/site-deploy.yml"
@@ -54,6 +56,9 @@ jobs:
             New-Item -ItemType Directory -Path (Split-Path -Parent $configPath) -Force | Out-Null
             [IO.File]::WriteAllBytes($configPath, [Convert]::FromBase64String($env:WRANGLER_CONFIG_TOML_B64))
           }
+
+      - name: Refresh recent blog archive
+        run: node generate_blog_archive.mjs --days=21
 
       - name: Build site output
         run: node prepare_cloudflare_pages.mjs --days=120

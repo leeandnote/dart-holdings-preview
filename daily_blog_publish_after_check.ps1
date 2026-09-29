@@ -108,7 +108,8 @@ Invoke-Step "3. Generate daily blog pages with backfill" {
   foreach ($queryPath in @("dart:listDailyReportDates", "dart:listExecutiveDailyReportDates")) {
     try {
       $body = @{ path = $queryPath; args = @{}; format = "json" } | ConvertTo-Json -Depth 5
-      $response = Invoke-RestMethod -Uri "https://gregarious-lemming-92.convex.cloud/api/query" -Method Post -ContentType "application/json" -Body $body -TimeoutSec 30
+      $convexUrl = if ([string]::IsNullOrWhiteSpace($env:CONVEX_URL)) { "https://quiet-cardinal-118.convex.cloud" } else { $env:CONVEX_URL.TrimEnd('/') }
+      $response = Invoke-RestMethod -Uri "$convexUrl/api/query" -Method Post -ContentType "application/json" -Body $body -TimeoutSec 30
       if ($response.status -eq "success") {
         foreach ($dateValue in @($response.value)) {
           $normalized = ([string]$dateValue) -replace "\D", ""

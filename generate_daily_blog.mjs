@@ -2,7 +2,7 @@ import { mkdir, writeFile, readFile, readdir, rm } from "node:fs/promises";
 import path from "node:path";
 
 const ROOT = path.resolve("site");
-const CONVEX_URL = "https://gregarious-lemming-92.convex.cloud";
+const CONVEX_URL = process.env.CONVEX_URL || "https://quiet-cardinal-118.convex.cloud";
 const ADSENSE = "ca-pub-5230074340613849";
 
 const ymd = process.argv[2] || "20260824";
