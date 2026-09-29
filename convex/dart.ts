@@ -2055,6 +2055,9 @@ async function pollMajorEventReportsHandler(ctx: any, args: PollArgs): Promise<a
   const enriched = (await Promise.all(
     reports.slice(0, args.limit ?? 20).map((item) => enrichMajorEvent(apiKey, item, reportDate)),
   )).filter((row) => row.receiptNo && row.corpCode && row.stockCode);
+  if (enriched.length > 0) {
+    await ctx.runMutation(internal.dart.upsertMajorEventDailyReportItems, { reportDate, rows: enriched });
+  }
   const unseen: AlertRow[] = await ctx.runMutation(internal.dart.filterAndRecordDisclosures, {
     force: args.force ?? false,
     rows: enriched.map((row) => ({
@@ -2099,6 +2102,42 @@ export const pollMajorEventReportsInternal = internalAction({
     limit: v.optional(v.number()),
   },
   handler: async (ctx, args) => await pollMajorEventReportsHandler(ctx, args),
+});
+
+export const upsertMajorEventDailyReportItems = internalMutation({
+  args: {
+    reportDate: v.string(),
+    rows: v.array(v.object({
+      receiptNo: v.string(), receiptDate: v.string(), corpCode: v.string(), stockCode: v.string(),
+      corpName: v.string(), market: v.string(), reportName: v.string(), url: v.string(),
+      eventTitle: v.string(), eventType: v.string(), detail: v.string(), metric: v.string(),
+    })),
+  },
+  handler: async (ctx, args) => {
+    const now = Date.now();
+    for (const row of args.rows) {
+      const existing = await ctx.db.query("majorEventDailyReportItems")
+        .withIndex("by_receiptNo", (q) => q.eq("receiptNo", row.receiptNo)).unique();
+      const payload = { ...row, reportDate: args.reportDate };
+      if (existing) await ctx.db.patch(existing._id, payload);
+      else await ctx.db.insert("majorEventDailyReportItems", { ...payload, createdAt: now });
+    }
+  },
+});
+
+export const listMajorEventDailyReportItemsRange = query({
+  args: {
+    bgnDe: v.optional(v.union(v.string(), v.number())),
+    endDe: v.optional(v.union(v.string(), v.number())),
+    limit: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    const bgnDe = String(args.bgnDe ?? "00000000").replace(/\D/g, "").slice(0, 8);
+    const endDe = String(args.endDe ?? "99999999").replace(/\D/g, "").slice(0, 8);
+    const takeLimit = Math.min(Math.max(args.limit ?? 1000, 1), 3000);
+    const rows = await ctx.db.query("majorEventDailyReportItems").withIndex("by_reportDate").order("desc").take(takeLimit);
+    return rows.filter((row) => row.reportDate >= bgnDe && row.reportDate <= endDe);
+  },
 });
 
 export const backfillContractDailyReportItems = action({

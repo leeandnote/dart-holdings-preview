@@ -158,6 +158,26 @@ export default defineSchema({
     .index("by_receiptNo", ["receiptNo"])
     .index("by_stockDate", ["stockCode", "reportDate"]),
 
+  majorEventDailyReportItems: defineTable({
+    reportDate: v.string(),
+    receiptNo: v.string(),
+    receiptDate: v.string(),
+    corpCode: v.string(),
+    corpName: v.string(),
+    stockCode: v.string(),
+    market: v.string(),
+    reportName: v.string(),
+    eventTitle: v.string(),
+    eventType: v.string(),
+    detail: v.string(),
+    metric: v.string(),
+    url: v.string(),
+    createdAt: v.number(),
+  })
+    .index("by_reportDate", ["reportDate"])
+    .index("by_receiptNo", ["receiptNo"])
+    .index("by_stockDate", ["stockCode", "reportDate"]),
+
   telegramNotifications: defineTable({
     dedupeKey: v.string(),
     reportDate: v.string(),

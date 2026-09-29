@@ -407,12 +407,49 @@ function downloadMajorEventsImage() {
   canvas.toBlob((blob) => blob && downloadMajorEventBlob(blob, `투자판단공시_${majorEventState.page}페이지.png`), "image/png");
 }
 
-function initializeMajorEvents() {
+function convexMajorEventRow(row) {
+  return normalizeMajorEvent({
+    "접수일": row.receiptDate || row.reportDate,
+    "시장": row.market,
+    "종목명": row.corpName,
+    "종목코드": row.stockCode,
+    "보고서명": row.eventTitle || row.reportName,
+    "주요내용": [row.eventTitle, row.detail, row.metric].filter(Boolean).join(" · "),
+    "접수번호": row.receiptNo,
+    DART_URL: row.url,
+  });
+}
+
+async function loadLiveMajorEvents() {
+  const now = new Date(Date.now() + 9 * 60 * 60 * 1000);
+  const endDe = `${now.getUTCFullYear()}${String(now.getUTCMonth() + 1).padStart(2, "0")}${String(now.getUTCDate()).padStart(2, "0")}`;
+  now.setUTCDate(now.getUTCDate() - 120);
+  const bgnDe = `${now.getUTCFullYear()}${String(now.getUTCMonth() + 1).padStart(2, "0")}${String(now.getUTCDate()).padStart(2, "0")}`;
+  const response = await fetch("https://quiet-cardinal-118.convex.cloud/api/query", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ path: "dart:listMajorEventDailyReportItemsRange", args: { bgnDe, endDe, limit: 1000 }, format: "json" }),
+  });
+  if (!response.ok) throw new Error(`HTTP ${response.status}`);
+  const payload = await response.json();
+  if (payload.status !== "success") throw new Error(payload.errorMessage || "Convex query failed");
+  return (payload.value || []).map(convexMajorEventRow);
+}
+
+async function initializeMajorEvents() {
   const payload = window.__DISCLOSURE_SIGNALS__ || {};
-  majorEventState.rows = (payload.rows || [])
+  const staticRows = (payload.rows || [])
     .filter((row) => row["공시유형"] === "투자판단관련주요경영사항")
-    .map(normalizeMajorEvent)
-    .sort((a, b) => b.date.localeCompare(a.date) || b.receiptNo.localeCompare(a.receiptNo));
+    .map(normalizeMajorEvent);
+  let liveRows = [];
+  try {
+    liveRows = await loadLiveMajorEvents();
+  } catch (error) {
+    console.warn("Live major-event data unavailable; using static snapshot.", error);
+  }
+  const merged = new Map();
+  for (const row of [...staticRows, ...liveRows]) merged.set(row.receiptNo || `${row.date}:${row.stockCode}:${row.title}`, row);
+  majorEventState.rows = [...merged.values()].sort((a, b) => b.date.localeCompare(a.date) || b.receiptNo.localeCompare(a.receiptNo));
   const first = majorEventState.rows.at(-1)?.date;
   const last = majorEventState.rows[0]?.date;
   majorEventEl("majorEventPeriod").textContent = first && last ? `수록기간 ${majorEventDisplayDate(first)} ~ ${majorEventDisplayDate(last)} · ${majorEventState.rows.length.toLocaleString("ko-KR")}건` : "수집된 공시가 없습니다.";
