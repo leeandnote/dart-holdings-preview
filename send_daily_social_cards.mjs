@@ -298,6 +298,16 @@ async function loadContractRows() {
 }
 
 async function loadMajorEventRows() {
+  try {
+    const rows = await convexQuery("dart:listMajorEventDailyReportItemsRange", {
+      bgnDe: ymd,
+      endDe: ymd,
+      limit: 500,
+    });
+    if (Array.isArray(rows) && rows.length > 0) return rows;
+  } catch (error) {
+    console.warn("Convex major-event rows unavailable; using static disclosure signals", error);
+  }
   const filePath = path.join(ROOT, "site", "data", "disclosure_signals.json");
   if (!existsSync(filePath)) return [];
   const payload = JSON.parse(await readFile(filePath, "utf8"));
@@ -337,15 +347,31 @@ function majorEventMetric(text, kind) {
 function pickMajorEvents(rows) {
   const seen = new Set();
   return rows.map((row) => {
-    const source = `${row["보고서명"] || ""} ${row["주요내용"] || ""}`;
-    const kind = majorEventKind(source);
+    const detail = row.detail || row["주요내용"] || "";
+    const source = `${row.reportName || row["보고서명"] || ""} ${row.eventTitle || ""} ${detail}`;
+    let kind = row.eventType || majorEventKind(source);
+    let title = row.eventTitle
+      ? cleanContractText(row.eventTitle, 48)
+      : cleanMajorEventTitle(row.reportName || row["보고서명"] || detail);
+    if (/^(?:자회사의 )?주요경영사항(?: 공시)?$/.test(title)) {
+      const licensedAsset = detail.match(/(?:표적항암제\s*)?([^\s,]+)에 대한 기술이전계약.*?계약 해지 및 권리 반환/);
+      title = licensedAsset
+        ? `${licensedAsset[1]} 기술이전 계약 해지 및 권리 반환`
+        : cleanContractText(String(detail).split(/[.。]/)[0], 38) || title;
+    }
+    if (/기술이전.*(?:해지|반환)|라이선스.*(?:해지|반환)/.test(`${title} ${detail}`)) kind = "기술이전";
+    const storedMetric = String(row.metric || "").trim();
+    const metric = storedMetric && !/^(?:원문|핵심 수치)/.test(storedMetric)
+      ? storedMetric
+      : majorEventMetric(source, kind);
     return {
-      name: row["종목명"] || "-",
-      code: row["종목코드"] || "-",
-      market: row["시장"] || "-",
+      name: row.corpName || row["종목명"] || "-",
+      code: row.stockCode || row["종목코드"] || "-",
+      market: row.market || row["시장"] || "-",
       kind,
-      title: cleanMajorEventTitle(row["보고서명"] || row["주요내용"]),
-      metric: majorEventMetric(source, kind),
+      title,
+      detail: cleanContractText(detail, 90),
+      metric: /^(?:원문|핵심 수치)/.test(metric) ? title : metric,
     };
   }).filter((row) => {
     const key = `${row.code}:${row.title}`;
@@ -800,7 +826,7 @@ function koreanParticle(value, consonantForm, vowelForm) {
   return `${text}${hasFinal ? consonantForm : vowelForm}`;
 }
 
-function buildDailyCommentary({ fiveRows, executiveRows, contractRows }) {
+function buildDailyCommentary({ fiveRows, executiveRows, contractRows, majorEventRows }) {
   const paragraphs = [`[${iso} DART전자공시 주요 이슈]`];
   const tags = new Set(["dart전자공시", "리앤노트", "leeandnote", "주식", "주식공시"]);
   const executiveGroups = new Map();
@@ -832,13 +858,32 @@ function buildDailyCommentary({ fiveRows, executiveRows, contractRows }) {
     paragraphs.push(`대형수주에서는 ${contracts.map((row) => `${koreanParticle(row.name, "이", "가")} ${contractMoneyEok(row.amount)} 규모(매출액 대비 ${contractRatioText(row.ratio)})`).join(", ")}의 계약을 공시했습니다.`);
     contracts.forEach((row) => tags.add(hashtagName(row.name)));
   }
-  const tagList = [...tags].filter(Boolean).slice(0, 10);
+  const majorEvents = [];
+  const majorEventKeys = new Set();
+  for (const row of majorEventRows) {
+    if (!row.title || /^(?:자회사의 )?주요경영사항(?: 공시)?$/.test(row.title)) continue;
+    const key = row.title.replace(/\([^)]*\)/g, "").replace(/\s+/g, "").replace(/^자회사/, "");
+    if (majorEventKeys.has(key)) continue;
+    majorEventKeys.add(key);
+    majorEvents.push(row);
+    if (majorEvents.length >= 2) break;
+  }
+  if (majorEvents.length) {
+    const summary = majorEvents.map((row) => {
+      const metric = row.metric && row.metric !== row.title ? `(${row.metric})` : "";
+      return `${koreanParticle(row.name, "은", "는")} ${row.title}${metric}`;
+    }).join(", ");
+    paragraphs.push(`투자판단 공시에서는 ${summary} 등 주요 사건이 확인됐습니다.`);
+    majorEvents.forEach((row) => tags.add(hashtagName(row.name)));
+  }
+  const tagList = [...tags].filter(Boolean).slice(0, 14);
   const full = `${paragraphs.join("\n\n")}\n\n${tagList.map((tag) => `#${tag}`).join(" ")}`;
   const compactParts = [
     `[${iso} DART 주요 이슈]`,
     executiveName ? `${executiveName} 공시 ${executiveGroup.count}건·합산 ${signedShares(executiveGroup.shares)}` : "",
     ownership[0] ? `${ownership[0].name} ${pct(ownership[0].prev)}%→${pct(ownership[0].cur)}%` : "",
     contracts[0] ? `${contracts[0].name} ${contractMoneyEok(contracts[0].amount)}·매출대비 ${contractRatioText(contracts[0].ratio)}` : "",
+    majorEvents[0] ? `투자판단: ${majorEvents[0].name} ${majorEvents[0].title}` : "",
   ].filter(Boolean);
   const compactTags = tagList.slice(0, 6).map((tag) => `#${tag}`).join(" ");
   return { full, compact: `${compactParts.join("\n")}\n${compactTags}`.slice(0, 280), tags: tagList };
@@ -1180,7 +1225,7 @@ async function main() {
     }
     const targetCards = onlyKinds ? cards.filter((card) => onlyKinds.has(card.kind)) : cards;
     validateCompleteBundle(targetCards);
-    const commentary = buildDailyCommentary({ fiveRows, executiveRows: executiveModels, contractRows });
+    const commentary = buildDailyCommentary({ fiveRows, executiveRows: executiveModels, contractRows, majorEventRows });
     if (!dryRun && !skipTelegram && !xOnly && !threadsOnly && !instagramOnly && !youtubeOnly) {
       const messageIds = await sendMediaGroup(targetCards, commentary.full);
       console.log(JSON.stringify({ channel: "telegram", messageIds }));
