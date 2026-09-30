@@ -155,6 +155,10 @@ jobs:
         if: ${{ inputs.social_only == true }}
         shell: pwsh
         run: |
+          if ("${{ inputs.post_threads }}" -eq "true" -or "${{ inputs.post_instagram }}" -eq "true" -or "${{ inputs.post_youtube }}" -eq "true") {
+            & node ./prepare_cloudflare_pages.mjs --days=120
+            if ($LASTEXITCODE -ne 0) { throw "Social video staging build failed" }
+          }
           $args = @($env:REPORT_DATE)
           if ("${{ inputs.send_telegram }}" -ne "true") { $args += "--skip-telegram" }
           if ("${{ inputs.post_x }}" -eq "true") { $args += "--x" }
