@@ -37,6 +37,11 @@ on:
         required: false
         default: false
         type: boolean
+      social_only:
+        description: "Skip site refresh and publish today's social bundle from collected Convex data."
+        required: false
+        default: false
+        type: boolean
 
 concurrency:
   group: daily-leeandnote-publish
@@ -120,6 +125,7 @@ jobs:
           "REPORT_DATE=$inputDate" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
 
       - name: Publish after data health check
+        if: ${{ inputs.social_only != true }}
         shell: pwsh
         run: |
           $args = @(
@@ -145,8 +151,21 @@ jobs:
           if ($postYouTube) { $args += "-PostYouTubeShort" }
           & pwsh @args
 
+      - name: Publish social bundle only
+        if: ${{ inputs.social_only == true }}
+        shell: pwsh
+        run: |
+          $args = @($env:REPORT_DATE)
+          if ("${{ inputs.send_telegram }}" -ne "true") { $args += "--skip-telegram" }
+          if ("${{ inputs.post_x }}" -eq "true") { $args += "--x" }
+          if ("${{ inputs.post_threads }}" -eq "true") { $args += "--threads" }
+          if ("${{ inputs.post_instagram }}" -eq "true") { $args += "--instagram" }
+          if ("${{ inputs.post_youtube }}" -eq "true") { $args += "--youtube" }
+          & node ./send_daily_social_cards.mjs @args
+          if ($LASTEXITCODE -ne 0) { throw "Social-only publish failed for $env:REPORT_DATE" }
+
       - name: Render social card previews
-        if: ${{ success() }}
+        if: ${{ success() && inputs.social_only != true }}
         shell: pwsh
         run: |
           $output = & node ./send_daily_social_cards.mjs $env:REPORT_DATE --dry-run --keep | ConvertFrom-Json

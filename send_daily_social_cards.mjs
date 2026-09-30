@@ -334,10 +334,10 @@ function cleanMajorEventTitle(value) {
 
 function majorEventMetric(text, kind) {
   const source = String(text || "").replace(/\s+/g, " ");
-  if (kind === "임상/IND") {
+  if (/임상|IND/i.test(kind)) {
     const stage = source.match(/(?:미국|국내|한국|유럽|글로벌)?\s*(?:제\s*)?\d(?:\/\d[a-z]?)?\s*상/i)?.[0]?.replace(/\s+/g, " ");
-    const status = source.match(/IND\s*(?:신청|승인)|임상시험계획\s*(?:신청|승인|변경승인)/i)?.[0]?.replace(/\s+/g, " ");
-    return [stage, status].filter(Boolean).join(" · ") || "임상 단계 원문 확인";
+    const status = source.match(/IND\s*(?:신청|승인)|임상시험(?:계획)?\s*(?:신청|승인|변경승인|결과)|CSR\s*수령/i)?.[0]?.replace(/\s+/g, " ");
+    return [stage, status].filter(Boolean).join(" · ").trim() || "임상 단계 원문 확인";
   }
   const eok = source.match(/(?:약\s*)?[\d,.]+\s*억\s*원?/i)?.[0]?.replace(/\s+/g, "");
   const foreign = source.match(/(?:USD|US\$|\$|EUR|€)\s*[\d,.]+\s*(?:M|million|백만)?/i)?.[0];
@@ -353,6 +353,14 @@ function pickMajorEvents(rows) {
     let title = row.eventTitle
       ? cleanContractText(row.eventTitle, 48)
       : cleanMajorEventTitle(row.reportName || row["보고서명"] || detail);
+    title = title
+      .replace(/^임상시험결과\)?\s*\(?/i, "")
+      .replace(/^임상시험계획승인신청등결정\)?\s*\(?/i, "")
+      .replace(/\)+$/, "")
+      .trim();
+    if (/HY209겔/.test(`${title} ${detail}`) && /제\s*2상/.test(`${title} ${detail}`)) {
+      title = "HY209겔 아토피 피부염 제2상 결과보고서 수령";
+    }
     if (/^(?:자회사의 )?주요경영사항(?: 공시)?$/.test(title)) {
       const licensedAsset = detail.match(/(?:표적항암제\s*)?([^\s,]+)에 대한 기술이전계약.*?계약 해지 및 권리 반환/);
       title = licensedAsset
@@ -360,8 +368,9 @@ function pickMajorEvents(rows) {
         : cleanContractText(String(detail).split(/[.。]/)[0], 38) || title;
     }
     if (/기술이전.*(?:해지|반환)|라이선스.*(?:해지|반환)/.test(`${title} ${detail}`)) kind = "기술이전";
+    else if (/기술이전|기술도입|라이선스|공동연구/.test(title)) kind = "기술이전";
     const storedMetric = String(row.metric || "").trim();
-    const metric = storedMetric && !/^(?:원문|핵심 수치)/.test(storedMetric)
+    const metric = storedMetric && !/^(?:원문|핵심 수치|임상 진행단계)/.test(storedMetric)
       ? storedMetric
       : majorEventMetric(source, kind);
     return {
@@ -871,8 +880,8 @@ function buildDailyCommentary({ fiveRows, executiveRows, contractRows, majorEven
   }
   if (majorEvents.length) {
     const summary = majorEvents.map((row) => {
-      const metric = row.metric && row.metric !== row.title ? `(${row.metric})` : "";
-      return `${koreanParticle(row.name, "은", "는")} ${row.title}${metric}`;
+      const metric = row.metric && row.metric !== row.title ? `(${row.metric.trim()})` : "";
+      return `${row.name}의 ${row.title}${metric}`;
     }).join(", ");
     paragraphs.push(`투자판단 공시에서는 ${summary} 등 주요 사건이 확인됐습니다.`);
     majorEvents.forEach((row) => tags.add(hashtagName(row.name)));
