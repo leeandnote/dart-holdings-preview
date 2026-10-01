@@ -339,6 +339,9 @@ function majorEventMetric(text, kind) {
     const status = source.match(/IND\s*(?:신청|승인)|임상시험(?:계획)?\s*(?:신청|승인|변경승인|결과)|CSR\s*수령/i)?.[0]?.replace(/\s+/g, " ");
     return [stage, status].filter(Boolean).join(" · ").trim() || "임상 단계 원문 확인";
   }
+  if (/기술이전|파트너십/i.test(kind) && /Teva Pharmaceuticals/i.test(source)) {
+    return "Teva Pharmaceuticals 파트너십";
+  }
   const eok = source.match(/(?:약\s*)?[\d,.]+\s*억\s*원?/i)?.[0]?.replace(/\s+/g, "");
   const foreign = source.match(/(?:USD|US\$|\$|EUR|€)\s*[\d,.]+\s*(?:M|million|백만)?/i)?.[0];
   return [eok, foreign].filter(Boolean).join(" · ") || (kind === "소송" ? "소송 진행상황" : "핵심 수치 원문 확인");
@@ -356,10 +359,15 @@ function pickMajorEvents(rows) {
     title = title
       .replace(/^임상시험결과\)?\s*\(?/i, "")
       .replace(/^임상시험계획승인신청등결정\)?\s*\(?/i, "")
+      .replace(/^임상시험계획변경승인\)?\s*\(?/i, "")
+      .replace(/^자회사의 주요경영사항\)?\s*\(?/i, "")
       .replace(/\)+$/, "")
       .trim();
     if (/HY209겔/.test(`${title} ${detail}`) && /제\s*2상/.test(`${title} ${detail}`)) {
       title = "HY209겔 아토피 피부염 제2상 결과보고서 수령";
+    }
+    if (/SB41/.test(source) && /SB44/.test(source) && /파트너십/.test(source)) {
+      title = "SB41·SB44 바이오시밀러 파트너십 계약 체결";
     }
     if (/^(?:자회사의 )?주요경영사항(?: 공시)?$/.test(title)) {
       const licensedAsset = detail.match(/(?:표적항암제\s*)?([^\s,]+)에 대한 기술이전계약.*?계약 해지 및 권리 반환/);
@@ -368,7 +376,7 @@ function pickMajorEvents(rows) {
         : cleanContractText(String(detail).split(/[.。]/)[0], 38) || title;
     }
     if (/기술이전.*(?:해지|반환)|라이선스.*(?:해지|반환)/.test(`${title} ${detail}`)) kind = "기술이전";
-    else if (/기술이전|기술도입|라이선스|공동연구/.test(title)) kind = "기술이전";
+    else if (/기술이전|기술도입|라이선스|공동연구|파트너십|독점판매권/.test(title)) kind = "기술이전";
     const storedMetric = String(row.metric || "").trim();
     const metric = storedMetric && !/^(?:원문|핵심 수치|임상 진행단계)/.test(storedMetric)
       ? storedMetric
