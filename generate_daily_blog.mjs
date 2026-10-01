@@ -173,6 +173,41 @@ function sharesText(value) {
   return `${num > 0 ? "+" : "-"}${Math.abs(Math.round(num)).toLocaleString("ko-KR")}주`;
 }
 
+function cleanMajorEventTitle(value) {
+  return String(value || "")
+    .replace(/\s+/g, " ")
+    .replace(/^\[기재정정\]\s*/, "")
+    .replace(/^투자판단관련주요경영사항(?:\(자회사의 주요경영사항\))?\s*/i, "")
+    .replace(/^자회사의 주요경영사항\)?\s*\(?/i, "")
+    .replace(/^임상시험(?:계획변경승인|계획승인신청등결정|결과)\)?\s*\(?/i, "")
+    .replace(/^[:：\-\/()\s]+|\)+$/g, "")
+    .trim();
+}
+
+function majorEventItems(rows) {
+  return rows.map((row) => {
+    const source = `${row.reportName || ""} ${row.eventTitle || ""} ${row.detail || ""}`;
+    let title = cleanMajorEventTitle(row.eventTitle || row.reportName || row.detail);
+    if (/SB41/.test(source) && /SB44/.test(source) && /파트너십/.test(source)) {
+      title = "SB41·SB44 바이오시밀러 파트너십 계약 체결";
+    }
+    if (/HY209겔/.test(source) && /제\s*2상/.test(source)) {
+      title = "HY209겔 아토피 피부염 제2상 결과보고서 수령";
+    }
+    return {
+      name: row.corpName || "-", code: row.stockCode || "-", market: row.market || "-",
+      type: /기술이전|기술도입|라이선스|공동연구|파트너십|독점판매권/.test(title) ? "기술이전·파트너십" : (row.eventType || "주요경영사항"),
+      title: title || "주요경영사항 공시", detail: row.detail || "", metric: row.metric || "원문 확인",
+      url: row.url || "#", receiptNo: row.receiptNo || "",
+    };
+  }).filter((row) => row.name !== "-");
+}
+
+function majorEventTable(rows) {
+  const body = rows.map((row) => `<tr><td class="stock"><strong>${esc(row.name)}</strong><small>${esc(row.code)} · ${esc(row.market)}</small></td><td>${esc(row.type)}</td><td class="reason"><b>${esc(row.title)}</b><span>${esc(row.detail).slice(0, 150)}</span></td><td class="money"><strong>${esc(row.metric)}</strong><a class="dartLink" href="${esc(row.url)}">원문보기</a></td></tr>`).join("");
+  return `<div class="articleTableWrap"><table class="articleTable"><thead><tr><th>종목</th><th>유형</th><th>핵심 사건·내용</th><th>핵심지표</th></tr></thead><tbody>${body}</tbody></table></div>`;
+}
+
 function isNeutralOwnershipReason(reason) {
   const text = String(reason || "");
   return /담보|질권|계약변경|주식담보|대여|차입|반환|공동보유|특별관계/.test(text) && !/장내매수|장외매수|매수|취득|장내매도|장외매도|매도|처분/.test(text);
@@ -835,7 +870,14 @@ async function main() {
   const postDir = path.join(categoryDir, iso);
   await mkdir(postDir, { recursive: true });
 
-  const postTitle = `${dotted} - 5%보고공시 요약 노트`;
+  const ownershipKeyword = jpMorgan.length
+    ? "JP모건 5% 지분 변동 종목"
+    : pension.length
+      ? "국민연금 보유주식 변동 종목"
+      : newEntries[0]
+        ? `${newEntries[0].name} 5% 신규 보유`
+        : `${(increases[0] || decreases[0] || items[0])?.name || "주요 종목"} 지분 변동`;
+  const postTitle = `${dotted} ${ownershipKeyword} | 5%보고공시`;
   const postDescription = `${dotted} DART 5%보고공시에서 신규 진입, 지분율 증감, 주요 제출인 흐름을 정리했습니다.`;
   const postUrl = `https://leeandnote.com/blog/5percent/${iso}`;
   const imageUrl = `https://leeandnote.com/assets/blog/${themes[0]?.svgFile || `dart-5percent-${ymd}-new-entry.svg`}`;
@@ -868,6 +910,7 @@ ${pageNav("blog")}
         <a class="active" href="/blog/5percent/">5%보고</a>
         <a href="/blog/executives/">임원보고</a>
         <a href="/blog/contracts/">대형수주</a>
+        <a href="/blog/major-events/">투자판단</a>
         <a href="/blog/issues/">이슈 분석</a>
       </nav>
     </header>
@@ -898,12 +941,13 @@ ${pageNav("blog")}
     console.log(`Skipped empty 5% blog post: ${postUrl}`);
   }
   const indexTitle = "리앤노트 블로그 | DART 공시 해설과 데이터 요약";
-  const indexDesc = "5%보고공시, 임원보고공시 등 DART 공시 데이터를 블로그 글과 9:16 요약 이미지로 정리합니다.";
+  const indexDesc = "5%보고공시, 임원보고공시, 대형수주와 투자판단공시를 블로그 글과 데이터 표로 정리합니다.";
   const insightCategories = `<div class="categoryBar" aria-label="블로그 카테고리">
     <a class="active" href="/blog/">전체</a>
     <a href="/blog/5percent/">5%보고</a>
     <a href="/blog/executives/">임원보고</a>
     <a href="/blog/contracts/">대형수주</a>
+    <a href="/blog/major-events/">투자판단</a>
     <a href="/blog/issues/">이슈 분석</a>
   </div>`;
   await writeFile(path.join(indexDir, "index.html"), `${htmlHead({ title: indexTitle, description: indexDesc, canonical: "https://leeandnote.com/blog/", image: imageUrl })}
@@ -914,7 +958,7 @@ ${pageNav("blog")}
   <section class="blogHero">
     <p>LEE&NOTE INSIGHT</p>
     <h1>리앤노트가 전하는 DART전자공시 인사이트</h1>
-    <div class="lead">5%보고, 임원보고, 대형수주 공시를 읽기 쉬운 요약 노트와 데이터 표로 정리합니다.</div>
+    <div class="lead">5%보고, 임원보고, 대형수주, 투자판단 공시를 읽기 쉬운 요약 노트와 데이터 표로 정리합니다.</div>
   </section>
   ${insightCategories}
   <section class="insightGrid" aria-label="공시 인사이트 목록">
@@ -1037,7 +1081,11 @@ ${pageNav("blog")}
   const execCategoryDir = path.join(indexDir, "executives");
   const execPostDir = path.join(execCategoryDir, iso);
   await mkdir(execPostDir, { recursive: true });
-  const execPostTitle = `${dotted} - 임원보고공시 요약 노트`;
+  const samsungExecutiveRows = execItems.filter((row) => row.code === "005930");
+  const executiveKeyword = samsungExecutiveRows.length
+    ? "삼성전자 임원·주요주주 보유주식 변동"
+    : `${(execIncreases[0] || execItems[0])?.name || "주요 종목"} 임원·주요주주 보유주식 변동`;
+  const execPostTitle = `${dotted} ${executiveKeyword} | 임원보고공시`;
   const execPostDescription = `${dotted} DART 임원보고공시에서 임원·주요주주의 보유주식수와 보유비율 변동을 정리했습니다.`;
   const execPostUrl = `https://leeandnote.com/blog/executives/${iso}`;
   const execLeadNames = (execIncreases.length ? execIncreases : execItems).slice(0, 3).map((r) => r.name).join(", ");
@@ -1070,6 +1118,7 @@ ${pageNav("blog")}
         <a href="/blog/5percent/">5%보고</a>
         <a class="active" href="/blog/executives/">임원보고</a>
         <a href="/blog/contracts/">대형수주</a>
+        <a href="/blog/major-events/">투자판단</a>
         <a href="/blog/issues/">이슈 분석</a>
       </nav>
     </header>
@@ -1136,7 +1185,9 @@ ${pageNav("blog")}
   const contractCategoryDir = path.join(indexDir, "contracts");
   const contractPostDir = path.join(contractCategoryDir, iso);
   await mkdir(contractPostDir, { recursive: true });
-  const contractPostTitle = `${dotted} - 대형수주보고 요약 노트`;
+  const contractPostTitle = contractItems[0]
+    ? `${dotted} ${contractItems[0].name} ${plainMoneyEok(contractItems[0].amount)} 수주 | 대형수주공시`
+    : `${dotted} 대형수주보고 요약 노트`;
   const contractPostDescription = `${dotted} DART 단일판매·공급계약 공시에서 계약금액, 매출액 대비 비중, 계약상대방과 기간을 정리했습니다.`;
   const contractPostUrl = `https://leeandnote.com/blog/contracts/${iso}`;
   const contractLeadNames = contractItems.slice(0, 3).map((r) => r.name).join(", ");
@@ -1166,6 +1217,7 @@ ${pageNav("blog")}
         <a href="/blog/5percent/">5%보고</a>
         <a href="/blog/executives/">임원보고</a>
         <a class="active" href="/blog/contracts/">대형수주</a>
+        <a href="/blog/major-events/">투자판단</a>
         <a href="/blog/issues/">이슈 분석</a>
       </nav>
     </header>
@@ -1198,6 +1250,69 @@ ${pageNav("blog")}
     console.log(`Skipped empty contracts blog post: ${contractPostUrl}`);
   }
 
+  const majorRaw = await convexQuery("dart:listMajorEventDailyReportItemsRange", { bgnDe: ymd, endDe: ymd, limit: 300 });
+  const majorItems = majorEventItems(majorRaw);
+  const majorCategoryDir = path.join(indexDir, "major-events");
+  const majorPostDir = path.join(majorCategoryDir, iso);
+  await mkdir(majorPostDir, { recursive: true });
+  const majorSeoPhrases = majorItems.slice(0, 2).map((row) => {
+    if (/SB41.*SB44/.test(row.title)) return `${row.name} SB41·SB44 파트너십`;
+    if (/GI102/.test(row.title)) return `${row.name} GI102 임상 변경승인`;
+    return `${row.name} ${row.title}`.slice(0, 42).trim();
+  });
+  const majorPostTitle = `${dotted} ${majorSeoPhrases.join("·") || "투자판단 관련 주요경영사항"} | 투자판단공시`;
+  const majorPostDescription = `${dotted} DART 투자판단 관련 주요경영사항에서 임상시험, 기술이전, 파트너십과 주요 사업 사건을 공시 원문 기준으로 정리했습니다.`;
+  const majorPostUrl = `https://leeandnote.com/blog/major-events/${iso}`;
+  const majorLeadNames = [...new Set(majorItems.slice(0, 4).map((row) => row.name))].join(", ");
+  const majorTypes = [...new Set(majorItems.map((row) => row.type))];
+  const majorFacts = [
+    { question: `${dotted} 투자판단공시는 몇 건인가요?`, answer: `${dotted} 접수 기준 총 ${majorItems.length.toLocaleString("ko-KR")}건입니다.` },
+    { question: "투자판단공시에서 무엇을 확인할 수 있나요?", answer: `${majorTypes.slice(0, 4).join(", ") || "임상시험, 기술이전, 계약과 주요 사업 사건"} 등 기업가치 판단에 영향을 줄 수 있는 사건을 확인할 수 있습니다.` },
+    { question: "공시 제목만 확인해도 되나요?", answer: "같은 임상 공시도 신청, 승인, 변경승인과 결과 발표의 의미가 다릅니다. 핵심 사건과 수치뿐 아니라 연결된 DART 원문을 함께 확인해야 합니다." },
+  ];
+  const majorSchema = articleStructuredData({
+    title: majorPostTitle, description: majorPostDescription, canonical: majorPostUrl, image: imageUrl,
+    section: "투자판단공시", rows: ["종목명", "유형", "핵심 사건", "핵심지표"], facts: majorFacts,
+  });
+  const majorColumn = majorItems.length ? `<h2>오늘 투자판단공시에서 확인할 내용</h2>
+      <p>오늘 공시는 <strong>${esc(majorLeadNames)}</strong> 등을 중심으로 확인됩니다. 투자판단 관련 주요경영사항은 임상시험, 기술이전, 사업 제휴, 소송처럼 성격이 서로 다른 사건을 한 범주에 담기 때문에 공시명만으로 동일하게 해석하기 어렵습니다.</p>
+      <p>${majorItems.some((row) => /임상|IND/i.test(`${row.type} ${row.title}`)) ? "임상·IND 공시는 신청과 승인, 변경승인, 결과 수령을 구분해야 하며 임상 단계와 적응증도 함께 봐야 합니다." : "각 공시의 상대방, 사업 범위와 실제 효력 발생 조건을 원문에서 확인할 필요가 있습니다."} ${majorItems.some((row) => /기술이전|파트너십/.test(row.type)) ? "기술이전·파트너십은 계약 체결 자체와 실제 수령 가능한 선급금·마일스톤 조건을 나눠 보는 것이 중요합니다." : "핵심 수치가 공개되지 않은 공시는 임의로 추정하지 않고 원문 확인 대상으로 표시합니다."}</p>` : "";
+
+  await writeFile(path.join(majorPostDir, "index.html"), `${htmlHead({ title: majorPostTitle, description: majorPostDescription, canonical: majorPostUrl, image: imageUrl, structuredData: majorSchema })}
+<body class="blogBody">
+${blogCss()}
+${pageNav("blog")}
+<main class="blogShell">
+  <article>
+    <header class="blogHero">
+      <div class="postMeta"><span class="postBadge">투자판단공시</span><span class="postDate">· ${dotted}</span></div>
+      <h1>${esc(majorPostTitle)}</h1>
+      <div class="lead">오늘 접수된 투자판단 관련 주요경영사항에서 구체적인 사건명과 핵심 지표를 공시 원문 기준으로 정리했습니다.</div>
+      <nav class="insightTabs" aria-label="블로그 공시 주제">
+        <a href="/blog/">전체</a><a href="/blog/5percent/">5%보고</a><a href="/blog/executives/">임원보고</a><a href="/blog/contracts/">대형수주</a><a class="active" href="/blog/major-events/">투자판단</a><a href="/blog/issues/">이슈 분석</a>
+      </nav>
+    </header>
+    <section class="articleBody">
+      <p class="articleMeta">요약 기준: ${iso} 접수 공시 · 총 ${majorItems.length.toLocaleString("ko-KR")}건 · <a href="/editorial-policy.html">LEE&amp;NOTE 편집·검수 기준</a></p>
+      <div class="summaryBox">오늘 접수된 투자판단공시는 총 <strong>${majorItems.length.toLocaleString("ko-KR")}건</strong>입니다.${majorLeadNames ? ` 주요 확인 종목은 <strong>${esc(majorLeadNames)}</strong>입니다.` : ""} 제목의 포괄적인 접두사는 제거하고 실제 사건명과 핵심 지표를 기준으로 정리했습니다.</div>
+      ${factQa(majorFacts)}
+      ${majorColumn}
+      <h2>주요 투자판단 관련 공시</h2>
+      ${majorEventTable(majorItems)}
+      <div class="blogCta"><div><strong>실시간 투자판단공시 확인하기</strong><p>임상, 기술이전, 계약과 주요 사업 사건을 원문 링크와 함께 확인해보세요.</p></div><a href="/major-events">투자판단 스캐너 보기 →</a></div>
+      <div class="note">본 글은 DART 공시 원문을 바탕으로 정리한 정보 제공 콘텐츠입니다. 특정 종목의 매수·매도 추천이 아니며 정정 공시와 세부 조건을 함께 확인해야 합니다.</div>
+    </section>
+  </article>
+  <footer class="blogFoot">출처: DART 전자공시 · LEE&amp;NOTE 데이터 레이더</footer>
+</main>
+</body>
+</html>
+`, "utf8");
+  if (!majorItems.length) {
+    await rm(majorPostDir, { recursive: true, force: true });
+    console.log(`Skipped empty major-events blog post: ${majorPostUrl}`);
+  }
+
   await writeFile(path.join(contractCategoryDir, "index.html"), `${htmlHead({ title: "대형수주보고 블로그 | 리앤노트", description: "DART 단일판매·공급계약 공시를 일자별로 정리한 리앤노트 블로그 카테고리입니다.", canonical: "https://leeandnote.com/blog/contracts/", image: imageUrl })}
 <body class="blogBody">
 ${blogCss()}
@@ -1213,6 +1328,7 @@ ${pageNav("blog")}
     <a href="/blog/5percent/">5%보고</a>
     <a href="/blog/executives/">임원보고</a>
     <a class="active" href="/blog/contracts/">대형수주</a>
+    <a href="/blog/major-events/">투자판단</a>
     <a href="/blog/issues/">이슈 분석</a>
   </div>
   <section class="insightGrid" aria-label="대형수주 인사이트 목록">
@@ -1303,17 +1419,22 @@ function addIsoDays(isoDate, days) {
   function insightCard({ kind, date }) {
     const isExecutive = kind === "executives";
     const isContract = kind === "contracts";
+    const isMajor = kind === "major-events";
     const dottedItem = dottedDate(date);
-    const href = isContract ? `/blog/contracts/${date}/` : isExecutive ? `/blog/executives/${date}/` : `/blog/5percent/${date}/`;
-    const label = isContract ? "대형수주" : isExecutive ? "임원보고" : "5%보고";
-    const title = isContract ? `${dottedItem} - 대형수주보고 요약 노트` : isExecutive ? `${dottedItem} - 임원보고공시 요약 노트` : `${dottedItem} - 5%보고공시 요약 노트`;
-    const desc = isContract
+    const href = isMajor ? `/blog/major-events/${date}/` : isContract ? `/blog/contracts/${date}/` : isExecutive ? `/blog/executives/${date}/` : `/blog/5percent/${date}/`;
+    const label = isMajor ? "투자판단" : isContract ? "대형수주" : isExecutive ? "임원보고" : "5%보고";
+    const title = date === iso
+      ? (isMajor ? majorPostTitle : isContract ? contractPostTitle : isExecutive ? execPostTitle : postTitle)
+      : isMajor ? `${dottedItem} 투자판단 관련 주요경영사항 정리` : isContract ? `${dottedItem} - 대형수주보고 요약 노트` : isExecutive ? `${dottedItem} - 임원보고공시 요약 노트` : `${dottedItem} - 5%보고공시 요약 노트`;
+    const desc = isMajor
+      ? "DART 투자판단 관련 주요경영사항에서 임상, 기술이전, 제휴와 주요 사업 사건을 정리했습니다."
+      : isContract
       ? "DART 단일판매·공급계약 공시에서 계약금액, 매출액 대비 비중, 계약기간을 정리했습니다."
       : isExecutive
         ? "임원과 주요주주의 소유상황 변동을 보고자, 보유비율, 보유주식수 중심으로 정리했습니다."
         : "DART 5%보고공시에서 신규 진입, 지분율 증감, 주요 제출인 흐름을 정리했습니다.";
-    const thumbClass = isContract ? " contract" : isExecutive ? " executive" : "";
-    const thumbLabel = isContract ? "CONTRACT REPORT" : isExecutive ? "EXECUTIVE REPORT" : "5% REPORT";
+    const thumbClass = isMajor ? " executive" : isContract ? " contract" : isExecutive ? " executive" : "";
+    const thumbLabel = isMajor ? "MAJOR EVENT REPORT" : isContract ? "CONTRACT REPORT" : isExecutive ? "EXECUTIVE REPORT" : "5% REPORT";
     return `<a class="insightCard" href="${href}">
       <div class="insightThumb"><div class="orbThumb${thumbClass}"><span class="stars"></span><span class="orbit"></span><span class="label">${thumbLabel}<small>${dottedItem} DART NOTE</small></span></div></div>
       <div class="insightContent">
@@ -1327,10 +1448,12 @@ function addIsoDays(isoDate, days) {
   const fivePostDates = await listPostDates(categoryDir, "5percent");
   const execPostDates = await listPostDates(execCategoryDir, "executives");
   const contractPostDates = await listPostDates(contractCategoryDir, "contracts");
+  const majorPostDates = await listPostDates(majorCategoryDir, "major-events");
   const allPostCards = [
     ...fivePostDates.map((date) => ({ kind: "5percent", date })),
     ...execPostDates.map((date) => ({ kind: "executives", date })),
     ...contractPostDates.map((date) => ({ kind: "contracts", date })),
+    ...majorPostDates.map((date) => ({ kind: "major-events", date })),
   ]
     .sort((a, b) => b.date.localeCompare(a.date) || a.kind.localeCompare(b.kind))
     .map(insightCard)
@@ -1338,6 +1461,7 @@ function addIsoDays(isoDate, days) {
   const fivePostCards = fivePostDates.map((date) => insightCard({ kind: "5percent", date })).join("\n");
   const execPostCards = execPostDates.map((date) => insightCard({ kind: "executives", date })).join("\n");
   const contractPostCards = contractPostDates.map((date) => insightCard({ kind: "contracts", date })).join("\n");
+  const majorPostCards = majorPostDates.map((date) => insightCard({ kind: "major-events", date })).join("\n");
   const latestFivePostDate = fivePostDates[0] || "";
   const fiveNoReportStart = latestFivePostDate ? addIsoDays(latestFivePostDate, 1) : "";
   const fiveStatusNotice = latestFivePostDate && latestFivePostDate < iso
@@ -1354,7 +1478,7 @@ ${pageNav("blog")}
   <section class="blogHero">
     <p>LEE&NOTE INSIGHT</p>
     <h1>리앤노트가 전하는 DART전자공시 인사이트</h1>
-    <div class="lead">5%보고, 임원보고, 대형수주 공시를 읽기 쉬운 요약 노트와 데이터 표로 정리합니다.</div>
+    <div class="lead">5%보고, 임원보고, 대형수주, 투자판단 공시를 읽기 쉬운 요약 노트와 데이터 표로 정리합니다.</div>
   </section>
   ${insightCategories}
   <section class="insightGrid" aria-label="공시 인사이트 목록">
@@ -1381,6 +1505,7 @@ ${pageNav("blog")}
     <a class="active" href="/blog/5percent/">5%보고</a>
     <a href="/blog/executives/">임원보고</a>
     <a href="/blog/contracts/">대형수주</a>
+    <a href="/blog/major-events/">투자판단</a>
     <a href="/blog/issues/">이슈 분석</a>
   </div>
   ${fiveStatusNotice}
@@ -1407,6 +1532,7 @@ ${pageNav("blog")}
     <a href="/blog/5percent/">5%보고</a>
     <a class="active" href="/blog/executives/">임원보고</a>
     <a href="/blog/contracts/">대형수주</a>
+    <a href="/blog/major-events/">투자판단</a>
     <a href="/blog/issues/">이슈 분석</a>
   </div>
   <section class="insightGrid" aria-label="임원보고 인사이트 목록">
@@ -1432,11 +1558,25 @@ ${pageNav("blog")}
     <a href="/blog/5percent/">5%보고</a>
     <a href="/blog/executives/">임원보고</a>
     <a class="active" href="/blog/contracts/">대형수주</a>
+    <a href="/blog/major-events/">투자판단</a>
     <a href="/blog/issues/">이슈 분석</a>
   </div>
   <section class="insightGrid" aria-label="대형수주 인사이트 목록">
     ${contractPostCards || "<p>아직 발행된 대형수주 인사이트가 없습니다.</p>"}
   </section>
+</main>
+</body>
+</html>
+`, "utf8");
+
+  await writeFile(path.join(majorCategoryDir, "index.html"), `${htmlHead({ title: "투자판단공시 블로그 | 리앤노트", description: "DART 투자판단 관련 주요경영사항을 사건명, 임상 단계와 핵심 수치 중심으로 누적 정리합니다.", canonical: "https://leeandnote.com/blog/major-events/", image: imageUrl })}
+<body class="blogBody">
+${blogCss()}
+${pageNav("blog")}
+<main class="blogShell">
+  <section class="blogHero"><p>LEE&NOTE INSIGHT</p><h1>투자판단공시 인사이트</h1><div class="lead">임상시험, 기술이전, 파트너십과 주요 사업 사건을 구체적인 공시 내용 중심으로 날짜별 축적합니다.</div></section>
+  <div class="categoryBar" aria-label="블로그 카테고리"><a href="/blog/">전체</a><a href="/blog/5percent/">5%보고</a><a href="/blog/executives/">임원보고</a><a href="/blog/contracts/">대형수주</a><a class="active" href="/blog/major-events/">투자판단</a><a href="/blog/issues/">이슈 분석</a></div>
+  <section class="insightGrid" aria-label="투자판단공시 인사이트 목록">${majorPostCards || "<p>발행 기준을 충족한 투자판단공시가 없습니다.</p>"}</section>
 </main>
 </body>
 </html>
@@ -1453,6 +1593,8 @@ ${pageNav("blog")}
     ...execPostDates.map((date) => [`https://leeandnote.com/blog/executives/${date}/`, "0.7", "weekly"]),
     ["https://leeandnote.com/blog/contracts/", "0.8", "daily"],
     ...contractPostDates.map((date) => [`https://leeandnote.com/blog/contracts/${date}/`, "0.7", "weekly"]),
+    ["https://leeandnote.com/blog/major-events/", "0.8", "daily"],
+    ...majorPostDates.map((date) => [`https://leeandnote.com/blog/major-events/${date}/`, "0.7", "weekly"]),
     ["https://leeandnote.com/disclaimer.html", "0.4", "monthly"],
     ["https://leeandnote.com/privacy.html", "0.4", "monthly"],
     ["https://leeandnote.com/terms.html", "0.3", "monthly"],

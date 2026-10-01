@@ -132,7 +132,7 @@ jobs:
             "-NoProfile", "-ExecutionPolicy", "Bypass",
             "-File", ".\daily_blog_publish_after_check.ps1",
             "-ReportDate", $env:REPORT_DATE,
-            "-BackfillDays", "8",
+            "-BackfillDays", "30",
             "-PublishDays", "120"
           )
           $isScheduled = "${{ github.event_name }}" -eq "schedule"
