@@ -18,17 +18,17 @@ on:
         default: true
         type: boolean
       post_threads:
-        description: "Post the 3-card vertical video to Threads."
+        description: "Post the 4-card vertical video to Threads."
         required: false
         default: true
         type: boolean
       post_instagram:
-        description: "Post the 3-card vertical video as an Instagram Reel."
+        description: "Post the 4-card vertical video as an Instagram Reel."
         required: false
         default: true
         type: boolean
       post_youtube:
-        description: "Upload the 3-card vertical video to YouTube Shorts."
+        description: "Upload the 4-card vertical video to YouTube Shorts."
         required: false
         default: true
         type: boolean

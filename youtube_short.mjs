@@ -15,7 +15,7 @@ function requireValue(name) {
 
 export function renderYouTubeShort(cards, outputPath) {
   if (cards.length < 2) throw new Error("YouTube Short rendering requires at least two cards.");
-  const selected = cards.slice(0, 3);
+  const selected = cards.slice(0, 4);
   const args = ["-y"];
   for (const card of selected) {
     args.push("-loop", "1", "-t", String(CARD_SECONDS), "-i", card.file);
