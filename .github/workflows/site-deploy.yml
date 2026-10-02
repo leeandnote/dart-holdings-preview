@@ -58,8 +58,19 @@ jobs:
             [IO.File]::WriteAllBytes($configPath, [Convert]::FromBase64String($env:WRANGLER_CONFIG_TOML_B64))
           }
 
+      - name: Rebuild recent daily blog pages
+        shell: pwsh
+        run: |
+          $kstToday = [DateTimeOffset]::UtcNow.ToOffset([TimeSpan]::FromHours(9)).Date
+          for ($i = 0; $i -lt 30; $i++) {
+            $reportDate = $kstToday.AddDays(-$i).ToString("yyyyMMdd")
+            Write-Host "Generating daily blog pages for $reportDate"
+            & node generate_daily_blog.mjs $reportDate
+            if ($LASTEXITCODE -ne 0) { throw "Daily blog generation failed for $reportDate" }
+          }
+
       - name: Refresh recent blog archive
-        run: node generate_blog_archive.mjs --days=21
+        run: node generate_blog_archive.mjs --days=30
 
       - name: Refresh search-led issue analysis
         run: node generate_issue_analysis.mjs
