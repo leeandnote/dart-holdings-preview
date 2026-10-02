@@ -1,4 +1,5 @@
 name: Daily Lee&Note publish
+run-name: Daily publish report=${{ inputs.report_date }} social_only=${{ inputs.social_only }}
 
 on:
   workflow_dispatch:

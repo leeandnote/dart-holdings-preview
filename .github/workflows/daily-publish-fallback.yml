@@ -37,6 +37,7 @@ jobs:
           $runs = (Invoke-RestMethod -Uri $runsUrl -Headers $headers).workflow_runs
           $recent = $runs | Where-Object {
             [DateTimeOffset]::Parse($_.created_at) -ge $todayStartUtc -and
+            $_.display_title -like "*report=$reportDate*" -and
             ($_.status -in @("queued", "in_progress") -or $_.conclusion -eq "success")
           } | Select-Object -First 1
           if ($recent) {
@@ -54,6 +55,7 @@ jobs:
               post_instagram = "true"
               post_youtube = "true"
               render_youtube_only = "false"
+              social_only = "true"
             }
           } | ConvertTo-Json -Depth 5
           Invoke-RestMethod -Uri $dispatchUrl -Method Post -Headers $headers -ContentType "application/json" -Body $body
