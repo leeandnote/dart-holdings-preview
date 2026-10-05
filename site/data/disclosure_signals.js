@@ -1,8 +1,8 @@
 window.__DISCLOSURE_SIGNALS__ = {
-  "generatedAt": "2026-10-03 01:25:34",
+  "generatedAt": "2026-10-06 04:21:16",
   "scope": "KOSPI/KOSDAQ 실적·계약 공시",
-  "bgnDe": "20260405",
-  "endDe": "20261002",
+  "bgnDe": "20260408",
+  "endDe": "20261005",
   "totalCandidates": 185,
   "parsedDocuments": 185,
   "parseFailures": 0,
