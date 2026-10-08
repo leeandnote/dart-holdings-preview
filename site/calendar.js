@@ -18,6 +18,14 @@ const events=[
 import { macroSources, macroEvents } from './calendar-macro.mjs?v=20261008-2';
 Object.assign(sources, macroSources);
 events.push(...macroEvents);
+sources.stockFutures = ['한국거래소 · 개별주식 선물', 'https://global.krx.co.kr/contents/GLB/02/0201/0201040401/GLB0201040401.jsp'];
+sources.stockOptions = ['한국거래소 · 개별주식 옵션', 'https://global.krx.co.kr/contents/GLB/02/0201/0201040402/GLB0201040402.jsp'];
+events.push({
+  date: '2026-12-10', title: '선물·옵션 동시만기일 (네 마녀의 날)',
+  type: 'expiry', region: 'KR', source: 'futures', status: '규칙 기준', zone: 'Asia/Seoul',
+  description: '주가지수 선물·옵션과 개별주식 선물·옵션 네 종류의 12월물 최종거래일이 겹치는 날이다. 쿼드러플 위칭데이라고도 부른다. 분기월(3·6·9·12월)의 둘째 목요일 규칙에 따른 표시이며, 휴장 또는 임시 변경 시 앞당겨질 수 있어 거래소 공지를 추가 확인해야 한다. 실제 최종결제일과는 구분한다. 기존 상품별 만기 일정과 같은 날을 묶어 설명한 항목이다.',
+  relatedSources: ['futures', 'krx', 'stockFutures', 'stockOptions'],
+});
 const labels={expiry:'선물·옵션 만기',index:'ETF·지수 정기변경',policy:'금리·중앙은행',macro:'물가·고용',holiday:'휴장·단축거래'};
 function timing(e) { return e.time || (e.region === 'KR' ? '한국 날짜' : e.region === 'US' ? '미국 현지 날짜 · 시각 미정' : '출처 날짜 · 시각 미정'); }
 const $=id=>document.getElementById(id);
@@ -25,7 +33,7 @@ const today=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Seoul',year:'numeric
 let month=today.slice(0,7),view=matchMedia('(max-width:700px)').matches?'list':'month';
 function element(tag,text,className){const e=document.createElement(tag);if(text)e.textContent=text;if(className)e.className=className;return e;}
 function show(event){$('detailType').textContent=labels[event.type];$('detailTitle').textContent=event.title;$('detailDate').textContent=event.date+' · '+timing(event);$('detailText').textContent=event.description;$('detailMeta').replaceChildren();const meta=[['상태',event.status],['출처',sources[event.source][0]],['출처 확인일','2026-10-08'],['출처 시간대',event.zone]];if(event.localDate)meta.push(['현지 발표',event.localDate+' '+event.localTime]);for(const [label,value] of meta){$('detailMeta').append(element('dt',label),element('dd',value));}$('detailSource').href=sources[event.source][1];$('eventDialog').showModal();}
-function button(event,cls){const b=element('button','',cls);b.type='button';b.dataset.type=event.type;b.setAttribute('aria-label',event.date+' '+event.title);b.addEventListener('click',()=>show(event));return b;}
+function button(event,cls){const b=element('button','',cls);b.type='button';b.dataset.type=event.type;b.setAttribute('aria-label',event.date+' '+event.title);b.addEventListener('click',()=>{show(event);for(const key of event.relatedSources || []){const dd=element('dd');const a=element('a',sources[key][0]);a.href=sources[key][1];a.target='_blank';a.rel='noopener noreferrer';dd.append(a);$('detailMeta').append(element('dt','상품 규정'),dd);}});return b;}
 function matches(e){return ($('type').value==='all'||e.type===$('type').value)&&($('region').value==='all'||e.region===$('region').value)&&(e.title+' '+sources[e.source][0]).toLowerCase().includes($('search').value.trim().toLowerCase());}
 function render() {
   const sort = (a,b) => a.date.localeCompare(b.date) || (a.instant || '').localeCompare(b.instant || '');
