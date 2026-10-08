@@ -15,7 +15,7 @@ const events=[
  ['2026-12-24','NYSE 성탄절 전일 단축거래','holiday','US','nyse','공식 발표','America/New_York','미국 동부시간 13:00 주식시장 조기 종료.'],
  ['2026-12-25','NYSE 성탄절 휴장','holiday','US','nyse','공식 발표','America/New_York','NYSE 주식시장 휴장.']
 ].map(([date,title,type,region,source,status,zone,description],id)=>({id,date,title,type,region,source,status,zone,description}));
-import { macroSources, macroEvents } from './calendar-macro.mjs?v=20261008-2';
+import { macroSources, macroEvents } from './calendar-macro.mjs?v=20261008-5';
 Object.assign(sources, macroSources);
 events.push(...macroEvents);
 sources.stockFutures = ['한국거래소 · 개별주식 선물', 'https://global.krx.co.kr/contents/GLB/02/0201/0201040401/GLB0201040401.jsp'];
@@ -26,7 +26,7 @@ events.push({
   description: '주가지수 선물·옵션과 개별주식 선물·옵션 네 종류의 12월물 최종거래일이 겹치는 날이다. 쿼드러플 위칭데이라고도 부른다. 분기월(3·6·9·12월)의 둘째 목요일 규칙에 따른 표시이며, 휴장 또는 임시 변경 시 앞당겨질 수 있어 거래소 공지를 추가 확인해야 한다. 실제 최종결제일과는 구분한다. 기존 상품별 만기 일정과 같은 날을 묶어 설명한 항목이다.',
   relatedSources: ['futures', 'krx', 'stockFutures', 'stockOptions'],
 });
-const labels={expiry:'선물·옵션 만기',index:'ETF·지수 정기변경',policy:'금리·중앙은행',macro:'물가·고용',holiday:'휴장·단축거래'};
+const labels={expiry:'선물·옵션 만기',index:'ETF·지수 정기변경',policy:'금리·중앙은행',macro:'물가·고용',growth:'성장·소비',holiday:'휴장·단축거래'};
 function timing(e) { return e.time || (e.region === 'KR' ? '한국 날짜' : e.region === 'US' ? '미국 현지 날짜 · 시각 미정' : '출처 날짜 · 시각 미정'); }
 const $=id=>document.getElementById(id);
 const today=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Seoul',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
