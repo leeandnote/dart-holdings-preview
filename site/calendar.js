@@ -15,14 +15,73 @@ const events=[
  ['2026-12-24','NYSE 성탄절 전일 단축거래','holiday','US','nyse','공식 발표','America/New_York','미국 동부시간 13:00 주식시장 조기 종료.'],
  ['2026-12-25','NYSE 성탄절 휴장','holiday','US','nyse','공식 발표','America/New_York','NYSE 주식시장 휴장.']
 ].map(([date,title,type,region,source,status,zone,description],id)=>({id,date,title,type,region,source,status,zone,description}));
-const labels={expiry:'선물·옵션 만기',index:'ETF·지수 정기변경',policy:'통화정책',holiday:'휴장·단축거래'};
+import { macroSources, macroEvents } from './calendar-macro.mjs';
+Object.assign(sources, macroSources);
+events.push(...macroEvents);
+const labels={expiry:'선물·옵션 만기',index:'ETF·지수 정기변경',policy:'금리·중앙은행',macro:'물가·고용',holiday:'휴장·단축거래'};
+function timing(e) { return e.time || (e.region === 'KR' ? '한국 날짜' : e.region === 'US' ? '미국 현지 날짜 · 시각 미정' : '출처 날짜 · 시각 미정'); }
 const $=id=>document.getElementById(id);
 const today=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Seoul',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
 let month=today.slice(0,7),view=matchMedia('(max-width:700px)').matches?'list':'month';
 function element(tag,text,className){const e=document.createElement(tag);if(text)e.textContent=text;if(className)e.className=className;return e;}
-function show(event){$('detailType').textContent=labels[event.type];$('detailTitle').textContent=event.title;$('detailDate').textContent=event.date+' · '+event.zone;$('detailText').textContent=event.description;$('detailMeta').replaceChildren();for(const [label,value] of [['상태',event.status],['출처',sources[event.source][0]],['출처 확인일','2026-10-08'],['기준 시간대',event.zone]]){$('detailMeta').append(element('dt',label),element('dd',value));}$('detailSource').href=sources[event.source][1];$('eventDialog').showModal();}
+function show(event){$('detailType').textContent=labels[event.type];$('detailTitle').textContent=event.title;$('detailDate').textContent=event.date+' · '+timing(event);$('detailText').textContent=event.description;$('detailMeta').replaceChildren();const meta=[['상태',event.status],['출처',sources[event.source][0]],['출처 확인일','2026-10-08'],['출처 시간대',event.zone]];if(event.localDate)meta.push(['현지 발표',event.localDate+' '+event.localTime]);for(const [label,value] of meta){$('detailMeta').append(element('dt',label),element('dd',value));}$('detailSource').href=sources[event.source][1];$('eventDialog').showModal();}
 function button(event,cls){const b=element('button','',cls);b.type='button';b.dataset.type=event.type;b.setAttribute('aria-label',event.date+' '+event.title);b.addEventListener('click',()=>show(event));return b;}
 function matches(e){return ($('type').value==='all'||e.type===$('type').value)&&($('region').value==='all'||e.region===$('region').value)&&(e.title+' '+sources[e.source][0]).toLowerCase().includes($('search').value.trim().toLowerCase());}
-function render(){const rows=events.filter(e=>e.date.startsWith(month)&&matches(e)).sort((a,b)=>a.date.localeCompare(b.date));$('monthLabel').textContent=month.replace('-','년 ')+'월';$('resultCount').textContent=rows.length+'건 · 현지 날짜 기준';$('calendar').hidden=view!=='month';$('agenda').hidden=view!=='list';$('monthView').setAttribute('aria-pressed',view==='month');$('listView').setAttribute('aria-pressed',view==='list');$('calendar').replaceChildren();$('agenda').replaceChildren();const week=element('div','','calWeek');for(const day of ['일','월','화','수','목','금','토'])week.append(element('span',day));const grid=element('div','','calGrid');const first=new Date(month+'-01T00:00:00Z');const offset=first.getUTCDay();const count=new Date(first.getUTCFullYear(),first.getUTCMonth()+1,0).getDate();for(let i=0;i<Math.ceil((offset+count)/7)*7;i++){const d=new Date(first);d.setUTCDate(1-offset+i);const date=d.toISOString().slice(0,10);const cell=element('div','','calDay'+(!date.startsWith(month)?' outside':'')+(date===today?' isToday':''));const time=element('time',String(d.getUTCDate()));time.dateTime=date;cell.append(time);for(const e of rows.filter(e=>e.date===date)){const b=button(e,'calEvent');b.textContent=e.title;cell.append(b);}grid.append(cell);}$('calendar').append(week,grid);for(const e of rows){const b=button(e,'agendaRow');const date=element('span',e.date.slice(5));date.append(element('small',e.region==='KR'?'한국':e.region==='US'?'미국 현지':'출처 날짜'));const text=element('span');text.append(element('strong',e.title),element('small',labels[e.type]+' · '+sources[e.source][0]));b.append(date,text,element('span',e.status));$('agenda').append(b);}if(!rows.length){const notice=month<'2026-10'||month>'2026-12'?'이 달은 아직 검수한 일정이 없다. 일정이 없다는 뜻은 아니다.':'선택한 조건에 등록된 일정이 없다.';$('agenda').append(element('p',notice,'calEmpty'));$('calendar').append(element('p',notice,'calEmpty'));}$('upcoming').replaceChildren();const upcoming=events.filter(e=>e.date>=today&&matches(e)).sort((a,b)=>a.date.localeCompare(b.date)).slice(0,3);for(const e of upcoming){const b=button(e,'');b.append(element('small',e.date+' · '+e.status),element('strong',e.title),element('small',sources[e.source][0]));$('upcoming').append(b);}if(!upcoming.length)$('upcoming').append(element('p','조건에 맞는 예정 일정이 없다.','muted'));}
+function render() {
+  const sort = (a,b) => a.date.localeCompare(b.date) || (a.instant || '').localeCompare(b.instant || '');
+  const rows = events.filter(e => e.date.startsWith(month) && matches(e)).sort(sort);
+  $('monthLabel').textContent = month.replace('-','년 ')+'월';
+  $('resultCount').textContent = rows.length+'건 · 발표 시각은 한국시간, 날짜만 공표된 해외 일정은 현지 날짜';
+  $('calendar').hidden = view !== 'month';
+  $('agenda').hidden = view !== 'list';
+  $('monthView').setAttribute('aria-pressed', view === 'month');
+  $('listView').setAttribute('aria-pressed', view === 'list');
+  $('calendar').replaceChildren();
+  $('agenda').replaceChildren();
+  const week = element('div','','calWeek');
+  for (const day of ['일','월','화','수','목','금','토']) week.append(element('span',day));
+  const grid = element('div','','calGrid');
+  const first = new Date(month+'-01T00:00:00Z');
+  const offset = first.getUTCDay();
+  const count = new Date(first.getUTCFullYear(),first.getUTCMonth()+1,0).getDate();
+  for (let i=0; i<Math.ceil((offset+count)/7)*7; i++) {
+    const d = new Date(first);
+    d.setUTCDate(1-offset+i);
+    const date = d.toISOString().slice(0,10);
+    const cell = element('div','','calDay'+(!date.startsWith(month)?' outside':'')+(date===today?' isToday':''));
+    const time = element('time',String(d.getUTCDate()));
+    time.dateTime = date;
+    cell.append(time);
+    for (const e of rows.filter(e=>e.date===date)) {
+      const b = button(e,'calEvent');
+      b.append(element('span',e.title), element('small',timing(e)));
+      cell.append(b);
+    }
+    grid.append(cell);
+  }
+  $('calendar').append(week,grid);
+  for (const e of rows) {
+    const b = button(e,'agendaRow');
+    const date = element('span',e.date.slice(5));
+    date.append(element('small',timing(e)));
+    const text = element('span');
+    text.append(element('strong',e.title),element('small',labels[e.type]+' · '+sources[e.source][0]));
+    b.append(date,text,element('span',e.status));
+    $('agenda').append(b);
+  }
+  if (!rows.length) {
+    const notice = month<'2026-10'||month>'2026-12'?'이 달은 아직 검수한 일정이 없다. 일정이 없다는 뜻은 아니다.':'선택한 조건에 등록된 일정이 없다.';
+    $('agenda').append(element('p',notice,'calEmpty'));
+    $('calendar').append(element('p',notice,'calEmpty'));
+  }
+  $('upcoming').replaceChildren();
+  const upcoming = events.filter(e=>e.date>=today&&matches(e)).sort(sort).slice(0,3);
+  for (const e of upcoming) {
+    const b = button(e,'');
+    b.append(element('small',e.date+' · '+timing(e)),element('strong',e.title),element('small',sources[e.source][0]+' · '+e.status));
+    $('upcoming').append(b);
+  }
+  if (!upcoming.length) $('upcoming').append(element('p','조건에 맞는 예정 일정이 없다.','muted'));
+}
 function move(delta){const d=new Date(month+'-01T00:00:00Z');d.setUTCMonth(d.getUTCMonth()+delta);month=d.toISOString().slice(0,7);render();}
 $('previous').onclick=()=>move(-1);$('next').onclick=()=>move(1);$('today').onclick=()=>{month=today.slice(0,7);render();};$('monthView').onclick=()=>{view='month';render();};$('listView').onclick=()=>{view='list';render();};for(const id of ['type','region','search'])$(id).addEventListener('input',render);$('closeDialog').onclick=()=>$('eventDialog').close();render();
