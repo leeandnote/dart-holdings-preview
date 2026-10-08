@@ -32,6 +32,19 @@ const $=id=>document.getElementById(id);
 const today=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Seoul',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
 let month=today.slice(0,7),view=matchMedia('(max-width:700px)').matches?'list':'month';
 function element(tag,text,className){const e=document.createElement(tag);if(text)e.textContent=text;if(className)e.className=className;return e;}
+function eventTitle(e) {
+  const row = element('span', '', 'eventTitle');
+  const flag = element('img', '', 'eventFlag');
+  const regions = { KR: ['kr.png','한국'], US: ['us.png','미국'], JP: ['jp.png','일본'], GLOBAL: ['global.svg','글로벌'] };
+  const [file, name] = regions[e.region] || regions.GLOBAL;
+  flag.src = '/assets/flags/' + file;
+  flag.alt = name;
+  flag.width = 20;
+  flag.height = 15;
+  row.append(flag, element('span', e.title));
+  if (e.relatedSources) row.classList.add('isMajor');
+  return row;
+}
 function show(event){$('detailType').textContent=labels[event.type];$('detailTitle').textContent=event.title;$('detailDate').textContent=event.date+' · '+timing(event);$('detailText').textContent=event.description;$('detailMeta').replaceChildren();const meta=[['상태',event.status],['출처',sources[event.source][0]],['출처 확인일','2026-10-08'],['출처 시간대',event.zone]];if(event.localDate)meta.push(['현지 발표',event.localDate+' '+event.localTime]);for(const [label,value] of meta){$('detailMeta').append(element('dt',label),element('dd',value));}$('detailSource').href=sources[event.source][1];$('eventDialog').showModal();}
 function button(event,cls){const b=element('button','',cls);b.type='button';b.dataset.type=event.type;b.setAttribute('aria-label',event.date+' '+event.title);b.addEventListener('click',()=>{show(event);for(const key of event.relatedSources || []){const dd=element('dd');const a=element('a',sources[key][0]);a.href=sources[key][1];a.target='_blank';a.rel='noopener noreferrer';dd.append(a);$('detailMeta').append(element('dt','상품 규정'),dd);}});return b;}
 function matches(e){return ($('type').value==='all'||e.type===$('type').value)&&($('region').value==='all'||e.region===$('region').value)&&(e.title+' '+sources[e.source][0]).toLowerCase().includes($('search').value.trim().toLowerCase());}
@@ -62,7 +75,7 @@ function render() {
     cell.append(time);
     for (const e of rows.filter(e=>e.date===date)) {
       const b = button(e,'calEvent');
-      b.append(element('span',e.title), element('small',timing(e)));
+      b.append(eventTitle(e), element('small',timing(e)));
       cell.append(b);
     }
     grid.append(cell);
@@ -73,7 +86,7 @@ function render() {
     const date = element('span',e.date.slice(5));
     date.append(element('small',timing(e)));
     const text = element('span');
-    text.append(element('strong',e.title),element('small',labels[e.type]+' · '+sources[e.source][0]));
+    text.append(eventTitle(e),element('small',labels[e.type]+' · '+sources[e.source][0]));
     b.append(date,text,element('span',e.status));
     $('agenda').append(b);
   }
@@ -86,7 +99,7 @@ function render() {
   const upcoming = events.filter(e=>e.date>=today&&matches(e)).sort(sort).slice(0,3);
   for (const e of upcoming) {
     const b = button(e,'');
-    b.append(element('small',e.date+' · '+timing(e)),element('strong',e.title),element('small',sources[e.source][0]+' · '+e.status));
+    b.append(element('small',e.date+' · '+timing(e)),eventTitle(e),element('small',sources[e.source][0]+' · '+e.status));
     $('upcoming').append(b);
   }
   if (!upcoming.length) $('upcoming').append(element('p','조건에 맞는 예정 일정이 없다.','muted'));
