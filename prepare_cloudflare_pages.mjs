@@ -69,6 +69,26 @@ makeCleanRoute("5percent.html", "5percent");
 makeCleanRoute("executives.html", "executives");
 makeCleanRoute("contracts.html", "contracts");
 makeCleanRoute("major-events.html", "major-events");
+makeCleanRoute("calendar.html", "calendar");
+
+// Apply the shared navigation to generated blog and scanner pages at build time.
+for (const file of walk(distDir).filter((file) => file.endsWith('.html'))) {
+  const html = fs.readFileSync(file, 'utf8');
+  if (!html.includes('href="/calendar"') && html.includes('class="siteNav"')) {
+    const link = '<a class="navLink" href="/calendar"><span class="navIcon disclosureIcon"></span>주요 일정</a>';
+    const anchor = /(<a\b[^>]*href="\/major-events\/?"[^>]*>[\s\S]*?<\/a>)/;
+    const updated = anchor.test(html) ? html.replace(anchor, `$1${link}`) : html.replace(/(<nav class="siteNav"[^>]*>)/, `$1${link}`);
+    fs.writeFileSync(file, updated, 'utf8');
+  }
+}
+
+const sitemapPath = path.join(distDir, "sitemap.xml");
+if (fs.existsSync(sitemapPath)) {
+  const sitemap = fs.readFileSync(sitemapPath, "utf8");
+  if (!sitemap.includes("https://leeandnote.com/calendar</loc>")) {
+    fs.writeFileSync(sitemapPath, sitemap.replace("</urlset>", "<url><loc>https://leeandnote.com/calendar</loc></url>\n</urlset>"), "utf8");
+  }
+}
 
 const latestJsonPath = path.join(siteDir, "data", "latest.json");
 if (fs.existsSync(latestJsonPath)) {
