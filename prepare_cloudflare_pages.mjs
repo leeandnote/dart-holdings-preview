@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
+import { applySiteMetadata } from "./site_metadata.mjs";
 
 const root = path.dirname(fileURLToPath(import.meta.url));
 const publicDaysArg = process.argv.find((arg) => arg.startsWith("--days="));
@@ -126,6 +127,7 @@ if (fs.existsSync(latestJsonPath)) {
   fs.writeFileSync(path.join(dataDir, "latest.js"), `window.__DART_DATA__ = ${jsonText};\n`, "utf8");
 }
 
+applySiteMetadata(distDir);
 const files = walk(distDir);
 const tooLarge = files
   .map((file) => ({ file, size: fs.statSync(file).size }))

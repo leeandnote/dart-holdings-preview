@@ -8,6 +8,7 @@ on:
     paths:
       - "site/**"
       - "prepare_cloudflare_pages.mjs"
+      - "site_metadata.mjs"
       - "generate_daily_blog.mjs"
       - "generate_blog_archive.mjs"
       - "generate_issue_analysis.mjs"
