@@ -157,6 +157,17 @@ jobs:
         shell: pwsh
         run: |
           if ("${{ inputs.post_threads }}" -eq "true" -or "${{ inputs.post_instagram }}" -eq "true" -or "${{ inputs.post_youtube }}" -eq "true") {
+            # Video staging deploys the whole site, so rebuild the same blog window as site-deploy.
+            $kstToday = [DateTimeOffset]::UtcNow.ToOffset([TimeSpan]::FromHours(9)).Date
+            for ($i = 0; $i -lt 30; $i++) {
+              $blogDate = $kstToday.AddDays(-$i).ToString("yyyyMMdd")
+              & node ./generate_daily_blog.mjs $blogDate
+              if ($LASTEXITCODE -ne 0) { throw "Social staging blog generation failed" }
+            }
+            & node ./generate_blog_archive.mjs --days=30
+            if ($LASTEXITCODE -ne 0) { throw "Social staging blog archive failed" }
+            & node ./generate_issue_analysis.mjs
+            if ($LASTEXITCODE -ne 0) { throw "Social staging issue analysis failed" }
             & node ./prepare_cloudflare_pages.mjs --days=120
             if ($LASTEXITCODE -ne 0) { throw "Social video staging build failed" }
           }
