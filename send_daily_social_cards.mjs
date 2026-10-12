@@ -335,6 +335,8 @@ function cleanMajorEventTitle(value) {
 function majorEventMetric(text, kind) {
   const source = String(text || "").replace(/\s+/g, " ");
   if (/임상|IND/i.test(kind)) {
+    const outcome = source.match(/(?:승인\s*)?신청\s*(?:반려|철회)|승인\s*(?:취소|거절)/)?.[0];
+    if (outcome) return outcome;
     const stage = source.match(/(?:미국|국내|한국|유럽|글로벌)?\s*(?:제\s*)?\d(?:\/\d[a-z]?)?\s*상/i)?.[0]?.replace(/\s+/g, " ");
     const status = source.match(/IND\s*(?:신청|승인)|임상시험(?:계획)?\s*(?:신청|승인|변경승인|결과)|CSR\s*수령/i)?.[0]?.replace(/\s+/g, " ");
     return [stage, status].filter(Boolean).join(" · ").trim() || "임상 단계 원문 확인";
@@ -344,6 +346,8 @@ function majorEventMetric(text, kind) {
   }
   const eok = source.match(/(?:약\s*)?[\d,.]+\s*억\s*원?/i)?.[0]?.replace(/\s+/g, "");
   const foreign = source.match(/(?:USD|US\$|\$|EUR|€)\s*[\d,.]+\s*(?:M|million|백만)?/i)?.[0];
+  const won = source.match(/(?:낙찰금액|계약금액)\s*\(원\)\s*[:：]\s*([\d,]+)/)?.[1];
+  if (!eok && won) return `${(Number(won.replaceAll(",", "")) / 1e8).toLocaleString("ko-KR", { maximumFractionDigits: 1 })}억원`;
   return [eok, foreign].filter(Boolean).join(" · ") || (kind === "소송" ? "소송 진행상황" : "핵심 수치 원문 확인");
 }
 
@@ -377,8 +381,10 @@ function pickMajorEvents(rows) {
     }
     if (/기술이전.*(?:해지|반환)|라이선스.*(?:해지|반환)/.test(`${title} ${detail}`)) kind = "기술이전";
     else if (/기술이전|기술도입|라이선스|공동연구|파트너십|독점판매권/.test(title)) kind = "기술이전";
+    if (/주식양수도|최대주주\s*변경/.test(title)) kind = "지배구조";
     const storedMetric = String(row.metric || "").trim();
-    const metric = storedMetric && !/^(?:원문|핵심 수치|임상 진행단계)/.test(storedMetric)
+    const adverseClinical = /임상|IND/i.test(kind) && /신청\s*(?:반려|철회)|승인\s*(?:취소|거절)/.test(title);
+    const metric = adverseClinical ? majorEventMetric(title, kind) : storedMetric && !/^(?:원문|핵심 수치|임상 진행단계)/.test(storedMetric)
       ? storedMetric
       : majorEventMetric(source, kind);
     return {
