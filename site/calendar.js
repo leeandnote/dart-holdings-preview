@@ -15,7 +15,7 @@ const events=[
  ['2026-12-24','NYSE 성탄절 전일 단축거래','holiday','US','nyse','공식 발표','America/New_York','미국 동부시간 13:00 주식시장 조기 종료.'],
  ['2026-12-25','NYSE 성탄절 휴장','holiday','US','nyse','공식 발표','America/New_York','NYSE 주식시장 휴장.']
 ].map(([date,title,type,region,source,status,zone,description],id)=>({id,date,title,type,region,source,status,zone,description}));
-import { macroSources, macroEvents } from './calendar-macro.mjs?v=20261008-5';
+import { macroSources, macroEvents } from './calendar-macro.mjs?v=20261012-1';
 Object.assign(sources, macroSources);
 events.push(...macroEvents);
 sources.stockFutures = ['한국거래소 · 개별주식 선물', 'https://global.krx.co.kr/contents/GLB/02/0201/0201040401/GLB0201040401.jsp'];
@@ -45,7 +45,7 @@ function eventTitle(e) {
   if (e.relatedSources) row.classList.add('isMajor');
   return row;
 }
-function show(event){$('detailType').textContent=labels[event.type];$('detailTitle').textContent=event.title;$('detailDate').textContent=event.date+' · '+timing(event);$('detailText').textContent=event.description;$('detailMeta').replaceChildren();const meta=[['상태',event.status],['출처',sources[event.source][0]],['출처 확인일','2026-10-08'],['출처 시간대',event.zone]];if(event.localDate)meta.push(['현지 발표',event.localDate+' '+event.localTime]);for(const [label,value] of meta){$('detailMeta').append(element('dt',label),element('dd',value));}$('detailSource').href=sources[event.source][1];$('eventDialog').showModal();}
+function show(event){$('detailType').textContent=labels[event.type];$('detailTitle').textContent=event.title;$('detailDate').textContent=event.date+' · '+timing(event);$('detailText').textContent=event.description;$('detailMeta').replaceChildren();const meta=[['상태',event.status],['출처',sources[event.source][0]],['출처 확인일',event.checkedAt || '2026-10-08'],['출처 시간대',event.zone]];if(event.localDate)meta.push(['현지 발표',event.localDate+' '+event.localTime]);for(const [label,value] of meta){$('detailMeta').append(element('dt',label),element('dd',value));}$('detailSource').href=sources[event.source][1];$('eventDialog').showModal();}
 function button(event,cls){const b=element('button','',cls);b.type='button';b.dataset.type=event.type;b.setAttribute('aria-label',event.date+' '+event.title);b.addEventListener('click',()=>{show(event);for(const key of event.relatedSources || []){const dd=element('dd');const a=element('a',sources[key][0]);a.href=sources[key][1];a.target='_blank';a.rel='noopener noreferrer';dd.append(a);$('detailMeta').append(element('dt','상품 규정'),dd);}});return b;}
 function matches(e){return ($('type').value==='all'||e.type===$('type').value)&&($('region').value==='all'||e.region===$('region').value)&&(e.title+' '+sources[e.source][0]).toLowerCase().includes($('search').value.trim().toLowerCase());}
 function render() {

@@ -67,4 +67,6 @@ const additional = [
     zone: 'America/New_York', description };
 });
 
-export const macroEvents = [...meetings, ...releases, ...additional];
+export const macroEvents = [...meetings, ...releases, ...additional].map(event => ({
+  ...event, checkedAt: '2026-10-12',
+}));
