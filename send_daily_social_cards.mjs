@@ -1110,7 +1110,7 @@ async function instagramFetch(pathname, params = {}) {
 
 async function waitForInstagramContainer(containerId) {
   const { accessToken } = await loadInstagramConfig();
-  for (let attempt = 1; attempt <= 20; attempt += 1) {
+  for (let attempt = 1; attempt <= 120; attempt += 1) {
     const query = new URLSearchParams({ fields: "status_code,status", access_token: accessToken });
     const response = await fetch(`https://graph.instagram.com/v24.0/${containerId}?${query}`);
     const body = await response.json().catch(() => ({}));
@@ -1118,8 +1118,8 @@ async function waitForInstagramContainer(containerId) {
     if (["ERROR", "EXPIRED"].includes(body.status_code)) {
       throw new Error(`Instagram media processing failed: ${body.status || body.status_code}`);
     }
-    if (attempt === 20) throw new Error(`Instagram media processing timed out: ${body.status_code || response.status}`);
-    await new Promise((resolve) => setTimeout(resolve, 3000));
+    if (attempt === 120) throw new Error(`Instagram media processing timed out: ${body.status_code || response.status}`);
+    await new Promise((resolve) => setTimeout(resolve, 5000));
   }
 }
 
