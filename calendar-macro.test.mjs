@@ -2,6 +2,16 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { macroEvents, macroSources, koreanTime } from './site/calendar-macro.mjs';
 
+test('BLS events link to their specific official release schedules', () => {
+  const types = [['CPI', 'cpi'], ['PPI', 'ppi'], ['고용보고서', 'empsit'], ['JOLTS', 'jolts'], ['고용비용지수', 'eci']];
+  for (const [name, slug] of types) {
+    const events = macroEvents.filter(e => e.title.includes(name));
+    assert.ok(events.length > 0);
+    for (const event of events) assert.equal(macroSources[event.source][1], `https://www.bls.gov/schedule/news_release/${slug}.htm`);
+  }
+  assert.ok(Object.values(macroSources).every(([, url]) => !url.includes('/2026/home.htm')));
+});
+
 test('reviewed macro entries have valid dates and official sources', () => {
   assert.equal(macroEvents.length, 27);
   assert.equal(new Set(macroEvents.map(e => e.date + e.title)).size, 27);

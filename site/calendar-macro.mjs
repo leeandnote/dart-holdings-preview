@@ -2,7 +2,11 @@ export const macroSources = {
   bok: ['한국은행 · 2026 통화정책방향 결정회의', 'https://www.bok.or.kr/portal/singl/crncyPolicyDrcMtg/listYear.do?menuNo=200755&mtgSe=A&pYear=2026'],
   boj: ['일본은행 · 2026 금융정책결정회의 일정', 'https://www.boj.or.jp/en/mopo/mpmsche_minu/m_ref/mref250731a.pdf'],
   bea: ['BEA · 경제지표 발표 일정', 'https://www.bea.gov/news/schedule/'],
-  bls: ['BLS · 2026 경제지표 발표 일정', 'https://www.bls.gov/schedule/2026/home.htm'],
+  blsCpi: ['BLS · 소비자물가지수(CPI) 발표 일정', 'https://www.bls.gov/schedule/news_release/cpi.htm'],
+  blsPpi: ['BLS · 생산자물가지수(PPI) 발표 일정', 'https://www.bls.gov/schedule/news_release/ppi.htm'],
+  blsEmployment: ['BLS · 고용보고서 발표 일정', 'https://www.bls.gov/schedule/news_release/empsit.htm'],
+  blsJolts: ['BLS · 구인·이직(JOLTS) 발표 일정', 'https://www.bls.gov/schedule/news_release/jolts.htm'],
+  blsEci: ['BLS · 고용비용지수(ECI) 발표 일정', 'https://www.bls.gov/schedule/news_release/eci.htm'],
   census: ['미국 Census Bureau · 소매판매 발표 일정', 'https://www.census.gov/retail/release_schedule.html'],
 };
 
@@ -44,7 +48,8 @@ const releases = [
   const instant = `${localDate}T08:30:00${offset}`;
   return {
     ...koreanTime(instant), instant, localDate, localTime: '08:30 미국 동부시간',
-    title: `미국 ${name} (${period})`, type: 'macro', region: 'US', source,
+    title: `미국 ${name} (${period})`, type: 'macro', region: 'US',
+    source: source === 'bls' ? (name.startsWith('CPI') ? 'blsCpi' : name.startsWith('PPI') ? 'blsPpi' : 'blsEmployment') : source,
     status: '공식 일정', zone: 'America/New_York',
     description: `2026년 ${period} 통계의 발표 일정이다. ${source === 'bea' ? '개인소득·지출 보고서에 PCE와 식품·에너지를 제외한 근원 PCE 물가지수가 포함된다.' : '발표 대상월과 실제 발표일은 다르다.'} 발표값·시장 예상치는 수록하지 않으며 일정 변경은 공식 출처에서 확인한다.`,
   };
@@ -63,7 +68,8 @@ const additional = [
 ].map(([localDate, clock, name, source, type, description]) => {
   const instant = `${localDate}T${clock}:00${localDate < '2026-11-01' ? '-04:00' : '-05:00'}`;
   return { ...koreanTime(instant), instant, localDate, localTime: `${clock} 미국 동부시간`,
-    title: `미국 ${name}`, type, region: 'US', source, status: '공식 일정',
+    title: `미국 ${name}`, type, region: 'US',
+    source: source === 'bls' ? (name.startsWith('JOLTS') ? 'blsJolts' : 'blsEci') : source, status: '공식 일정',
     zone: 'America/New_York', description };
 });
 

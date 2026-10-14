@@ -15,7 +15,7 @@ const events=[
  ['2026-12-24','NYSE 성탄절 전일 단축거래','holiday','US','nyse','공식 발표','America/New_York','미국 동부시간 13:00 주식시장 조기 종료.'],
  ['2026-12-25','NYSE 성탄절 휴장','holiday','US','nyse','공식 발표','America/New_York','NYSE 주식시장 휴장.']
 ].map(([date,title,type,region,source,status,zone,description],id)=>({id,date,title,type,region,source,status,zone,description}));
-import { macroSources, macroEvents } from './calendar-macro.mjs?v=20261012-1';
+import { macroSources, macroEvents } from './calendar-macro.mjs?v=20261014-1';
 Object.assign(sources, macroSources);
 events.push(...macroEvents);
 sources.stockFutures = ['한국거래소 · 개별주식 선물', 'https://global.krx.co.kr/contents/GLB/02/0201/0201040401/GLB0201040401.jsp'];
