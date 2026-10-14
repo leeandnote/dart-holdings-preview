@@ -338,6 +338,8 @@ function majorEventMetric(text, kind) {
     const outcome = source.match(/(?:승인\s*)?신청\s*(?:반려|철회)|승인\s*(?:취소|거절)/)?.[0];
     if (outcome) return outcome;
     const stage = source.match(/(?:미국|국내|한국|유럽|글로벌)?\s*(?:제\s*)?\d(?:\/\d[a-z]?)?\s*상/i)?.[0]?.replace(/\s+/g, " ");
+    const result = source.match(/(?:top\s*line(?:\s*data)?|CSR|결과보고서)\s*수령/i)?.[0];
+    if (result) return [stage?.trim(), /top\s*line/i.test(result) ? "탑라인 결과 수령" : "결과보고서 수령"].filter(Boolean).join(" · ");
     const status = source.match(/IND\s*(?:신청|승인)|임상시험(?:계획)?\s*(?:신청|승인|변경승인|결과)|CSR\s*수령/i)?.[0]?.replace(/\s+/g, " ");
     return [stage, status].filter(Boolean).join(" · ").trim() || "임상 단계 원문 확인";
   }
@@ -383,8 +385,9 @@ function pickMajorEvents(rows) {
     else if (/기술이전|기술도입|라이선스|공동연구|파트너십|독점판매권/.test(title)) kind = "기술이전";
     if (/주식양수도|최대주주\s*변경/.test(title)) kind = "지배구조";
     const storedMetric = String(row.metric || "").trim();
-    const adverseClinical = /임상|IND/i.test(kind) && /신청\s*(?:반려|철회)|승인\s*(?:취소|거절)/.test(title);
-    const metric = adverseClinical ? majorEventMetric(title, kind) : storedMetric && !/^(?:원문|핵심 수치|임상 진행단계)/.test(storedMetric)
+    const fullTitle = String(row.eventTitle || row.reportName || row["보고서명"] || title);
+    const explicitClinicalOutcome = /임상|IND/i.test(kind) && /신청\s*(?:반려|철회)|승인\s*(?:취소|거절)|(?:top\s*line(?:\s*data)?|CSR|결과보고서)\s*수령/i.test(fullTitle);
+    const metric = explicitClinicalOutcome ? majorEventMetric(fullTitle, kind) : storedMetric && !/^(?:원문|핵심 수치|임상 진행단계)/.test(storedMetric)
       ? storedMetric
       : majorEventMetric(source, kind);
     return {

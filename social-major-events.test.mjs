@@ -16,6 +16,14 @@ test('share transfer is not a supply contract', () => {
   const [row] = context.pickMajorEvents([{ corpName: '광명전기', eventTitle: '최대주주 변경을 수반하는 주식양수도계약 체결', eventType: '단일판매·수주' }]);
   assert.equal(row.kind, '지배구조');
 });
+test('topline receipt overrides approval using the untruncated title', () => {
+  const [row] = context.pickMajorEvents([{ corpName: '압타바이오', eventTitle: '임상시험결과) (조영제유발급성신장손상(CIAKI) 치료제 Isuzinaxib(APX115)의 임상시험 제2상 Topline data수령', eventType: '임상시험·IND', metric: '제2상 · 임상시험계획 승인' }]);
+  assert.equal(row.metric, '제2상 · 탑라인 결과 수령');
+});
+test('clinical approval is preserved when no result receipt is announced', () => {
+  const [row] = context.pickMajorEvents([{ corpName: '셀트리온', eventTitle: '한국 임상 3상 시험계획 승인', eventType: '임상시험·IND', metric: '3상 · 임상시험계획 승인' }]);
+  assert.equal(row.metric, '3상 · 임상시험계획 승인');
+});
 test('bid amount in won is converted without treating it as revenue', () => {
   assert.equal(context.majorEventMetric('낙찰금액(원) : 108,081,549,400 (부가세 제외)', '단일판매·수주'), '1,080.8억원');
   assert.equal(context.majorEventMetric('최근매출액(원) : 108,081,549,400', '단일판매·수주'), '핵심 수치 원문 확인');
