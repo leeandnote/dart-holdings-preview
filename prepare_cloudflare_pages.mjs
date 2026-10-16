@@ -71,7 +71,6 @@ makeCleanRoute("executives.html", "executives");
 makeCleanRoute("contracts.html", "contracts");
 makeCleanRoute("major-events.html", "major-events");
 makeCleanRoute("calendar.html", "calendar");
-makeCleanRoute("charts.html", "charts");
 
 // Apply the shared navigation to generated blog and scanner pages at build time.
 for (const file of walk(distDir).filter((file) => file.endsWith('.html'))) {
@@ -84,26 +83,11 @@ for (const file of walk(distDir).filter((file) => file.endsWith('.html'))) {
   }
 }
 
-for (const file of walk(distDir).filter(file => file.endsWith('.html'))) {
-  const html = fs.readFileSync(file, 'utf8');
-  if (html.includes('class="siteNav"') && !html.includes('href="/charts"')) {
-    const link = '<a class="navLink" href="/charts"><span class="navIcon disclosureIcon"></span>차트</a>';
-    fs.writeFileSync(file, html.replace(/(<a\b[^>]*href="\/calendar\/?"[^>]*>[\s\S]*?<\/a>)/, `$1${link}`), 'utf8');
-  }
-}
-
 const sitemapPath = path.join(distDir, "sitemap.xml");
 if (fs.existsSync(sitemapPath)) {
   const sitemap = fs.readFileSync(sitemapPath, "utf8");
   if (!sitemap.includes("https://leeandnote.com/calendar</loc>")) {
     fs.writeFileSync(sitemapPath, sitemap.replace("</urlset>", "<url><loc>https://leeandnote.com/calendar</loc></url>\n</urlset>"), "utf8");
-  }
-}
-
-if (fs.existsSync(sitemapPath)) {
-  const sitemap = fs.readFileSync(sitemapPath, 'utf8');
-  if (!sitemap.includes('https://leeandnote.com/charts</loc>')) {
-    fs.writeFileSync(sitemapPath, sitemap.replace('</urlset>', '<url><loc>https://leeandnote.com/charts</loc></url>\n</urlset>'), 'utf8');
   }
 }
 
