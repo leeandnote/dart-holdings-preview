@@ -3,6 +3,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
 import { applySiteMetadata } from "./site_metadata.mjs";
+import { applyBlogEditorial } from "./blog_editorial.mjs";
 
 const root = path.dirname(fileURLToPath(import.meta.url));
 const publicDaysArg = process.argv.find((arg) => arg.startsWith("--days="));
@@ -62,6 +63,10 @@ if (!fs.existsSync(siteDir)) throw new Error(`site folder not found: ${siteDir}`
 removeDirSafe(distDir);
 fs.mkdirSync(deployDir, { recursive: true });
 fs.cpSync(siteDir, distDir, { recursive: true });
+// Market-ranking drafts stay local until the provider integration is reviewed.
+for (const draft of ['market-rankings.html','market-rankings.css','market-rankings.mjs','market-rankings-model.mjs','data/market-rankings.json']) {
+  fs.rmSync(path.join(distDir, draft), { force: true });
+}
 const publicLogosDir = path.join(root, "public", "logos");
 if (fs.existsSync(publicLogosDir)) {
   fs.cpSync(publicLogosDir, path.join(distDir, "logos"), { recursive: true });
@@ -128,6 +133,7 @@ if (fs.existsSync(latestJsonPath)) {
 }
 
 applySiteMetadata(distDir);
+console.log(`BLOG_EDITORIAL_PAGES=${await applyBlogEditorial(distDir)}`);
 const files = walk(distDir);
 const tooLarge = files
   .map((file) => ({ file, size: fs.statSync(file).size }))
