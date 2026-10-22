@@ -5,6 +5,11 @@ import {createHash} from 'node:crypto';
 const origin='https://leeandnote.com';
 const esc=s=>String(s??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;');
 const json=s=>JSON.stringify(s).replaceAll('<','\\u003c');
+export function inheritAdSense(html,template){
+  const tags=[...template.matchAll(/<meta\b[^>]*name="google-adsense-account"[^>]*>|<script\b[^>]*src="https:\/\/pagead2\.googlesyndication\.com\/pagead\/js\/adsbygoogle\.js[^"<>]*"[^>]*>[\s\S]*?<\/script>/gi)].map(m=>m[0]);
+  const missing=tags.filter(tag=>tag.startsWith('<meta')?!html.includes('name="google-adsense-account"'):!html.includes('/pagead/js/adsbygoogle.js'));
+  return html.replace('</head>',missing.join('')+'</head>');
+}
 export const termGroups={
   ownership:[
     ['보유비율과 지분율 변동폭은 어떻게 다른가?','보유비율은 전체 기준 주식 수에서 보유분이 차지하는 비율이다. 5%에서 6%로 바뀌면 변동폭은 1%포인트이며, 증가율 1%와는 다르다.'],
@@ -86,6 +91,8 @@ export async function applyBlogEditorial(dist,{remote=true,now=new Date().toISOS
   const topbar=template.match(/<header class="topbar">[\s\S]*?<\/header>/)?.[0]||'<a href="/blog/">공시 블로그</a>';
   const labels={ownership:'지분·임원보고',contracts:'수주·계약',clinical:'임상·기술수출',events:'투자판단·정정'};
   fs.writeFileSync(path.join(dist,'stock-terms.html'),`<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>주식·공시 용어 Q&amp;A | 리앤노트</title><meta name="description" content="보유비율과 %포인트, 수주 계약금액, IND와 마일스톤, 정정 공시의 의미를 질문과 답변으로 정리한다."><link rel="canonical" href="${origin}/stock-terms.html"><link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/blog-editorial.css"></head><body>${topbar}<main class="termsPage"><h1>주식·공시 용어 Q&amp;A</h1><p>작성·운영 <a href="/about.html">리앤노트</a> · 설명 기준일 <time datetime="2026-10-22">2026-10-22</time></p><nav aria-label="용어 주제">${Object.entries(labels).map(([key,label])=>`<a href="#${key}">${label}</a>`).join('')}</nav>${Object.entries(termGroups).map(([key,qa])=>`<section class="editorialTerms" id="${key}"><h2>${labels[key]}</h2>${qa.map(([q,a])=>`<section><h3>${esc(q)}</h3><p>${esc(a)}</p></section>`).join('')}</section>`).join('')}<footer class="editorialTerms"><p>일반적인 개념 설명이며 개별 공시의 법적·회계적 판단을 대신하지 않는다. 실제 조건은 <a href="https://dart.fss.or.kr/">DART 공시 원문</a>과 정정 내역에서 확인한다.</p><p><a href="/editorial-policy.html">편집·자동화 기준</a> · <a href="/contact.html">내용 오류 제보</a> · <a href="/blog/">공시 블로그</a></p></footer></main></body></html>`);
+  const glossaryPath=path.join(dist,'stock-terms.html');
+  fs.writeFileSync(glossaryPath,inheritAdSense(fs.readFileSync(glossaryPath,'utf8'),template));
   fs.writeFileSync(path.join(dist,'data/blog-editorial.json'),JSON.stringify({version:1,entries}));
   // Do not stamp every historical article with the date of the most recent data batch.
   const sitemap=path.join(dist,'sitemap.xml');
