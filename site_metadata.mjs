@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import { enhanceHome } from './home_search.mjs';
 
 const origin = 'https://leeandnote.com';
 const pages = {
@@ -55,7 +56,8 @@ export function applySiteMetadata(directory) {
       if(entry.isDirectory()) visit(file);
       else if(entry.name.endsWith('.html') && entry.name !== '404.html') {
         const html = fs.readFileSync(file,'utf8');
-        fs.writeFileSync(file,metadata(html,path.relative(directory,file)),'utf8');
+        const relative = path.relative(directory,file);
+        fs.writeFileSync(file,metadata(relative === 'index.html' ? enhanceHome(html) : html,relative),'utf8');
         count++;
       }
     }

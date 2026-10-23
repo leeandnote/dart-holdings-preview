@@ -9,6 +9,7 @@ on:
       - "site/**"
       - "prepare_cloudflare_pages.mjs"
       - "site_metadata.mjs"
+      - "home_search.mjs"
       - "blog_editorial.mjs"
       - "search_guides.mjs"
       - "search_foundation.mjs"
