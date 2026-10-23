@@ -1,5 +1,6 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { searchGuides } from './search_guides.mjs';
 
 const ROOT = path.resolve("site");
 const OUT = path.join(ROOT, "blog", "issues");
@@ -66,6 +67,7 @@ if (clinical.length) topics.push({ slug: "biotech-clinical-trials", score: 86, t
 const jpmorgan = holdings.filter((r) => /j\.?\s*p\.?\s*morgan|jpmorgan|제이피모간|제이피모건/i.test(`${r.reporter} ${r.reporterType}`)).sort((a, b) => b.reportDate.localeCompare(a.reportDate));
 if (jpmorgan.length) topics.push({ slug: "jpmorgan-five-percent-holdings", score: 90, title: "JP모건이 5% 이상 보유한 국내 주식은? 지분 변동 종목 정리", description: "JP모건 계열 제출인의 국내 상장사 5% 신규 보유와 지분 증가·감소 공시를 종목별로 누적 확인한다.", answer: `운영 DB 수집 시작 이후 JP모건 관련 5%보고 <strong>${jpmorgan.length.toLocaleString("ko-KR")}건</strong>을 누적했다. 신규 5% 진입과 기존 지분 변동을 구분해 볼 필요가 있다.`, column: `<h2>JP모건 5% 지분 공시는 무엇을 의미하나</h2><p>국내 상장사 주식 등을 5% 이상 보유하게 되거나 보유비율에 중요한 변동이 생기면 대량보유상황보고가 제출된다. JP모건 관련 보고는 영문 법인명이나 계열사 명칭으로 제출될 수 있어 단일 이름만 검색하면 일부 공시를 놓칠 수 있다.</p><p><strong>신규 5% 보고는 처음 투자한 날과 같은 뜻이 아니다.</strong> 보유비율이 보고 기준에 도달해 의무가 발생한 것이며, 여러 거래가 누적된 결과일 수 있다. 반대로 5% 아래로 내려간 보고도 전량 매도를 뜻하지 않는다.</p><h2>기관 5% 보고에서 함께 볼 항목</h2><ul><li>직전 보고와 이번 보고의 보유비율</li><li>보고 목적이 단순투자인지 일반투자인지 경영참가 목적인지</li><li>제출인이 JP모건 계열 어느 법인인지</li><li>보유주식수 변화와 보고의무 발생일</li></ul>`, faq: `<h2>자주 묻는 질문</h2><h3>JP모건이 5%를 신고하면 주가에 긍정적인가?</h3><p>기관의 대량보유 사실은 참고 정보지만 향후 주가 방향을 보장하지 않는다. 보유 목적과 이후 추가 보고, 회사의 재무·사업 상황을 함께 봐야 한다.</p><h3>표에서 0%에서 시작하는 이유는 무엇인가?</h3><p>운영 데이터상 비교 가능한 직전 보고가 없거나 신규 보고로 분류된 경우 0%로 표시될 수 있다. 정확한 기준은 연결된 DART 원문에서 확인하는 것이 좋다.</p>`, rows: jpmorgan, headers: ["종목", "제출인", "보유비율", "변동", "접수일"], row: (r) => `<tr><td>${esc(r.corpName)}<small>${esc(r.stockCode)} · ${esc(r.market)}</small></td><td>${esc(r.reporter)}</td><td>${pct(r.previousRate)} → ${pct(r.currentRate)}</td><td>${pct(r.rateDelta)}</td><td>${dateText(r.reportDate)}<small><a href="${esc(r.url)}">원문보기</a></small></td></tr>` });
 
+topics.push(...searchGuides(holdings));
 topics.sort((a, b) => b.score - a.score);
 await mkdir(OUT, { recursive: true });
 for (const topic of topics) await article(topic);

@@ -1,4 +1,5 @@
 /blog /blog/ 301
+/main / 301
 /blog.html /blog/ 301
 /blog.js /blog/ 301
 /local-blog-source-compact.js /blog/ 301

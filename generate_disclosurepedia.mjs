@@ -5,7 +5,7 @@ const ROOT = process.cwd();
 const SITE = path.join(ROOT, "site");
 const OUT = path.join(SITE, "disclosurepedia");
 const BASE = "https://leeandnote.com";
-const MAX_COMPANIES = 30;
+const MAX_COMPANIES = 100;
 const MIN_DISCLOSURES = 3;
 const PRIORITY_CODES = [
   "005930", "000660", "000270", "035420", "068270", "207940", "042660",
@@ -26,7 +26,8 @@ function money(value) {
   return n >= 100000000 ? `${Math.round(n / 100000000).toLocaleString("ko-KR")}억원` : `${Math.round(n).toLocaleString("ko-KR")}원`;
 }
 function pct(value) { const n = Number(value); return Number.isFinite(n) ? `${n.toLocaleString("ko-KR", { maximumFractionDigits: 2 })}%` : ""; }
-function slug(code, name) { return `${code}-${String(name || "company").replace(/[^0-9A-Za-z가-힣]+/g, "-").replace(/^-|-$/g, "").toLowerCase()}`; }
+const existingSlugs=new Map(fs.existsSync(OUT)?fs.readdirSync(OUT,{withFileTypes:true}).filter(e=>e.isDirectory()&&/^\d{6}-/.test(e.name)).map(e=>[e.name.slice(0,6),e.name]):[]);
+function slug(code, name) { return existingSlugs.get(code)||`${code}-${String(name || "company").replace(/[^0-9A-Za-z가-힣]+/g, "-").replace(/^-|-$/g, "").toLowerCase()}`; }
 function category(row) {
   if (row.category) return row.category;
   const report = `${row.reportName || ""} ${row.type || ""}`;
@@ -73,6 +74,7 @@ const ranked = [...companies.values()]
 const priority = PRIORITY_CODES.map((code) => ranked.find((company) => company.code === code)).filter(Boolean);
 const prioritySet = new Set(priority.map((company) => company.code));
 const selected = [...priority, ...ranked.filter((company) => company.rows.length >= MIN_DISCLOSURES && !prioritySet.has(company.code))].slice(0, MAX_COMPANIES);
+for(const company of ranked)if(existingSlugs.has(company.code)&&!selected.some(c=>c.code===company.code))selected.push(company);
 
 const commonStyle = `
 body[data-page-kind="disclosurepedia"] main{padding-top:14px}.pediaHero{padding:4px 0 12px}.pediaHero .eyebrow{margin-bottom:5px}.pediaHero h1{font-size:24px;line-height:1.25}.pediaHero p{margin-top:5px;color:var(--muted);font-size:13px;line-height:1.55}.pediaStats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:4px 0 14px}.pediaStat{padding:13px 15px;border:1px solid var(--line);border-radius:8px;background:#fff;box-shadow:0 5px 14px rgba(15,23,42,.035)}.pediaStat b{display:block;color:var(--ink);font-size:21px}.pediaStat span{color:var(--muted);font-size:11px;font-weight:700}.pediaPanel{margin:0 0 14px;border:1px solid var(--line);border-radius:8px;background:#fff;box-shadow:0 10px 24px rgba(15,23,42,.05);overflow:hidden}.pediaPanel>h2{padding:15px 17px;border-top:3px solid var(--orange);border-bottom:1px solid #e8ecf2;font-size:17px}.pediaGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;padding:14px}.pediaCompany{display:block;min-height:104px;padding:13px;border:1px solid #e0e6ee;border-radius:8px;background:#fff;text-decoration:none}.pediaCompany:hover{border-color:#ff9d79;background:#fffaf7}.pediaCompany strong{color:var(--ink);font-size:16px}.pediaCompany small{color:#718096;font-size:11px;font-weight:700}.pediaCompany p{margin:9px 0 0;color:#566276;font-size:12px;line-height:1.5}.pediaTable{width:100%;border-collapse:collapse;table-layout:fixed}.pediaTable th{height:44px;padding:8px 12px;background:#1e2530;color:#fff;font-size:12px;text-align:left}.pediaTable td{height:58px;padding:9px 12px;border-bottom:1px solid #e7ecf2;font-size:12px;vertical-align:middle}.pediaTable td:first-child{width:112px;white-space:nowrap}.pediaTable td:last-child{width:90px}.pediaPill{display:inline-flex;margin-right:6px;padding:3px 7px;border:1px solid #ffb899;border-radius:999px;background:#fffaf7;color:#273142;font-size:10px;font-weight:800}.pediaDart{color:#7b8493;font-size:11px;font-weight:700;text-decoration:none}.pediaDart:hover{color:var(--orange)}.pediaSummary{overflow:hidden;color:#596579;line-height:1.45;text-overflow:ellipsis}.pediaLinks{display:flex;flex-wrap:wrap;gap:8px;padding:14px 17px}.pediaLinks a{padding:8px 11px;border:1px solid #dce3ec;border-radius:7px;background:#fbfcfe;font-size:12px;font-weight:800;text-decoration:none}.pediaFoot{margin:18px 2px 0;color:#8792a2;font-size:11px;line-height:1.6}@media(max-width:1100px){.pediaGrid{grid-template-columns:repeat(3,minmax(0,1fr))}}@media(max-width:760px){.pediaGrid{grid-template-columns:1fr}.pediaStats{grid-template-columns:repeat(2,1fr)}.pediaTable th:nth-child(3),.pediaTable td:nth-child(3){display:none}.pediaTable td{padding:9px 8px}.pediaHero h1{font-size:22px}}
@@ -81,7 +83,8 @@ function shell({ title, description, canonical, body, jsonLd }) {
   return `<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(title)}</title><meta name="description" content="${esc(description)}"><meta name="google-adsense-account" content="ca-pub-5230074340613849"><link rel="canonical" href="${canonical}"><meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(description)}"><meta property="og:url" content="${canonical}"><link rel="icon" href="/assets/favicon.ico" sizes="any"><link rel="stylesheet" href="/styles.css?v=20260929-pedia1"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5230074340613849" crossorigin="anonymous"></script><script type="application/ld+json">${JSON.stringify(jsonLd)}</script><style>${commonStyle}</style></head><body data-page-kind="disclosurepedia"><header class="topbar"><a class="brandHome" href="/" aria-label="리앤노트 홈"><img class="brandMark" src="/assets/leeandnote-mark.png" alt=""><img class="brandLogo" src="/assets/leeandnote-logo.png" alt="LEE&amp;NOTE"></a><nav class="siteNav" aria-label="주요 카테고리"><a class="navLink" href="/5percent"><span class="navIcon disclosureIcon"></span>5%</a><a class="navLink" href="/executives"><span class="navIcon disclosureIcon"></span>임원·주요주주</a><a class="navLink" href="/contracts"><span class="navIcon disclosureIcon"></span>대형수주</a><a class="navLink" href="/major-events"><span class="navIcon disclosureIcon"></span>투자판단</a><a class="navLink active" href="/disclosurepedia/"><span class="navIcon disclosureIcon"></span>공시피디아</a><a class="navLink" href="/blog/"><span class="navIcon disclosureIcon"></span>블로그</a></nav></header>${body}</body></html>`;
 }
 
-fs.rmSync(OUT, { recursive: true, force: true }); fs.mkdirSync(OUT, { recursive: true });
+// Keep published company URLs stable even when ranking or source coverage changes.
+fs.mkdirSync(OUT, { recursive: true });
 const latestDate = selected.map((c) => c.rows[0]?.date).filter(Boolean).sort().at(-1) || new Date().toISOString().slice(0,10).replaceAll("-","");
 const cards = selected.map((company) => {
   const counts = Object.groupBy ? Object.groupBy(company.rows, category) : company.rows.reduce((a,r)=>((a[category(r)] ||= []).push(r),a),{});

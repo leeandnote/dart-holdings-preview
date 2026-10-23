@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
 import { applySiteMetadata } from "./site_metadata.mjs";
 import { applyBlogEditorial } from "./blog_editorial.mjs";
+import { applySearchFoundation } from './search_foundation.mjs';
 
 const root = path.dirname(fileURLToPath(import.meta.url));
 const publicDaysArg = process.argv.find((arg) => arg.startsWith("--days="));
@@ -134,6 +135,7 @@ if (fs.existsSync(latestJsonPath)) {
 
 applySiteMetadata(distDir);
 console.log(`BLOG_EDITORIAL_PAGES=${await applyBlogEditorial(distDir)}`);
+applySearchFoundation(distDir);
 const files = walk(distDir);
 const tooLarge = files
   .map((file) => ({ file, size: fs.statSync(file).size }))
