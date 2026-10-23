@@ -228,7 +228,8 @@ if (Test-Path -LiteralPath $bundledNode) {
   if ($nodeCommand) { $nodePath = $nodeCommand.Source }
 }
 if ($nodePath -and (Test-Path -LiteralPath $recentPriceJs)) {
-  & $nodePath $recentPriceJs --concurrency 32 --recent-days $PriceRecentDays --timeout-ms 9000
+  & $nodePath $recentPriceJs --concurrency 8 --timeout-ms 15000
+  if ($LASTEXITCODE -ne 0) { throw "Price cache update failed: $LASTEXITCODE" }
 } else {
   Write-Host "Node not found. Falling back to slower PowerShell price updater."
   & (Join-Path $root "update_prices.ps1") -Range $PriceRange -Interval "1d" -SleepMs $PriceSleepMs

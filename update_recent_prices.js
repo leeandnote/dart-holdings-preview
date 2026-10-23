@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { completedCloseCutoff, allPriceTargets } from './price_refresh_policy.mjs';
 
 const root = path.dirname(fileURLToPath(import.meta.url));
 const dataDir = path.join(root, "site", "data");
@@ -12,21 +13,10 @@ const pricesIndexPath = path.join(dataDir, "prices.js");
 const range = process.argv.includes("--range") ? process.argv[process.argv.indexOf("--range") + 1] : "1mo";
 const concurrency = Number(process.argv.includes("--concurrency") ? process.argv[process.argv.indexOf("--concurrency") + 1] : 24);
 const maxStocks = Number(process.argv.includes("--max") ? process.argv[process.argv.indexOf("--max") + 1] : 0);
-const recentDays = Number(process.argv.includes("--recent-days") ? process.argv[process.argv.indexOf("--recent-days") + 1] : 0);
 const timeoutMs = Number(process.argv.includes("--timeout-ms") ? process.argv[process.argv.indexOf("--timeout-ms") + 1] : 10000);
-const cutoff = getKoreaTodayDate();
-const cutoffKey = cutoff.toISOString().slice(0, 10);
+const cutoffKey = completedCloseCutoff();
+const cutoff = new Date(`${cutoffKey}T00:00:00Z`);
 
-function getKoreaTodayDate() {
-  const parts = new Intl.DateTimeFormat("en-CA", {
-    timeZone: "Asia/Seoul",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).formatToParts(new Date());
-  const lookup = Object.fromEntries(parts.map((part) => [part.type, part.value]));
-  return new Date(`${lookup.year}-${lookup.month}-${lookup.day}T00:00:00Z`);
-}
 
 function readJson(file) {
   return JSON.parse(fs.readFileSync(file, "utf8").replace(/^\uFEFF/, ""));
@@ -44,39 +34,11 @@ function readWindowObject(file) {
   }
 }
 
-function suffix(market) {
-  return market === "KOSDAQ" ? "KQ" : "KS";
-}
 
 function rowValue(row, key, fallback = "") {
   return row[key] ?? fallback;
 }
 
-function stockTargets(rows) {
-  const map = new Map();
-  const recentCutoff = recentDays > 0 ? new Date(cutoff.getTime() - recentDays * 24 * 60 * 60 * 1000) : null;
-  for (const row of rows) {
-    if (recentCutoff) {
-      const receiptDate = rowDate(rowValue(row, "접수일"));
-      const obligationDate = rowDate(rowValue(row, "보고의무발생일") || rowValue(row, "보고의무발생일자") || rowValue(row, "변동일"));
-      const isRecent = (receiptDate && receiptDate >= recentCutoff) || (obligationDate && obligationDate >= recentCutoff);
-      if (!isRecent) continue;
-    }
-    const market = rowValue(row, "시장");
-    const code = rowValue(row, "종목코드");
-    const name = rowValue(row, "종목명");
-    if (!code || (market !== "KOSPI" && market !== "KOSDAQ")) continue;
-    map.set(code, { code, market, name, symbol: `${code}.${suffix(market)}` });
-  }
-  const targets = [...map.values()].sort((a, b) => `${a.market}${a.code}`.localeCompare(`${b.market}${b.code}`));
-  return maxStocks > 0 ? targets.slice(0, maxStocks) : targets;
-}
-
-function rowDate(value) {
-  const digits = String(value || "").replace(/\D/g, "");
-  if (digits.length !== 8) return null;
-  return new Date(`${digits.slice(0, 4)}-${digits.slice(4, 6)}-${digits.slice(6, 8)}T00:00:00Z`);
-}
 
 function parseChunk(code) {
   const file = path.join(priceDir, `${code}.js`);
@@ -184,7 +146,13 @@ function closestEventPrice(items, yyyymmdd) {
 async function main() {
   fs.mkdirSync(priceDir, { recursive: true });
   const latest = readJson(latestPath);
-  const targets = stockTargets(latest.rows || []);
+  const extraRows=[];
+  for(const name of ['disclosure_signals.json','convex_price_targets.json']){
+    const file=path.join(dataDir,name);
+    if(fs.existsSync(file)){const data=readJson(file);extraRows.push(...(Array.isArray(data)?data:data.rows||data.items||[]));}
+  }
+  const allTargets=allPriceTargets([...(latest.rows||[]),...extraRows]);
+  const targets=maxStocks>0?allTargets.slice(0,maxStocks):allTargets;
   const currentPrices = readWindowObject(currentPricesPath);
   const mergedPrices = new Map();
   const errors = [];
@@ -196,16 +164,16 @@ async function main() {
     try {
       const oldItems = parseChunk(stock.code);
       const newItems = await fetchCandles(stock);
-      const merged = mergeCandles(oldItems, newItems);
+      const merged = mergeCandles(oldItems, newItems).filter(item=>item.date<=cutoffKey);
       if (!merged.length) throw new Error("no candles");
       writeChunk(stock.code, merged);
       mergedPrices.set(stock.code, merged);
-      const latestClosed = merged.filter((item) => new Date(`${item.date}T00:00:00`) <= cutoff).at(-1);
+      const latestClosed = merged.at(-1);
       if (latestClosed) currentPrices[stock.code] = { date: latestClosed.date, close: latestClosed.close };
     } catch (error) {
       errors.push({ code: stock.code, name: stock.name, symbol: stock.symbol, error: error.message });
       const oldItems = parseChunk(stock.code);
-      const latestClosed = oldItems.filter((item) => new Date(`${item.date}T00:00:00`) <= cutoff).at(-1);
+      const latestClosed = oldItems.filter((item) => item.date <= cutoffKey).at(-1);
       if (latestClosed) currentPrices[stock.code] = { date: latestClosed.date, close: latestClosed.close };
     }
   });
@@ -234,13 +202,17 @@ async function main() {
       interval: "1d",
       completeCloseCutoff: cutoffKey,
       stockCount: Object.keys(currentPrices).length,
+      targetCount: targets.length,
+      latestDateDistribution: Object.values(currentPrices).reduce((counts,item)=>{counts[item.date]=(counts[item.date]||0)+1;return counts;},{}),
+      staleCount: Object.values(currentPrices).filter(item=>item.date<cutoffKey).length,
       errorCount: errors.length,
       errors,
       prices: {},
     })}; window.__PRICE_CHUNKS__ = window.__PRICE_CHUNKS__ || {};`,
     "utf8"
   );
-  console.log(`Recent price cache done: ${targets.length} refreshed / ${Object.keys(currentPrices).length} cached stocks, ${errors.length} errors, cutoff ${cutoffKey}`);
+  console.log(`Recent price cache done: ${targets.length} attempted / ${Object.keys(currentPrices).length} cached stocks, ${errors.length} errors, cutoff ${cutoffKey}`);
+  if(targets.length&&errors.length===targets.length)throw new Error('All price requests failed; cache remains stale.');
 }
 
 main().catch((error) => {
