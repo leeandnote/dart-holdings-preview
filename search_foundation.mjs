@@ -18,7 +18,10 @@ export function applySearchFoundation(dist){
       let html=normalizeLinks(fs.readFileSync(file,'utf8'));
       if(!html.includes('class="searchReadingLinks"'))html=html.replace('</head>',styles+'</head>').replace('</main>','</main>'+links);
       // A guide has no fictional disclosure table. Empty source results are explicit.
-      if(file.includes('how-to-read-dart-disclosures'))html=html.replace(/<h2 class="issueTableTitle">[\s\S]*?<div class="issueColumn issueFaq">/,'<div class="issueColumn issueFaq">');
+      if(['how-to-read-dart-disclosures','treasury-stock-buyback-disclosures'].some(slug=>file.includes(slug))) {
+        html=html.replace(/<h2 class="issueTableTitle">[\s\S]*?<div class="issueColumn issueFaq">/,'<div class="issueColumn issueFaq">');
+        html=html.replace('운영 DB 수집 시작 이후 공시를 누적해 최신순으로 제공한다.', '공시 확인 방법을 설명하는 안내 글이다.');
+      }
       if(file.includes('blackrock-shareholdings'))html=html.replace('<tbody></tbody>','<tbody><tr><td colspan="4">현재 수집 범위에서 일치하는 공시가 없다. 미보유를 뜻하지 않는다.</td></tr></tbody>');
       fs.writeFileSync(file,html);
     }
