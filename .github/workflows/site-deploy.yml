@@ -10,6 +10,7 @@ on:
       - "prepare_cloudflare_pages.mjs"
       - "site_metadata.mjs"
       - "home_search.mjs"
+      - "glossary_detail.mjs"
       - "blog_editorial.mjs"
       - "search_guides.mjs"
       - "search_foundation.mjs"

@@ -30,6 +30,8 @@ export function applySearchFoundation(dist){
   let xml=normalizeLinks(fs.readFileSync(sitemap,'utf8'));
   const seen=new Set();xml=xml.replace(/<url>[\s\S]*?<\/url>/g,block=>{
     const loc=block.match(/<loc>(.*?)<\/loc>/)?.[1];
-    if(seen.has(loc))return '';seen.add(loc);return block;
+    if(seen.has(loc))return '';seen.add(loc);
+    if(loc===origin+'/stock-terms')block=block.replace(/<lastmod>[^<]*<\/lastmod>/,'<lastmod>2026-10-24</lastmod>');
+    return block;
   });fs.writeFileSync(sitemap,xml);
 }
