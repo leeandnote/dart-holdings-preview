@@ -1171,6 +1171,8 @@ async function postInstagramReel(videoUrl, cards, caption) {
   const containerId = await instagramFetch(`/${userId}/media`, {
     media_type: "REELS",
     video_url: videoUrl,
+    // Instagram defaults to frame zero; select a fully visible first-card frame.
+    thumb_offset: "1000",
     caption: caption.slice(0, 2200),
     share_to_feed: "true",
   });

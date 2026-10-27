@@ -25,7 +25,6 @@ export function renderYouTubeShort(cards, outputPath) {
     `[${index}:v]scale=${VIDEO_WIDTH}:${VIDEO_HEIGHT}:force_original_aspect_ratio=increase,` +
     `crop=${VIDEO_WIDTH}:${VIDEO_HEIGHT},` +
     `fps=${FPS},` +
-    `fade=t=in:st=0:d=0.3,fade=t=out:st=${CARD_SECONDS - 0.3}:d=0.3,` +
     `setsar=1[v${index}]`
   );
   const concatInputs = selected.map((_, index) => `[v${index}]`).join("");
