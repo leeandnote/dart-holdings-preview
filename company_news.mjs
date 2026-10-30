@@ -6,8 +6,8 @@ export function newsLinks(name) {
 export async function loadCompanyNews(name, { env = process.env, request = fetch } = {}) {
   if (!env.NAVER_CLIENT_ID || !env.NAVER_CLIENT_SECRET) return { status: "unconfigured", items: [] };
   try {
-    const response = await request(`https://openapi.naver.com/v1/search/news.json?query=${encodeURIComponent('"' + name + '"')}&display=20&sort=date`, {
-      headers: { "X-Naver-Client-Id": env.NAVER_CLIENT_ID, "X-Naver-Client-Secret": env.NAVER_CLIENT_SECRET }, signal: AbortSignal.timeout(8000),
+    const response = await request(`https://naverapihub.apigw.ntruss.com/search/v1/news?query=${encodeURIComponent('"' + name + '"')}&display=20&sort=date&format=json`, {
+      headers: { "X-NCP-APIGW-API-KEY-ID": env.NAVER_CLIENT_ID, "X-NCP-APIGW-API-KEY": env.NAVER_CLIENT_SECRET }, signal: AbortSignal.timeout(8000),
     });
     if (!response.ok) return { status: "unavailable", items: [] };
     const data = await response.json();

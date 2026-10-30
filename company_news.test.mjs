@@ -1,6 +1,17 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { loadCompanyNews, newsSection, newsLinks } from './company_news.mjs';
+test('uses API HUB endpoint and authentication headers', async () => {
+  let captured;
+  await loadCompanyNews('삼성전자', { env: { NAVER_CLIENT_ID: 'id', NAVER_CLIENT_SECRET: 'secret' }, request: async (url, options) => {
+    captured = {url, options};
+    return {ok:true, json:async () => ({items:[]})};
+  }});
+  assert.equal(new URL(captured.url).origin, 'https://naverapihub.apigw.ntruss.com');
+  assert.equal(new URL(captured.url).pathname, '/search/v1/news');
+  assert.equal(captured.options.headers['X-NCP-APIGW-API-KEY-ID'], 'id');
+  assert.equal(captured.options.headers['X-NCP-APIGW-API-KEY'], 'secret');
+});
 test('missing credentials never calls provider', async () => {
   assert.equal((await loadCompanyNews('삼성전자', { env: {}, request: () => { throw Error('unexpected'); } })).status, 'unconfigured');
 });
