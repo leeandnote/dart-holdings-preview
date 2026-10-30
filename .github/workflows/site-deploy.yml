@@ -15,6 +15,7 @@ on:
       - "search_guides.mjs"
       - "search_foundation.mjs"
       - "generate_disclosurepedia.mjs"
+      - "company_news.mjs"
       - "generate_daily_blog.mjs"
       - "generate_blog_archive.mjs"
       - "generate_issue_analysis.mjs"
@@ -34,6 +35,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
+      NAVER_CLIENT_ID: ${{ secrets.NAVER_CLIENT_ID }}
+      NAVER_CLIENT_SECRET: ${{ secrets.NAVER_CLIENT_SECRET }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       WRANGLER_CONFIG_TOML_B64: ${{ secrets.WRANGLER_CONFIG_TOML_B64 }}
