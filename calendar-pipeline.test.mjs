@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {extractArticle,validateCandidate,upsertEvents,titleSimilarity} from './calendar_pipeline.mjs';
 import {toCalendarEvents} from './site/calendar-auto.mjs';
 import {matchesCategory} from './site/calendar-model.mjs';
-// Synthetic article/LLM pairs: no actual future announcement is asserted.
+// Synthetic articles: no actual future announcement is asserted.
 export const fixtures=[
   ['예시반도체','실적발표','2026년 3분기','주요실적','반도체','005930','2026-11-12'],
   ['예시학회','학회','2026년 정기학회','산업/학회/정책','바이오','','2026-11-13'],
@@ -13,12 +13,10 @@ export const fixtures=[
   const article={url:`https://example.org/news/${i}`,text,publishedAt:'2026-11-06T00:00:00Z'};
   return {article,event:{date,time:null,title:`${entity} ${eventKind}`,category,importance:'high',relatedSectors:[sector],relatedStockCodes:stock?[stock]:[],sourceUrl:article.url,entity,eventKind,period,status:'scheduled',region:'KR',dateBasis:'KST',evidence:text,dateEvidence:date}};
 });
-test('three sample articles parse structured responses and land in their date/category',async()=>{
+test('three sample articles parse locally without a model or network',async()=>{
   for(const {article,event} of fixtures){
-    const candidates=await extractArticle(article,{env:{OPENAI_API_KEY:'test',CALENDAR_EXTRACTION_MODEL:'test'},request:async(_url,request)=>{
-      assert.equal(JSON.parse(request.body).text.format.strict,true);
-      return {ok:true,json:async()=>({status:'completed',output:[{content:[{type:'output_text',text:JSON.stringify({events:[event]})}]}]})};
-    }});
+    const candidates=await extractArticle(article);
+    assert.equal(candidates[0].requiresReview,true);
     const validated=validateCandidate(candidates[0],article);
     assert.ok(validated);
     const ui=toCalendarEvents({updatedAt:'2026-11-06T00:00:00Z',events:[validated]});
@@ -41,6 +39,6 @@ test('upsert is idempotent, preserves reschedules and ignores older news',()=>{
   assert.equal(toCalendarEvents({events:[{...moved,status:'cancelled'}]}).length,0);
   assert.equal(titleSimilarity('예시 실적 발표','예시 실적발표'),1);
 });
-test('refused/incomplete extraction is a failure, not an empty successful run',async()=>{
-  await assert.rejects(extractArticle(fixtures[0].article,{env:{},request:async()=>({ok:true,json:async()=>({status:'incomplete'})})}),/Incomplete/);
+test('ambiguous news produces no inferred events',async()=>{
+  for(const text of ['오는 목요일 실적 발표 전망','2026-11-12 선거 가능성','발행 2026-11-12 주가 상승'])assert.deepEqual(await extractArticle({text}),[]);
 });
