@@ -1,0 +1,51 @@
+name: Update news calendar
+on:
+  workflow_dispatch:
+  schedule:
+    # 07:35 and 19:35 KST; not a social publishing job.
+    - cron: '35 22,10 * * *'
+permissions:
+  contents: write
+  actions: write
+concurrency:
+  group: news-calendar-update
+  cancel-in-progress: false
+jobs:
+  update:
+    if: github.event_name == 'workflow_dispatch' || vars.CALENDAR_PIPELINE_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Test extraction and calendar adapter
+        run: node --test calendar-pipeline.test.mjs
+      - name: Fetch and extract news events
+        env:
+          NAVER_CLIENT_ID: ${{ secrets.NAVER_CLIENT_ID }}
+          NAVER_CLIENT_SECRET: ${{ secrets.NAVER_CLIENT_SECRET }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          CALENDAR_EXTRACTION_MODEL: ${{ vars.CALENDAR_EXTRACTION_MODEL }}
+        run: node calendar_pipeline.mjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: calendar-review
+          path: calendar-pipeline-review.json
+          retention-days: 7
+      - name: Persist snapshot and request site deployment
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git config user.name 'leeandnote-calendar'
+          git config user.email 'actions@users.noreply.github.com'
+          git add site/data/calendar-auto.json calendar-pipeline-state.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'Update news calendar snapshot'
+            git pull --rebase origin main
+            git push origin HEAD:main
+            gh workflow run site-deploy.yml --ref main
+          fi

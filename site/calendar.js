@@ -29,12 +29,29 @@ events.push({
   description: '주가지수 선물·옵션과 개별주식 선물·옵션 네 종류의 12월물 최종거래일이 겹치는 날이다. 쿼드러플 위칭데이라고도 부른다. 분기월(3·6·9·12월)의 둘째 목요일 규칙에 따른 표시이며, 휴장 또는 임시 변경 시 앞당겨질 수 있어 거래소 공지를 추가 확인해야 한다. 실제 최종결제일과는 구분한다. 기존 상품별 만기 일정과 같은 날을 묶어 설명한 항목이다.',
   relatedSources: ['futures', 'krx', 'stockFutures', 'stockOptions'],
 });
-const labels={expiry:'선물·옵션 만기',index:'ETF·지수 정기변경',policy:'금리·중앙은행',macro:'물가·고용',growth:'성장·소비',earnings:'기업 실적',trade:'수출입',holiday:'휴장·단축거래'};
+import {categories,normalizeEvent,matchesCategory,zoneBadge,splitDay} from './calendar-model.mjs';
+import {toCalendarEvents} from './calendar-auto.mjs';
+for (let i=0;i<events.length;i++) events[i]=normalizeEvent(events[i]);
+const labels={expiry:'선물·옵션 만기',index:'ETF·지수 정기변경',policy:'금리·중앙은행',macro:'물가·고용',growth:'성장·소비',earnings:'기업 실적',trade:'수출입',holiday:'휴장·단축거래',politics:'정치/지정학',industry:'산업/학회/정책'};
 function timing(e) { return e.time || (e.region === 'KR' ? '한국 날짜' : e.region === 'US' ? '미국 현지 날짜 · 시각 미정' : '출처 날짜 · 시각 미정'); }
 const $=id=>document.getElementById(id);
 const today=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Seoul',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
 let month=today.slice(0,7),view=matchMedia('(max-width:700px)').matches?'list':'month';
 function element(tag,text,className){const e=document.createElement(tag);if(text)e.textContent=text;if(className)e.className=className;return e;}
+const typeFilter=$('type');
+typeFilter.replaceChildren(new Option('전체 유형','all'),...Object.entries(categories).map(([key,label])=>new Option(label,key)));
+const scopeFilter=element('select');scopeFilter.id='scope';scopeFilter.setAttribute('aria-label','일정 범위');
+scopeFilter.append(new Option('전체 범위','all'),new Option('시장 전체','market'),new Option('종목별 일정','company'));
+typeFilter.after(scopeFilter);scopeFilter.addEventListener('change',render);
+const dayDialog=element('dialog');
+dayDialog.id='dayDialog';
+dayDialog.setAttribute('aria-labelledby','dayTitle');
+const dayHeader=element('div','','dialogHeader');
+const dayTitle=element('h2');dayTitle.id='dayTitle';
+const closeDay=element('button','×');closeDay.type='button';closeDay.setAttribute('aria-label','일정 목록 닫기');closeDay.onclick=()=>dayDialog.close();
+dayHeader.append(dayTitle,closeDay);
+const dayItems=element('div');dayDialog.append(dayHeader,dayItems);document.body.append(dayDialog);
+function showDay(date,rows){dayTitle.textContent=date+' 일정';dayItems.replaceChildren();for(const event of rows){const b=button(event,'agendaRow');b.append(eventTitle(event),element('small',timing(event)+' · '+zoneBadge(event)));dayItems.append(b);}dayDialog.showModal();}
 function eventTitle(e) {
   const row = element('span', '', 'eventTitle');
   const flag = element('img', '', 'eventFlag');
@@ -45,12 +62,15 @@ function eventTitle(e) {
   flag.width = 20;
   flag.height = 15;
   row.append(flag, element('span', e.title));
+  if(e.provenance==='news')row.append(element('span','뉴스 기반','zoneBadge'));
+  if(e.importance==='high') row.append(element('span','중요','importanceBadge'));
+  row.append(element('span',zoneBadge(e),'zoneBadge'));
   if (e.relatedSources) row.classList.add('isMajor');
   return row;
 }
 function show(event){$('detailType').textContent=labels[event.type];$('detailTitle').textContent=event.title;$('detailDate').textContent=event.date+' · '+timing(event);$('detailText').textContent=event.description;$('detailMeta').replaceChildren();const meta=[['상태',event.status],['출처',sources[event.source][0]],['출처 확인일',event.checkedAt || '2026-10-08'],['출처 시간대',event.zone]];if(event.localDate)meta.push(['현지 발표',event.localDate+' '+event.localTime]);for(const [label,value] of meta){$('detailMeta').append(element('dt',label),element('dd',value));}$('detailSource').href=sources[event.source][1];$('eventDialog').showModal();}
 function button(event,cls){const b=element('button','',cls);b.type='button';b.dataset.type=event.type;b.setAttribute('aria-label',event.date+' '+event.title);b.addEventListener('click',()=>{show(event);for(const key of event.relatedSources || []){const dd=element('dd');const a=element('a',sources[key][0]);a.href=sources[key][1];a.target='_blank';a.rel='noopener noreferrer';dd.append(a);$('detailMeta').append(element('dt','상품 규정'),dd);}});return b;}
-function matches(e){return ($('type').value==='all'||e.type===$('type').value)&&($('region').value==='all'||e.region===$('region').value)&&(e.title+' '+sources[e.source][0]).toLowerCase().includes($('search').value.trim().toLowerCase());}
+function matches(e){return (scopeFilter.value==='all'||(e.scope||'market')===scopeFilter.value)&&matchesCategory(e,$('type').value)&&($('region').value==='all'||e.region===$('region').value)&&(e.title+' '+sources[e.source][0]+' '+e.relatedSectors.join(' ')+' '+(e.relatedStockCodes||[]).join(' ')).toLowerCase().includes($('search').value.trim().toLowerCase());}
 function render() {
   const sort = (a,b) => a.date.localeCompare(b.date) || (a.instant || '').localeCompare(b.instant || '');
   const rows = events.filter(e => e.date.startsWith(month) && matches(e)).sort(sort);
@@ -76,11 +96,14 @@ function render() {
     const time = element('time',String(d.getUTCDate()));
     time.dateTime = date;
     cell.append(time);
-    for (const e of rows.filter(e=>e.date===date)) {
+    const dayRows=rows.filter(e=>e.date===date);
+    const day=splitDay(dayRows);
+    for (const e of day.visible) {
       const b = button(e,'calEvent');
       b.append(eventTitle(e), element('small',timing(e)));
       cell.append(b);
     }
+    if(day.hidden){const more=element('button',`+${day.hidden}건 더보기`,'calMore');more.type='button';more.setAttribute('aria-label',date+' 일정 '+dayRows.length+'건 모두 보기');more.onclick=()=>showDay(date,dayRows);cell.append(more);}
     grid.append(cell);
   }
   $('calendar').append(week,grid);
@@ -107,5 +130,22 @@ function render() {
   }
   if (!upcoming.length) $('upcoming').append(element('p','조건에 맞는 예정 일정이 없다.','muted'));
 }
+const showBase=show;
+show=function(event){
+  showBase(event);
+  $('detailSource').textContent=event.provenance==='news'?'뉴스 원문 확인 ↗':'공식 출처 확인 ↗';
+  if(event.provenance==='news') $('detailMeta').append(element('dt','추출 근거'),element('dd',event.evidence));
+  $('detailType').textContent=categories[event.category];
+  for(const [label,value] of [['중요도',{high:'상',medium:'중',low:'하'}[event.importance]],['관련 업종',event.relatedSectors.join(' · ')||'미지정'],['표시 시간대',zoneBadge(event)]]) $('detailMeta').append(element('dt',label),element('dd',value));
+};
 function move(delta){const d=new Date(month+'-01T00:00:00Z');d.setUTCMonth(d.getUTCMonth()+delta);month=d.toISOString().slice(0,7);render();}
 $('previous').onclick=()=>move(-1);$('next').onclick=()=>move(1);$('today').onclick=()=>{month=today.slice(0,7);render();};$('monthView').onclick=()=>{view='month';render();};$('listView').onclick=()=>{view='list';render();};for(const id of ['type','region','search'])$(id).addEventListener('input',render);$('closeDialog').onclick=()=>$('eventDialog').close();render();
+fetch('/data/calendar-auto.json',{cache:'no-cache'}).then(response=>{if(!response.ok)throw Error('snapshot unavailable');return response.json();}).then(snapshot=>{
+  for(const event of toCalendarEvents(snapshot)){
+    sources[event.source]=['뉴스 원문',event.sourceUrl];
+    events.push(normalizeEvent(event));
+  }
+  render();
+  const status=element('p',snapshot.updatedAt?'뉴스 일정 갱신: '+new Date(snapshot.updatedAt).toLocaleString('ko-KR',{timeZone:'Asia/Seoul'})+' KST':'뉴스 자동 일정은 아직 연결되지 않았습니다.','calNotice');
+  $('resultCount').after(status);
+}).catch(()=>{$('resultCount').after(element('p','뉴스 기반 일정을 불러오지 못했습니다. 기존 공식 일정만 표시합니다.','calNotice'));});
