@@ -65,7 +65,11 @@ async function fetchArticles(env,request) {
 }
 export async function extractArticle(article,{env=process.env,request=fetch}={}) {
   const response=await request('https://api.openai.com/v1/responses',{method:'POST',headers:{Authorization:`Bearer ${env.OPENAI_API_KEY}`,'Content-Type':'application/json'},body:JSON.stringify({model:env.CALENDAR_EXTRACTION_MODEL,store:false,instructions:extractionPrompt,input:JSON.stringify(article),text:{format:{type:'json_schema',name:'calendar_events',strict:true,schema:extractionSchema}},max_output_tokens:2400}),signal:AbortSignal.timeout(60000)});
-  if(!response.ok)throw new Error(`Extraction failed: HTTP ${response.status}`);
+  if(!response.ok){
+    const failure=await response.json().catch(()=>({}));
+    const code=String(failure.error?.code||failure.error?.type||'unknown').replace(/[^a-zA-Z0-9_-]/g,'').slice(0,80);
+    throw new Error(`Extraction failed: HTTP ${response.status} (${code})`);
+  }
   const result=await response.json();
   if(result.status!=='completed')throw new Error('Incomplete extraction response');
   const output=(result.output||[]).flatMap(x=>x.content||[]).filter(x=>x.type==='output_text').map(x=>x.text).join('');
