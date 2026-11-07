@@ -22,9 +22,11 @@
       "error": "Threads API failed /me/threads: Error validating access token: The session has been invalidated because the user changed their password or Facebook has changed the session for security reasons.; code=190"
     },
     "instagram": {
-      "status": "attempting",
+      "status": "published",
       "at": "2026-11-07T14:25:51.046Z",
-      "container": "18435927961195397"
+      "container": "18435927961195397",
+      "id": "18366126538247566",
+      "completedAt": "2026-11-07T14:26:02.616Z"
     }
   },
   "history": [
