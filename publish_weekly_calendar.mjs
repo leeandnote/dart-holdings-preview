@@ -35,6 +35,20 @@ const igUrl=`https://leeandnote.com/assets/weekly/${week}-instagram.jpg`;
 const igLocal=await readFile(`site/assets/weekly/${week}-instagram.jpg`);
 const igRemote=await fetch(igUrl);
 if(!igRemote.ok||crypto.createHash('sha256').update(Buffer.from(await igRemote.arrayBuffer())).digest('hex')!==crypto.createHash('sha256').update(igLocal).digest('hex'))throw Error('Instagram image not deployed');
+let verifiedInstagramId;
+if(process.env.RETRY_INSTAGRAM==='true'){
+  const previous=state.channels.instagram;
+  if(previous?.status!=='needs_review'||previous.container||previous.id||!previous.error?.includes('Error validating access token'))throw Error('Instagram retry is limited to a confirmed authentication rejection.');
+  const {accessToken}=await loadInstagramConfig();
+  const response=await fetch('https://graph.instagram.com/v24.0/me?fields=id,user_id,username',{headers:{Authorization:`Bearer ${accessToken}`}});
+  const account=await response.json();
+  if(!response.ok||account.username!=='leeandnote'||!account.user_id)throw Error('Instagram identity check failed; no post attempted.');
+  verifiedInstagramId=String(account.user_id);
+  console.log(`Verified Instagram account ${account.username}, user_id=${verifiedInstagramId}; configured ID will not be used for this retry.`);
+  state.history??=[];state.history.push({channel:'instagram',...previous});
+  delete state.channels.instagram;
+  await save();
+}
 for(const channel of ['telegram','x','threads','instagram']){
   if(state.channels[channel]){console.log(`${channel}: existing state ${state.channels[channel].status}; no duplicate sent`);continue;}
   state.channels[channel]={status:'attempting',at:new Date().toISOString()};await save();
@@ -57,7 +71,8 @@ for(const channel of ['telegram','x','threads','instagram']){
       state.channels[channel].container=container;await save();
       await waitForThreadsContainer(container);id=await publishThreadsContainer(container);
     }else{
-      const {userId}=await loadInstagramConfig();
+      const config=await loadInstagramConfig();
+      const userId=verifiedInstagramId||config.userId;
       const container=await instagramFetch(`/${userId}/media`,{image_url:igUrl,caption});
       state.channels[channel].container=container;await save();
       await waitForInstagramContainer(container);

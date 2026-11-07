@@ -7,6 +7,10 @@ on:
         required: true
         default: '2026-11-09'
         type: string
+      retry_instagram:
+        description: Retry only a confirmed Instagram authentication rejection
+        type: boolean
+        default: false
 permissions:
   contents: write
 concurrency:
@@ -18,6 +22,7 @@ jobs:
     timeout-minutes: 15
     env:
       GITHUB_TOKEN: ${{ github.token }}
+      RETRY_INSTAGRAM: ${{ inputs.retry_instagram }}
       TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
       TELEGRAM_CHANNEL_ID: ${{ secrets.TELEGRAM_CHANNEL_ID }}
       TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
