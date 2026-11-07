@@ -36,6 +36,19 @@ const igLocal=await readFile(`site/assets/weekly/${week}-instagram.jpg`);
 const igRemote=await fetch(igUrl);
 if(!igRemote.ok||crypto.createHash('sha256').update(Buffer.from(await igRemote.arrayBuffer())).digest('hex')!==crypto.createHash('sha256').update(igLocal).digest('hex'))throw Error('Instagram image not deployed');
 let verifiedInstagramId;
+if(process.env.RETRY_THREADS==='true'){
+  const previous=state.channels.threads;
+  if(previous?.status!=='needs_review'||previous.container||previous.id||!previous.error?.includes('code=190'))throw Error('Threads retry is limited to a confirmed authentication rejection.');
+  const token=process.env.THREADS_ACCESS_TOKEN;
+  if(!token)throw Error('Threads token missing');
+  const response=await fetch('https://graph.threads.net/v1.0/me?fields=id,username',{headers:{Authorization:`Bearer ${token}`}});
+  const account=await response.json();
+  if(!response.ok||account.username!=='leeandnote'||!account.id)throw Error('Threads identity check failed; no post attempted.');
+  console.log(`Verified Threads account ${account.username}`);
+  state.history??=[];state.history.push({channel:'threads',...previous});
+  delete state.channels.threads;
+  await save();
+}
 if(process.env.RETRY_INSTAGRAM==='true'){
   const previous=state.channels.instagram;
   if(previous?.status!=='needs_review'||previous.container||previous.id||!previous.error?.includes('Error validating access token'))throw Error('Instagram retry is limited to a confirmed authentication rejection.');

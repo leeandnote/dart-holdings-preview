@@ -11,6 +11,10 @@ on:
         description: Retry only a confirmed Instagram authentication rejection
         type: boolean
         default: false
+      retry_threads:
+        description: Retry only a confirmed Threads authentication rejection
+        type: boolean
+        default: false
 permissions:
   contents: write
 concurrency:
@@ -23,6 +27,7 @@ jobs:
     env:
       GITHUB_TOKEN: ${{ github.token }}
       RETRY_INSTAGRAM: ${{ inputs.retry_instagram }}
+      RETRY_THREADS: ${{ inputs.retry_threads }}
       TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
       TELEGRAM_CHANNEL_ID: ${{ secrets.TELEGRAM_CHANNEL_ID }}
       TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
