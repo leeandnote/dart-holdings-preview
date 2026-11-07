@@ -2,8 +2,12 @@
   "week": "2026-11-09",
   "channels": {
     "telegram": {
-      "status": "attempting",
-      "at": "2026-11-07T13:58:15.222Z"
+      "status": "published",
+      "at": "2026-11-07T13:58:15.222Z",
+      "chatId": "-1003934502405",
+      "url": "https://t.me/leeandnote/3904",
+      "id": "3904",
+      "completedAt": "2026-11-07T13:58:20.435Z"
     }
   }
 }
