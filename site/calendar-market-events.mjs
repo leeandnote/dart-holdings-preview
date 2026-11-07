@@ -1,6 +1,7 @@
 import { koreanTime } from './calendar-macro.mjs';
 
 export const marketSources = {
+  sitc: ['SITC · 2026 연례 학회 공식 안내', 'https://www.sitcancer.org/2026/home'],
   samsung: ['삼성전자 IR · 실적 발표', 'https://www.samsung.com/global/ir/'],
   hynix: ['SK하이닉스 · 실적 설명회 공시 (SEC)', 'https://www.sec.gov/Archives/edgar/data/2120882/000119312526420934/d413172d6k.htm'],
   microsoft: ['Microsoft IR · 실적 일정', 'https://www.microsoft.com/en-us/investor/default'],
@@ -51,8 +52,15 @@ const expiries = ['2026-10-16','2026-11-20','2026-12-18'].map(date => ({
   description:'미국 개별주식·지수 옵션의 표준 월물 만기 일정. 주간·일일 만기는 제외한다. 상품에 따라 오전(AM)·오후(PM) 정산과 최종거래일이 다르므로 모든 옵션이 이날 장마감에 정산되는 것은 아니다. 다음 국내 거래일의 주가 방향을 예측하는 지표는 아니다.',
 }));
 
-export const marketEvents = [...earnings, ...china, ...trade, ...expiries, {
+const conferences = [4,5,6,7,8].map(day => ({
+  date:`2026-11-${String(day).padStart(2,'0')}`,title:'SITC 면역항암학회',region:'US',source:'sitc',
+  zone:'America/Phoenix',type:'industry',category:'industry',importance:'high',relatedSectors:['바이오','면역항암'],
+  status:'공식 일정',time:'미국 피닉스 현지 날짜 · 세션별 시각 상이',checkedAt:'2026-11-07',
+  description:'11월 4~8일 피닉스에서 열리는 연례 학회 및 사전 프로그램이다. 기간 중 각 날짜를 표시하며 특정 기업의 발표나 임상 성과를 보장하지 않는다. 기업별 발표 시각은 별도 공식 프로그램으로 확인해야 한다.',
+}));
+
+export const marketEvents = [...conferences, ...earnings, ...china, ...trade, ...expiries, {
   date:'2026-10-28',title:'마이크로소프트 FY27 1분기 실적',region:'US',source:'microsoft',zone:'America/Los_Angeles',
   type:'earnings',status:'공식 일정',time:'미국 현지 날짜 · 시각 미확인',
   description:'기업 IR에 공표된 현지 날짜다. 시각을 확인하지 못해 한국시간 날짜로 변환하지 않았다. 회계연도 2027년 1분기는 달력 기준 2026년 3분기에 해당한다. 클라우드와 AI 투자계획을 확인한다.',
-}].map(event => ({...event, checkedAt:'2026-10-19'}));
+}].map(event => ({checkedAt:'2026-10-19',...event}));

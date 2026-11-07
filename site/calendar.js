@@ -16,7 +16,10 @@ const events=[
  ['2026-12-25','NYSE 성탄절 휴장','holiday','US','nyse','공식 발표','America/New_York','NYSE 주식시장 휴장.']
 ].map(([date,title,type,region,source,status,zone,description],id)=>({id,date,title,type,region,source,status,zone,description}));
 import { macroSources, macroEvents } from './calendar-macro.mjs?v=20261014-1';
-import { marketSources, marketEvents } from './calendar-market-events.mjs?v=20261019-1';
+import { marketSources, marketEvents } from './calendar-market-events.mjs?v=20261107-1';
+import { japanSources, japanEvents } from './calendar-japan.mjs?v=20261107-1';
+Object.assign(sources, japanSources);
+events.push(...japanEvents);
 Object.assign(sources, marketSources);
 events.push(...marketEvents);
 Object.assign(sources, macroSources);
@@ -64,7 +67,6 @@ function eventTitle(e) {
   row.append(flag, element('span', e.title));
   if(e.provenance==='news')row.append(element('span','뉴스 기반','zoneBadge'));
   if(e.importance==='high') row.append(element('span','중요','importanceBadge'));
-  row.append(element('span',zoneBadge(e),'zoneBadge'));
   if (e.relatedSources) row.classList.add('isMajor');
   return row;
 }
@@ -100,7 +102,9 @@ function render() {
     const day=splitDay(dayRows);
     for (const e of day.visible) {
       const b = button(e,'calEvent');
-      b.append(eventTitle(e), element('small',timing(e)));
+      const meta = element('small',timing(e));
+      meta.append(element('span',zoneBadge(e),'zoneBadge'));
+      b.append(eventTitle(e), meta);
       cell.append(b);
     }
     if(day.hidden){const more=element('button',`+${day.hidden}건 더보기`,'calMore');more.type='button';more.setAttribute('aria-label',date+' 일정 '+dayRows.length+'건 모두 보기');more.onclick=()=>showDay(date,dayRows);cell.append(more);}
