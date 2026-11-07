@@ -24,9 +24,11 @@
       "completedAt": "2026-11-07T14:26:02.616Z"
     },
     "threads": {
-      "status": "attempting",
+      "status": "published",
       "at": "2026-11-07T14:32:18.766Z",
-      "container": "18106949921313883"
+      "container": "18106949921313883",
+      "id": "17938927323404941",
+      "completedAt": "2026-11-07T14:32:29.821Z"
     }
   },
   "history": [
