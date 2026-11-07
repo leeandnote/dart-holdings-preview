@@ -1,6 +1,10 @@
 import { koreanTime } from './calendar-macro.mjs';
 
 export const marketSources = {
+  obesity: ['ObesityWeek · 공식 주요 일정', 'https://obesityweek.org/key-dates/'],
+  apec: ['중국 국무원 · APEC 정상회의 일정', 'https://english.www.gov.cn/news/202512/12/content_WS693c1432c6d00ca5f9a080e6.html'],
+  gstar: ['지스타 · 공식 행사 안내', 'https://www.gstar.or.kr/part/gstar_part_info.do'],
+  exam: ['교육부 · 2027학년도 수능 시행일', 'https://www.moe.go.kr/boardCnts/viewRenew.do?boardID=294&boardSeq=100526&lev=0&m=020402&opType=N&s=moe&statusYN=W'],
   sitc: ['SITC · 2026 연례 학회 공식 안내', 'https://www.sitcancer.org/2026/home'],
   samsung: ['삼성전자 IR · 실적 발표', 'https://www.samsung.com/global/ir/'],
   hynix: ['SK하이닉스 · 실적 설명회 공시 (SEC)', 'https://www.sec.gov/Archives/edgar/data/2120882/000119312526420934/d413172d6k.htm'],
@@ -59,7 +63,14 @@ const conferences = [4,5,6,7,8].map(day => ({
   description:'11월 4~8일 피닉스에서 열리는 연례 학회 및 사전 프로그램이다. 기간 중 각 날짜를 표시하며 특정 기업의 발표나 임상 성과를 보장하지 않는다. 기업별 발표 시각은 별도 공식 프로그램으로 확인해야 한다.',
 }));
 
-export const marketEvents = [...conferences, ...earnings, ...china, ...trade, ...expiries, {
+const november = [
+  ...[14,15,16,17].map(day=>({day,title:'ObesityWeek 비만학회',source:'obesity',region:'US',zone:'America/New_York',category:'industry',relatedSectors:['바이오','비만치료제'],description:'11월 14~17일 미국 워싱턴 DC에서 개최한다. 현지 날짜 기준이며 기업별 발표·임상 결과는 별도 확인이 필요하다.'})),
+  ...[18,19].map(day=>({day,title:'APEC 정상회의 · 중국 선전',source:'apec',region:'CN',zone:'Asia/Shanghai',category:'politics',relatedSectors:['수출주','반도체','소비재'],description:'11월 18~19일 중국 선전에서 개최하는 정상회의다. 특정 정상의 참석이나 미·중·러 별도 회담 성사는 이 일정으로 확인되지 않으므로 포함하지 않는다.'})),
+  ...[19,20,21,22].map(day=>({day,title:'지스타 2026',source:'gstar',region:'KR',zone:'Asia/Seoul',category:'industry',relatedSectors:['게임'],description:'11월 19~22일 BTC 전시 일정이다. BTB 운영일과 다를 수 있다. 개별 신작 공개·출시일과 참가사 성과를 보장하지 않는다.'})),
+  {day:19,title:'2027학년도 대학수학능력시험',source:'exam',region:'KR',zone:'Asia/Seoul',category:'industry',relatedSectors:['교육'],description:'교육부가 공표한 수능 시행일이다. 증시 10시 개장 여부와 상품별 거래시간은 해당 연도 한국거래소 공지 확인 전까지 확정 표기하지 않는다.'},
+].map(({day,...event})=>({...event,date:`2026-11-${day}`,type:event.category,importance:'high',status:'공식 일정',checkedAt:'2026-11-07',time:event.region==='KR'?'한국 날짜 · 행사별 시각 상이':'현지 날짜 · 행사별 시각 상이'}));
+
+export const marketEvents = [...november, ...conferences, ...earnings, ...china, ...trade, ...expiries, {
   date:'2026-10-28',title:'마이크로소프트 FY27 1분기 실적',region:'US',source:'microsoft',zone:'America/Los_Angeles',
   type:'earnings',status:'공식 일정',time:'미국 현지 날짜 · 시각 미확인',
   description:'기업 IR에 공표된 현지 날짜다. 시각을 확인하지 못해 한국시간 날짜로 변환하지 않았다. 회계연도 2027년 1분기는 달력 기준 2026년 3분기에 해당한다. 클라우드와 AI 투자계획을 확인한다.',

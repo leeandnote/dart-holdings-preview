@@ -4,12 +4,12 @@ import { marketEvents, marketSources } from './site/calendar-market-events.mjs';
 import { koreanTime } from './site/calendar-macro.mjs';
 
 test('market events carry source, review date and unique valid dates', () => {
-  assert.equal(marketEvents.length, 15);
-  assert.equal(new Set(marketEvents.map(e => e.date + e.title)).size, 15);
+  assert.equal(marketEvents.length, 31);
+  assert.equal(new Set(marketEvents.map(e => e.date + e.title)).size, marketEvents.length);
   for (const e of marketEvents) {
     assert.equal(new Date(e.date).toISOString().slice(0,10), e.date);
     assert.ok(marketSources[e.source][1].startsWith('https://'));
-    assert.equal(e.checkedAt, '2026-10-19');
+    assert.match(e.checkedAt, /^2026-(10-19|11-07)$/);
     assert.ok(e.status && e.description && e.zone && e.time);
     if(e.instant) assert.deepEqual(koreanTime(e.instant), {date:e.date,time:e.time});
   }
@@ -19,7 +19,7 @@ test('US calls cross midnight while China releases remain on the local date', ()
     const e=marketEvents.find(e=>e.source===source);
     assert.equal(e.date,date); assert.equal(e.time,time);
   }
-  for(const e of marketEvents.filter(e=>e.region==='CN')) {
+  for(const e of marketEvents.filter(e=>e.source==='nbs')) {
     assert.equal(e.time,'11:00 KST'); assert.equal(e.date,e.localDate);
     assert.equal(e.status,'공식 예정');
   }
