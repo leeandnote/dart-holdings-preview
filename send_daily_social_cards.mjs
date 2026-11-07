@@ -4,6 +4,7 @@ import os from "node:os";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
 import crypto from "node:crypto";
+import { pathToFileURL } from "node:url";
 import { renderYouTubeShort, uploadYouTubeShort } from "./youtube_short.mjs";
 
 const ROOT = process.cwd();
@@ -1324,7 +1325,9 @@ async function main() {
   }
 }
 
-main().catch((error) => {
+export { loadTelegramConfig, uploadXImage, createXPost, threadsFetch, waitForThreadsContainer, publishThreadsContainer, instagramFetch, waitForInstagramContainer, loadInstagramConfig };
+
+if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) main().catch((error) => {
   console.error(error.message);
   process.exit(1);
 });
