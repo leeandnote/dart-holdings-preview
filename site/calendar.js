@@ -18,6 +18,9 @@ const events=[
 import { macroSources, macroEvents } from './calendar-macro.mjs?v=20261014-1';
 import { marketSources, marketEvents } from './calendar-market-events.mjs?v=20261107-1';
 import { japanSources, japanEvents } from './calendar-japan.mjs?v=20261107-1';
+import { conferenceSources, conferenceEvents } from './calendar-conferences.mjs?v=20261107-2';
+Object.assign(sources, conferenceSources);
+events.push(...conferenceEvents);
 Object.assign(sources, japanSources);
 events.push(...japanEvents);
 Object.assign(sources, marketSources);

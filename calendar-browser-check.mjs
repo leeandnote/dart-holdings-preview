@@ -37,11 +37,22 @@ try {
     }
     await page.locator('#monthView').click();
     for(const {event} of fixtures){
+      await page.locator('#search').fill(event.title);
       const cell=page.locator('.calDay').filter({has:page.locator(`time[datetime="${event.date}"]`)});
       const item=cell.getByRole('button',{name:new RegExp(event.title)});
       assert.equal(await item.count(),1);
       assert.match(await item.textContent(),/뉴스 기반/);
     }
+    await page.locator('#search').fill('');
+    const busy=page.locator('.calDay').filter({has:page.locator('time[datetime="2026-11-18"]')});
+    await busy.locator('.calMore').click();
+    assert.ok(await page.locator('#dayDialog').getByRole('button',{name:/SMART ENERGY WEEK/}).count());
+    await page.getByRole('button',{name:'일정 목록 닫기'}).click();
+    await page.locator('#scope').selectOption('company');
+    await page.locator('#search').fill('005930');
+    assert.equal(await page.locator('.calEvent').filter({hasText:'삼성전자 IR'}).count(),5);
+    await page.locator('#scope').selectOption('all');
+    await page.locator('#search').fill('');
     await page.locator('#type').selectOption('politics');
     assert.equal(await page.locator('.calEvent').count(),3);
     await page.locator('.calEvent').filter({hasText:'예시위원회'}).click();
