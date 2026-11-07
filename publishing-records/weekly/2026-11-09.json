@@ -17,8 +17,9 @@
       "completedAt": "2026-11-07T13:58:23.270Z"
     },
     "threads": {
-      "status": "attempting",
-      "at": "2026-11-07T13:58:24.134Z"
+      "status": "needs_review",
+      "at": "2026-11-07T13:58:24.134Z",
+      "error": "Threads API failed /me/threads: Error validating access token: The session has been invalidated because the user changed their password or Facebook has changed the session for security reasons.; code=190"
     }
   }
 }
