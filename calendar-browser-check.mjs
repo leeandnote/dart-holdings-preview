@@ -43,12 +43,12 @@ try {
       assert.match(await item.textContent(),/뉴스 기반/);
     }
     await page.locator('#type').selectOption('politics');
-    assert.equal(await page.locator('.calEvent').count(),1);
-    await page.locator('.calEvent').click();
+    assert.equal(await page.locator('.calEvent').count(),3);
+    await page.locator('.calEvent').filter({hasText:'예시위원회'}).click();
     assert.match(await page.locator('#detailMeta').textContent(),/추출 근거/);
     await page.locator('#closeDialog').click();
     await page.locator('#listView').click();
-    assert.equal(await page.locator('#agenda .agendaRow').count(),1);
+    assert.equal(await page.locator('#agenda .agendaRow').count(),3);
     assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth));
     await page.screenshot({path:`.qa/calendar-news-${width}.png`,fullPage:true});
   }
