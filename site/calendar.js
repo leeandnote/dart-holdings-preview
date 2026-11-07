@@ -35,7 +35,7 @@ events.push({
   description: '주가지수 선물·옵션과 개별주식 선물·옵션 네 종류의 12월물 최종거래일이 겹치는 날이다. 쿼드러플 위칭데이라고도 부른다. 분기월(3·6·9·12월)의 둘째 목요일 규칙에 따른 표시이며, 휴장 또는 임시 변경 시 앞당겨질 수 있어 거래소 공지를 추가 확인해야 한다. 실제 최종결제일과는 구분한다. 기존 상품별 만기 일정과 같은 날을 묶어 설명한 항목이다.',
   relatedSources: ['futures', 'krx', 'stockFutures', 'stockOptions'],
 });
-import {categories,normalizeEvent,matchesCategory,zoneBadge,splitDay} from './calendar-model.mjs';
+import {categories,normalizeEvent,matchesCategory,zoneBadge,splitDay,compactTiming} from './calendar-model.mjs?v=20261107-3';
 import {toCalendarEvents} from './calendar-auto.mjs';
 for (let i=0;i<events.length;i++) events[i]=normalizeEvent(events[i]);
 const labels={expiry:'선물·옵션 만기',index:'ETF·지수 정기변경',policy:'금리·중앙은행',macro:'물가·고용',growth:'성장·소비',earnings:'기업 실적',trade:'수출입',holiday:'휴장·단축거래',politics:'정치/지정학',industry:'산업/학회/정책'};
@@ -57,7 +57,7 @@ const dayTitle=element('h2');dayTitle.id='dayTitle';
 const closeDay=element('button','×');closeDay.type='button';closeDay.setAttribute('aria-label','일정 목록 닫기');closeDay.onclick=()=>dayDialog.close();
 dayHeader.append(dayTitle,closeDay);
 const dayItems=element('div');dayDialog.append(dayHeader,dayItems);document.body.append(dayDialog);
-function showDay(date,rows){dayTitle.textContent=date+' 일정';dayItems.replaceChildren();for(const event of rows){const b=button(event,'agendaRow');b.append(eventTitle(event),element('small',timing(event)+' · '+zoneBadge(event)));dayItems.append(b);}dayDialog.showModal();}
+function showDay(date,rows){dayTitle.textContent=date+' 일정';dayItems.replaceChildren();for(const event of rows){const b=button(event,'agendaRow');b.append(eventTitle(event));if(compactTiming(event))b.append(element('small',compactTiming(event)));dayItems.append(b);}dayDialog.showModal();}
 function eventTitle(e) {
   const row = element('span', '', 'eventTitle');
   const flag = element('img', '', 'eventFlag');
@@ -69,7 +69,6 @@ function eventTitle(e) {
   flag.height = 15;
   row.append(flag, element('span', e.title));
   if(e.provenance==='news')row.append(element('span','뉴스 기반','zoneBadge'));
-  if(e.importance==='high') row.append(element('span','중요','importanceBadge'));
   if (e.relatedSources) row.classList.add('isMajor');
   return row;
 }
@@ -105,9 +104,8 @@ function render() {
     const day=splitDay(dayRows);
     for (const e of day.visible) {
       const b = button(e,'calEvent');
-      const meta = element('small',timing(e));
-      meta.append(element('span',zoneBadge(e),'zoneBadge'));
-      b.append(eventTitle(e), meta);
+      b.append(eventTitle(e));
+      if(compactTiming(e)) b.append(element('small',compactTiming(e)));
       cell.append(b);
     }
     if(day.hidden){const more=element('button',`+${day.hidden}건 더보기`,'calMore');more.type='button';more.setAttribute('aria-label',date+' 일정 '+dayRows.length+'건 모두 보기');more.onclick=()=>showDay(date,dayRows);cell.append(more);}
@@ -117,7 +115,7 @@ function render() {
   for (const e of rows) {
     const b = button(e,'agendaRow');
     const date = element('span',e.date.slice(5));
-    date.append(element('small',timing(e)));
+    if(compactTiming(e)) date.append(element('small',compactTiming(e)));
     const text = element('span');
     text.append(eventTitle(e),element('small',labels[e.type]+' · '+sources[e.source][0]));
     b.append(date,text,element('span',e.status));
@@ -132,7 +130,7 @@ function render() {
   const upcoming = events.filter(e=>e.date>=today&&matches(e)).sort(sort).slice(0,3);
   for (const e of upcoming) {
     const b = button(e,'');
-    b.append(element('small',e.date+' · '+timing(e)),eventTitle(e),element('small',sources[e.source][0]+' · '+e.status));
+    b.append(element('small',[e.date,compactTiming(e)].filter(Boolean).join(' · ')),eventTitle(e),element('small',sources[e.source][0]+' · '+e.status));
     $('upcoming').append(b);
   }
   if (!upcoming.length) $('upcoming').append(element('p','조건에 맞는 예정 일정이 없다.','muted'));

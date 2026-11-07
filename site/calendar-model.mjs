@@ -22,3 +22,11 @@ export function zoneBadge(event) {
 }
 /** @template T @param {T[]} events @param {number} limit */
 export function splitDay(events, limit = 3) { return {visible:events.slice(0,limit),hidden:Math.max(0,events.length-limit)}; }
+
+/** @param {CalendarEvent} event */
+export function compactTiming(event) {
+  const time = (event.time || '').match(/\b\d{2}:\d{2}\s*KST\b/);
+  if (time) return time[0];
+  if (event.zone === 'Asia/Seoul' || event.zone === 'Asia/Tokyo') return '';
+  return event.zone === '출처 표기일' ? '출처 날짜 기준' : '현지 날짜 기준';
+}

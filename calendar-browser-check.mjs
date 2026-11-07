@@ -36,6 +36,9 @@ try {
       await page.locator(n>2026*12+11?'#previous':'#next').click();
     }
     await page.locator('#monthView').click();
+    assert.equal(await page.locator('.importanceBadge').count(),0);
+    assert.equal(await page.locator('.calEvent small .zoneBadge').count(),0);
+    await page.screenshot({path:`.qa/calendar-clean-${width}.png`,fullPage:true});
     for(const {event} of fixtures){
       await page.locator('#search').fill(event.title);
       const cell=page.locator('.calDay').filter({has:page.locator(`time[datetime="${event.date}"]`)});
