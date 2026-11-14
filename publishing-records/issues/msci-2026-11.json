@@ -17,9 +17,11 @@
       "completedAt": "2026-11-14T02:08:06.231Z"
     },
     "instagram": {
-      "status": "attempting",
+      "status": "published",
       "at": "2026-11-14T02:08:07.749Z",
-      "container": "18437071477195397"
+      "container": "18437071477195397",
+      "id": "18480872713113664",
+      "completedAt": "2026-11-14T02:08:17.881Z"
     }
   }
 }
