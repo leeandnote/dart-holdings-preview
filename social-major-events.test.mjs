@@ -12,6 +12,11 @@ test('clinical rejection overrides a stale approval metric', () => {
   const [row] = context.pickMajorEvents([{ corpName: '올릭스', eventTitle: '임상시험계획 승인 신청 반려', eventType: '임상시험·IND', metric: '임상시험계획 승인' }]);
   assert.equal(row.metric, '승인 신청 반려');
 });
+
+test('approval application is not reported as approval', () => {
+  const [row] = context.pickMajorEvents([{ corpName: '임상기업', eventTitle: '임상시험계획변경승인신청) (제1/2상)', eventType: '임상시험·IND', metric: '임상시험계획변경승인' }]);
+  assert.match(row.metric, /변경승인신청/);
+});
 test('share transfer is not a supply contract', () => {
   const [row] = context.pickMajorEvents([{ corpName: '광명전기', eventTitle: '최대주주 변경을 수반하는 주식양수도계약 체결', eventType: '단일판매·수주' }]);
   assert.equal(row.kind, '지배구조');

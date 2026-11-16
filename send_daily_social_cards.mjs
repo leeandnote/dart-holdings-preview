@@ -180,7 +180,7 @@ function rowModel(row) {
     code: row.stockCode || "-",
     market: row.market || "-",
     reporter: row.reporter || "-",
-    reporterType: row.reporterType || "확인필요",
+    reporterType: /국민연금|연금공단/.test(row.reporter || "") ? "연기금" : row.reporterType || "확인필요",
     prev,
     cur,
     delta,
@@ -222,7 +222,14 @@ function isPriorityGlobalInstitution(row) {
   return /블랙록|blackrock|모건스탠리|morgan\s*stanley|jp\s*모건|제이피\s*모건|j\.?p\.?\s*morgan/i.test(`${row.reporter} ${row.reporterType}`);
 }
 
+function isVerifiedOwnership(row) {
+  return Number.isFinite(row.prev) && Number.isFinite(row.cur)
+    && row.prev >= 0 && row.prev <= 100 && row.cur >= 0 && row.cur <= 100
+    && Boolean(row.reporter) && !/확인중|확인필요|^-$/u.test(row.reporter);
+}
+
 function pickFive(rows) {
+  rows = rows.filter(isVerifiedOwnership);
   const newEntries = rows.filter((r) => (r.prev ?? 0) < 5 && (r.cur ?? 0) >= 5).sort((a, b) => scoreAbsShares(b) - scoreAbsShares(a));
   const priorityInstitutions = rows.filter((r) => isPriorityGlobalInstitution(r) && hasUsefulSignal(r)).sort((a, b) => scoreAbsShares(b) - scoreAbsShares(a));
   const institutions = rows.filter((r) => /JP|J\.P|제이피|모건|블랙록|국민연금|연기금|자산운용|투자신탁|투자자문|Vanguard|BlackRock|Morgan|Capital|Fidelity|트러스톤|VIP|브이아이피/i.test(`${r.reporter} ${r.reporterType}`)).sort((a, b) => Math.abs(b.value) - Math.abs(a.value));
@@ -242,6 +249,7 @@ function topicForFive(row) {
 }
 
 function pickExecutive(rows) {
+  rows = rows.filter(isVerifiedOwnership);
   const plannedTrades = rows.filter((r) => r.plannedTrade).sort((a, b) => scoreAbsShares(b) - scoreAbsShares(a));
   const increases = rows.filter((r) => (r.delta ?? 0) > 0 || (r.shareDelta ?? 0) > 0).sort((a, b) => scoreAbsShares(b) - scoreAbsShares(a));
   const decreases = rows.filter((r) => (r.delta ?? 0) < 0 || (r.shareDelta ?? 0) < 0).sort((a, b) => scoreAbsShares(b) - scoreAbsShares(a));
@@ -341,7 +349,7 @@ function majorEventMetric(text, kind) {
     const stage = source.match(/(?:미국|국내|한국|유럽|글로벌)?\s*(?:제\s*)?\d(?:\/\d[a-z]?)?\s*상/i)?.[0]?.replace(/\s+/g, " ");
     const result = source.match(/(?:top\s*line(?:\s*data)?|CSR|결과보고서)\s*수령/i)?.[0];
     if (result) return [stage?.trim(), /top\s*line/i.test(result) ? "탑라인 결과 수령" : "결과보고서 수령"].filter(Boolean).join(" · ");
-    const status = source.match(/IND\s*(?:신청|승인)|임상시험(?:계획)?\s*(?:신청|승인|변경승인|결과)|CSR\s*수령/i)?.[0]?.replace(/\s+/g, " ");
+    const status = source.match(/IND\s*(?:승인\s*신청|신청|승인)|임상시험(?:계획)?\s*(?:변경승인신청|승인신청|변경승인|신청|승인|결과)|CSR\s*수령/i)?.[0]?.replace(/\s+/g, " ");
     return [stage, status].filter(Boolean).join(" · ").trim() || "임상 단계 원문 확인";
   }
   if (/기술이전|파트너십/i.test(kind) && /Teva Pharmaceuticals/i.test(source)) {
@@ -366,7 +374,7 @@ function pickMajorEvents(rows) {
     title = title
       .replace(/^임상시험결과\)?\s*\(?/i, "")
       .replace(/^임상시험계획승인신청등결정\)?\s*\(?/i, "")
-      .replace(/^임상시험계획변경승인\)?\s*\(?/i, "")
+      .replace(/^임상시험계획변경승인(?:신청)?\)?\s*\(?/i, "")
       .replace(/^자회사의 주요경영사항\)?\s*\(?/i, "")
       .replace(/\)+$/, "")
       .trim();
@@ -387,7 +395,7 @@ function pickMajorEvents(rows) {
     if (/주식양수도|최대주주\s*변경/.test(title)) kind = "지배구조";
     const storedMetric = String(row.metric || "").trim();
     const fullTitle = String(row.eventTitle || row.reportName || row["보고서명"] || title);
-    const explicitClinicalOutcome = /임상|IND/i.test(kind) && /신청\s*(?:반려|철회)|승인\s*(?:취소|거절)|(?:top\s*line(?:\s*data)?|CSR|결과보고서)\s*수령/i.test(fullTitle);
+    const explicitClinicalOutcome = /임상|IND/i.test(kind) && /승인신청(?!등)|신청\s*(?:반려|철회)|승인\s*(?:취소|거절)|(?:top\s*line(?:\s*data)?|CSR|결과보고서)\s*수령/i.test(fullTitle);
     const metric = explicitClinicalOutcome ? majorEventMetric(fullTitle, kind) : storedMetric && !/^(?:원문|핵심 수치|임상 진행단계)/.test(storedMetric)
       ? storedMetric
       : majorEventMetric(source, kind);
@@ -859,7 +867,7 @@ function buildDailyCommentary({ fiveRows, executiveRows, contractRows, majorEven
   const tags = new Set(["dart전자공시", "리앤노트", "leeandnote", "주식", "주식공시"]);
   const executiveGroups = new Map();
   for (const row of executiveRows) {
-    if (!row.name || row.name === "-") continue;
+    if (!row.name || row.name === "-" || !isVerifiedOwnership(row) || !Number.isFinite(row.shareDelta) || row.plannedTrade) continue;
     const group = executiveGroups.get(row.name) || { count: 0, shares: 0, rows: [] };
     group.count += 1;
     group.shares += Number(row.shareDelta) || 0;
@@ -929,6 +937,16 @@ function validateCompleteBundle(cards) {
 async function postXThread(cards, caption) {
   if (!cards.length) return [];
   if (!xSeparate) {
+    // These generated captions contain no URLs; non-ASCII weighting is conservative.
+    const lines = [];
+    let weight = 0;
+    for (const line of caption.split("\n")) {
+      const lineWeight = [...line].reduce((sum, char) => sum + (char.codePointAt(0) < 128 ? 1 : 2), 0) + 1;
+      if (weight + lineWeight > 280) break;
+      lines.push(line);
+      weight += lineWeight;
+    }
+    caption = lines.join("\n");
     const mediaIds = [];
     for (const card of cards.slice(0, 4)) {
       mediaIds.push(await uploadXImage(card.file));
@@ -1218,9 +1236,11 @@ async function main() {
     loadContractRows(),
     loadMajorEventRows(),
   ]);
-  const fiveRows = pickFive(fiveRaw.map(rowModel));
+  const fiveModels = fiveRaw.map(rowModel).filter(isVerifiedOwnership);
+  const fiveRows = pickFive(fiveModels);
   const mergedExecRaw = [...extraExecRaw, ...execRaw];
-  const executiveModels = mergedExecRaw.map(rowModel);
+  const executiveModels = mergedExecRaw.map(rowModel).filter(isVerifiedOwnership);
+  const excludedOwnership = fiveRaw.length - fiveModels.length + mergedExecRaw.length - executiveModels.length;
   const execRows = pickExecutive(executiveModels);
   const contractRows = pickContracts(contractRaw);
   const majorEventRows = pickMajorEvents(majorEventRaw);
@@ -1256,6 +1276,10 @@ async function main() {
     const targetCards = onlyKinds ? cards.filter((card) => onlyKinds.has(card.kind)) : cards;
     validateCompleteBundle(targetCards);
     const commentary = buildDailyCommentary({ fiveRows, executiveRows: executiveModels, contractRows, majorEventRows });
+    if (excludedOwnership > 0) {
+      commentary.full = `확인된 공시 기준 요약 · 보유비율·보고자 미확인 ${excludedOwnership}건 제외\n\n${commentary.full}`;
+      commentary.compact = `[확인된 공시 기준 · 미확인 ${excludedOwnership}건 제외]\n${commentary.compact}`;
+    }
     if (!dryRun && !skipTelegram && !xOnly && !threadsOnly && !instagramOnly && !youtubeOnly) {
       const messageIds = await sendMediaGroup(targetCards, commentary.full);
       console.log(JSON.stringify({ channel: "telegram", messageIds }));
