@@ -1,6 +1,7 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { searchGuides, enrichSearchTopics, buybackGuide } from './search_guides.mjs';
+import { questionGuides } from './disclosure_questions.mjs';
 
 const ROOT = path.resolve("site");
 const OUT = path.join(ROOT, "blog", "issues");
@@ -69,6 +70,7 @@ if (jpmorgan.length) topics.push({ slug: "jpmorgan-five-percent-holdings", score
 
 topics.push(...searchGuides(holdings));
 topics.push(buybackGuide());
+topics.push(...questionGuides());
 enrichSearchTopics(topics);
 topics.sort((a, b) => b.score - a.score);
 await mkdir(OUT, { recursive: true });

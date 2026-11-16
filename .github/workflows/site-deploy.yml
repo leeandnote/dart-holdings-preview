@@ -13,6 +13,7 @@ on:
       - "glossary_detail.mjs"
       - "blog_editorial.mjs"
       - "search_guides.mjs"
+      - "disclosure_questions.mjs"
       - "search_foundation.mjs"
       - "generate_disclosurepedia.mjs"
       - "company_news.mjs"
@@ -89,4 +90,8 @@ jobs:
         run: node prepare_cloudflare_pages.mjs --days=120
 
       - name: Deploy to Cloudflare Pages
-        run: pnpm dlx wrangler pages deploy public_dist --project-name leeandnote --branch main
+        # Validate search entry points before public deployment.
+        run: |
+          node --test search-questions.test.mjs
+          node verify-search-pages.mjs
+          pnpm dlx wrangler pages deploy public_dist --project-name leeandnote --branch main
