@@ -1,0 +1,16 @@
+{
+  "reportDate": "20261116",
+  "status": "published",
+  "runId": "43868772294",
+  "runUrl": "https://github.com/leeandnote/dart-holdings-preview/actions/runs/43868772294",
+  "sourceCommit": "8c42bbfc",
+  "scope": "Verified daily disclosure highlights; unverified ownership records excluded and disclosed in captions. Full site data health remains unresolved.",
+  "channels": {
+    "telegram": { "status": "published", "messageIds": [4325, 4326, 4327, 4328], "url": "https://t.me/leeandnote/4325", "publishedAt": "2026-11-16T12:44:00Z" },
+    "x": { "status": "published", "postId": "2122309717691085147", "url": "https://x.com/i/status/2122309717691085147", "publishedAt": "2026-11-16T12:44:02Z" },
+    "threads": { "status": "published", "postId": "18183551203440248", "mediaType": "VIDEO", "publishedAt": "2026-11-16T12:45:24Z" },
+    "instagram": { "status": "published", "postId": "18137231534504769", "mediaType": "REELS", "publishedAt": "2026-11-16T12:46:04Z" },
+    "youtube": { "status": "published", "videoId": "OjsQdK4Ytdo", "url": "https://www.youtube.com/shorts/OjsQdK4Ytdo", "publishedAt": "2026-11-16T12:46:14Z" }
+  },
+  "retryPolicy": "Do not republish successful channels. Check this record and platform state before any retry."
+}
