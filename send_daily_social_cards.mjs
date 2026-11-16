@@ -641,7 +641,16 @@ async function refreshXConfig(config) {
   return xConfigCache;
 }
 
+function telegramTitleFirst(caption) {
+  const lines = String(caption).split("\n");
+  const titleIndex = lines.findIndex((line) => /^\[\d{4}-\d{2}-\d{2} DART전자공시 주요 이슈\]$/.test(line.trim()));
+  if (titleIndex <= 0) return caption;
+  const [title] = lines.splice(titleIndex, 1);
+  return `${title.trim()}\n\n${lines.join("\n").trim().replace(/\n{3,}/g, "\n\n")}`;
+}
+
 async function sendMediaGroup(cards, caption) {
+  caption = telegramTitleFirst(caption);
   const { token, chatId } = await loadTelegramConfig();
   const selected = cards.slice(0, 10);
   if (!selected.length) return;
