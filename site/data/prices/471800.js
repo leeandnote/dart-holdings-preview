@@ -1,0 +1,1 @@
+window.__PRICE_CHUNKS__ = window.__PRICE_CHUNKS__ || {}; window.__PRICE_CHUNKS__['471800'] = [{"date":"2026-11-18","open":0,"high":0,"low":0,"close":13320,"volume":0}];
