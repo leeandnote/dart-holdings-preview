@@ -30,6 +30,11 @@ test('IndexNow rejects foreign URLs and deduplicates valid notifications',()=>{
   assert.throws(()=>indexNowPayload('bad',[]));
   assert.equal(indexNowPayload('abcdefgh',[origin+'/',origin+'/']).urlList.length,1);
 });
+test('news fetch clocks do not modify pages, but article changes do',()=>{
+  const html=page('/disclosurepedia/005930-test/','<h1>기업</h1><div class="companyNews"><ul><li><a href="https://example.com/news">기사 제목</a></li></ul><p>뉴스 확인: 26. 11. 19. 22:00 KST · 네이버 뉴스 검색</p></div>');
+  assert.equal(contentHash(html),contentHash(html.replace('22:00','22:10')));
+  assert.notEqual(contentHash(html),contentHash(html.replace('기사 제목','새로운 기사 제목')));
+});
 test('terms, reciprocal links, breadcrumbs and split sitemaps remain stable',async()=>{
   const dir=fs.mkdtempSync(path.join(os.tmpdir(),'search-integrity-'));
   const put=(file,html)=>{fs.mkdirSync(path.dirname(path.join(dir,file)),{recursive:true});fs.writeFileSync(path.join(dir,file),html);};

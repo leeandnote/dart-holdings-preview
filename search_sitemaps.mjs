@@ -12,6 +12,8 @@ export function contentHash(html){
   const {document}=parseHTML(html);
   const main=(document.querySelector('main')||document.body).cloneNode(true);
   main.querySelectorAll('script,style,#editorial-byline,.postDate').forEach(e=>e.remove());
+  // Refreshing the news fetch clock is not a substantive content update.
+  main.querySelectorAll('.companyNews > p').forEach(e=>{if(e.textContent.trim().startsWith('뉴스 확인:'))e.remove();});
   const schemas=[...document.querySelectorAll('script[type="application/ld+json"]')].map(s=>JSON.parse(s.textContent));
   const omitDates=(key,value)=>['dateModified','datePublished'].includes(key)?undefined:value;
   const content=[document.title,document.querySelector('meta[name="description"]')?.content,main.innerHTML.replace(/\s+/g,' ').trim(),JSON.stringify(schemas,omitDates)];
