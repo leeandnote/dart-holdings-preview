@@ -14,6 +14,11 @@ on:
       - "blog_editorial.mjs"
       - "search_guides.mjs"
       - "disclosure_questions.mjs"
+      - "daily_content.mjs"
+      - "term_pages.mjs"
+      - "search_graph.mjs"
+      - "search_sitemaps.mjs"
+      - "notify_indexnow.mjs"
       - "search_foundation.mjs"
       - "generate_disclosurepedia.mjs"
       - "company_news.mjs"
@@ -93,5 +98,9 @@ jobs:
         # Validate search entry points before public deployment.
         run: |
           node --test search-questions.test.mjs
+          node --test search-integrity.test.mjs
           node verify-search-pages.mjs
           pnpm dlx wrangler pages deploy public_dist --project-name leeandnote --branch main
+
+      - name: Notify IndexNow after deployment
+        run: node notify_indexnow.mjs

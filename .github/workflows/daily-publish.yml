@@ -186,6 +186,10 @@ jobs:
           & node ./send_daily_social_cards.mjs @args
           if ($LASTEXITCODE -ne 0) { throw "Social-only publish failed for $env:REPORT_DATE" }
 
+      - name: Notify IndexNow after daily site deployment
+        if: ${{ success() && inputs.social_only != true }}
+        run: node notify_indexnow.mjs
+
       - name: Render social card previews
         if: ${{ success() && inputs.social_only != true }}
         shell: pwsh

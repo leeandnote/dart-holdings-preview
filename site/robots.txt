@@ -13,12 +13,7 @@ Allow: /
 User-agent: OAI-SearchBot
 Allow: /
 
-User-agent: GPTBot
-Allow: /
-
-User-agent: ClaudeBot
-Allow: /
-
+# Training-crawler rules are managed by Cloudflare; do not duplicate them here.
 User-agent: Claude-User
 Allow: /
 

@@ -5,6 +5,9 @@ import { spawnSync } from "node:child_process";
 import { applySiteMetadata } from "./site_metadata.mjs";
 import { applyBlogEditorial } from "./blog_editorial.mjs";
 import { applySearchFoundation } from './search_foundation.mjs';
+import { createTermPages } from './term_pages.mjs';
+import { connectSearchPages } from './search_graph.mjs';
+import { buildSearchSitemaps } from './search_sitemaps.mjs';
 
 const root = path.dirname(fileURLToPath(import.meta.url));
 const publicDaysArg = process.argv.find((arg) => arg.startsWith("--days="));
@@ -135,7 +138,10 @@ if (fs.existsSync(latestJsonPath)) {
 
 applySiteMetadata(distDir);
 console.log(`BLOG_EDITORIAL_PAGES=${await applyBlogEditorial(distDir)}`);
+createTermPages(distDir);
 applySearchFoundation(distDir);
+console.log('SEARCH_LINKS='+JSON.stringify(connectSearchPages(distDir)));
+console.log('SEARCH_SITEMAPS='+JSON.stringify(await buildSearchSitemaps(distDir)));
 const files = walk(distDir);
 const tooLarge = files
   .map((file) => ({ file, size: fs.statSync(file).size }))

@@ -14,7 +14,7 @@ for(const slug of slugs){
   for(const [,link] of html.matchAll(/href="(\/blog\/issues\/[^"#]+)"/g)){
     assert.ok(fs.existsSync(path.join(root,link,'index.html')),`Missing internal target ${link}`);
   }
-  assert.ok(fs.readFileSync(path.join(root,'sitemap.xml'),'utf8').includes(`https://leeandnote.com/blog/issues/${slug}/`));
+  assert.ok(fs.readFileSync(path.join(root,'sitemap-blog.xml'),'utf8').includes(`https://leeandnote.com/blog/issues/${slug}/`));
 }
 for(const file of ['index.html','blog/index.html','disclosurepedia/index.html']){
   assert.match(fs.readFileSync(path.join(root,file),'utf8'),/class="questionReading"/);

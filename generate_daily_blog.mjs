@@ -1,5 +1,6 @@
 import { mkdir, writeFile, readFile, readdir, rm } from "node:fs/promises";
 import path from "node:path";
+import { exclusiveThemes, ownershipHeadline, factualReview } from './daily_content.mjs';
 
 const ROOT = path.resolve("site");
 const CONVEX_URL = process.env.CONVEX_URL || "https://quiet-cardinal-118.convex.cloud";
@@ -557,7 +558,7 @@ function downloadLinks() {
 }
 
 function articleDataTable({ title, badge, rows }) {
-  const displayRows = rows.slice(0, Math.min(rows.length, 10));
+  const displayRows = rows;
   if (!displayRows.length) return `<p>조건에 맞는 표 데이터가 없습니다.</p>`;
   return `<div class="articleTableWrap">
     <table class="articleTable ownershipArticleTable">
@@ -722,7 +723,7 @@ function themeSection(theme, index) {
       <p>${esc(theme.intro)}</p>
       ${articleDataTable({ title: "", badge: theme.badge, rows: theme.rows })}
       <p class="articleTableNote outside">지분변동주식수는 직전·이번 보고서의 보유수량 차이입니다. 수량을 확인할 수 없는 항목은 -로 표시합니다.</p>
-      ${proseReview(theme.rows, theme.mode)}`;
+      ${factualReview(theme.rows).map(text=>`<p>${esc(text)}</p>`).join('')}`;
 }
 
 function pointItems(rows) {
@@ -752,7 +753,7 @@ async function main() {
   ]);
   const raw = uniqueDisclosureRows([...convexRaw, ...localRaw]);
   const items = raw.map(rowModel).filter((row) => row.name !== "-");
-  const newEntries = items.filter((row) => (row.prev ?? 0) < 5 && (row.cur ?? 0) >= 5).sort((a, b) => Math.abs(b.delta ?? 0) - Math.abs(a.delta ?? 0));
+  const newEntries = items.filter((row) => Number.isFinite(row.prev) && Number.isFinite(row.cur) && row.prev < 5 && row.cur >= 5).sort((a, b) => Math.abs(b.delta ?? 0) - Math.abs(a.delta ?? 0));
   const increases = items.filter((row) => (row.delta ?? 0) > 0).sort((a, b) => (b.delta ?? 0) - (a.delta ?? 0));
   const decreases = items.filter((row) => (row.delta ?? 0) < 0).sort((a, b) => (a.delta ?? 0) - (b.delta ?? 0));
   const flow = items.filter((row) => Math.abs(row.value || 0) > 0).sort((a, b) => Math.abs(b.value) - Math.abs(a.value));
@@ -766,7 +767,7 @@ async function main() {
   const insiders = items.filter((row) => /오너|특수관계|최대주주|대표|임원|개인/i.test(`${row.reporter} ${row.reporterType}`)).sort((a, b) => Math.abs(b.value) - Math.abs(a.value));
 
   const primaryRows = newEntries.length ? newEntries : increases;
-  const themes = [
+  const themes = exclusiveThemes([
     {
       slug: "new-entry",
       tag: newEntries.length ? "신규5%진입" : "주요5%보고",
@@ -848,7 +849,7 @@ async function main() {
       rows: insiders,
       mode: "flow",
     },
-  ].filter((theme) => theme.rows.length);
+  ].filter((theme) => theme.rows.length), items);
 
   const assetDir = path.join(ROOT, "assets", "blog");
   await mkdir(assetDir, { recursive: true });
@@ -870,13 +871,7 @@ async function main() {
   const postDir = path.join(categoryDir, iso);
   await mkdir(postDir, { recursive: true });
 
-  const ownershipKeyword = jpMorgan.length
-    ? "JP모건 5% 지분 변동 종목"
-    : pension.length
-      ? "국민연금 보유주식 변동 종목"
-      : newEntries[0]
-        ? `${newEntries[0].name} 5% 신규 보유`
-        : `${(increases[0] || decreases[0] || items[0])?.name || "주요 종목"} 지분 변동`;
+  const ownershipKeyword = ownershipHeadline(items, newEntries);
   const postTitle = `${dotted} ${ownershipKeyword} | 5%보고공시`;
   const postDescription = `${dotted} DART 5%보고공시에서 신규 진입, 지분율 증감, 주요 제출인 흐름을 정리했습니다.`;
   const postUrl = `https://leeandnote.com/blog/5percent/${iso}`;
@@ -1026,7 +1021,7 @@ ${pageNav("blog")}
   const execDecreases = execItems.filter((row) => (row.delta ?? 0) < 0 || (row.shareDelta ?? 0) < 0).sort((a, b) => Math.abs(b.shareDelta ?? 0) - Math.abs(a.shareDelta ?? 0));
   const execFlow = execItems.slice().sort((a, b) => Math.abs(b.value) - Math.abs(a.value));
   const execInsiders = execItems.filter((row) => /오너|특수관계|대표|이사|상무|전무|사장|회장|주요주주|개인/i.test(`${row.reporter} ${row.reporterType}`)).sort((a, b) => Math.abs(b.shareDelta ?? 0) - Math.abs(a.shareDelta ?? 0));
-  const execThemes = [
+  const execThemes = exclusiveThemes([
     {
       slug: "increase",
       tag: "임원보유증가",
@@ -1063,7 +1058,7 @@ ${pageNav("blog")}
       rows: execInsiders,
       mode: "flow",
     },
-  ].filter((theme) => theme.rows.length);
+  ].filter((theme) => theme.rows.length), execItems);
 
   for (const theme of execThemes) {
     theme.svgFile = `dart-executive-${ymd}-${theme.slug}.svg`;
