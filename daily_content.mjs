@@ -31,6 +31,17 @@ export function reportCounts(rows) {
   return { reports: new Set(rows.map(disclosureKey)).size, companies: new Set(rows.map(row => row.code || row.name)).size };
 }
 
+export function receiptDate(row) {
+  const receipt = String(row.receiptNo || '').match(/^(\d{8})\d{6}$/)?.[1];
+  return receipt || '';
+}
+
+export function executiveDirection(row) {
+  // Share count is the primary axis; percentage can move in the opposite direction.
+  if (Number.isFinite(row.shareDelta)) return row.shareDelta > 0 ? 'increase' : row.shareDelta < 0 ? 'decrease' : 'unchanged';
+  return 'unverified';
+}
+
 export function factualReview(rows) {
   return rows.slice(0,2).map(row => `${row.name}: ${row.reporter} 제출 보고에서 보유비율 ${row.rateText}, 변동폭 ${row.deltaText}로 확인됩니다. 공시에 기재된 보고사유는 ${row.reason || '원문 확인 필요'}입니다.`);
 }

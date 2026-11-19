@@ -1,6 +1,6 @@
 import { mkdir, writeFile, readFile, readdir, rm } from "node:fs/promises";
 import path from "node:path";
-import { exclusiveThemes, ownershipHeadline, factualReview, reportCounts } from './daily_content.mjs';
+import { exclusiveThemes, ownershipHeadline, factualReview, reportCounts, receiptDate, executiveDirection } from './daily_content.mjs';
 
 const ROOT = path.resolve("site");
 const CONVEX_URL = process.env.CONVEX_URL || "https://quiet-cardinal-118.convex.cloud";
@@ -1008,13 +1008,16 @@ ${pageNav("blog")}
 </html>
 `, "utf8");
 
-  const [execRaw, execOverrides] = await Promise.all([
+  const nextDay = new Date(`${iso}T00:00:00Z`);
+  nextDay.setUTCDate(nextDay.getUTCDate() + 1);
+  const [execRaw, execOverrides, execAdjacent] = await Promise.all([
     dailyRows("dart:listExecutiveDailyReportItems", ymd, 300),
     loadExecutiveOverrides(ymd),
+    dailyRows("dart:listExecutiveDailyReportItems", nextDay.toISOString().slice(0,10).replaceAll('-',''), 300),
   ]);
-  const execItems = uniqueDisclosureRows([...execOverrides, ...execRaw]).map(rowModel).filter((row) => row.name !== "-");
-  const execIncreases = execItems.filter((row) => (row.delta ?? 0) > 0 || (row.shareDelta ?? 0) > 0).sort((a, b) => Math.abs(b.shareDelta ?? 0) - Math.abs(a.shareDelta ?? 0));
-  const execDecreases = execItems.filter((row) => (row.delta ?? 0) < 0 || (row.shareDelta ?? 0) < 0).sort((a, b) => Math.abs(b.shareDelta ?? 0) - Math.abs(a.shareDelta ?? 0));
+  const execItems = uniqueDisclosureRows([...execOverrides, ...execRaw, ...execAdjacent]).filter(row => receiptDate(row) === ymd).map(rowModel).filter((row) => row.name !== "-");
+  const execIncreases = execItems.filter((row) => executiveDirection(row) === 'increase').sort((a, b) => Math.abs(b.shareDelta ?? 0) - Math.abs(a.shareDelta ?? 0));
+  const execDecreases = execItems.filter((row) => executiveDirection(row) === 'decrease').sort((a, b) => Math.abs(b.shareDelta ?? 0) - Math.abs(a.shareDelta ?? 0));
   const execFlow = execItems.slice().sort((a, b) => Math.abs(b.value) - Math.abs(a.value));
   const execInsiders = execItems.filter((row) => /오너|특수관계|대표|이사|상무|전무|사장|회장|주요주주|개인/i.test(`${row.reporter} ${row.reporterType}`)).sort((a, b) => Math.abs(b.shareDelta ?? 0) - Math.abs(a.shareDelta ?? 0));
   const execThemes = exclusiveThemes([
@@ -1022,8 +1025,8 @@ ${pageNav("blog")}
       slug: "increase",
       tag: "임원보유증가",
       badge: "보유 증가",
-      heading: "보유주식수 또는 보유비율이 증가한 임원보고",
-      intro: "당일 임원보고 중 보유주식수나 보유비율이 증가한 공시를 먼저 확인합니다.",
+      heading: "보유주식수가 증가한 임원보고",
+      intro: "보유주식수 증가 기준입니다. 표시 보유비율이 같거나 낮아져도 수량이 늘어난 보고는 여기에 포함합니다.",
       rows: execIncreases,
       mode: "entry",
     },
@@ -1031,8 +1034,8 @@ ${pageNav("blog")}
       slug: "decrease",
       tag: "임원보유감소",
       badge: "보유 감소",
-      heading: "보유주식수 또는 보유비율이 감소한 임원보고",
-      intro: "주요주주와 임원의 보유주식수 감소 또는 지분율 하락이 확인되는 공시를 모았습니다.",
+      heading: "보유주식수가 감소한 임원보고",
+      intro: "보유주식수 감소 기준입니다. 비율 상승과 수량 감소가 동시에 발생할 수 있으며, 수량 감소만으로 매도라고 단정하지 않습니다.",
       rows: execDecreases,
       mode: "flow",
     },
@@ -1054,7 +1057,15 @@ ${pageNav("blog")}
       rows: execInsiders,
       mode: "flow",
     },
-  ].filter((theme) => theme.rows.length), execItems);
+  ].filter((theme) => ['increase','decrease'].includes(theme.slug) && theme.rows.length), execItems);
+  const execOther = execThemes.find(theme => theme.slug === 'other');
+  if (execOther) {
+    execOther.heading = '보유주식수 유지·수량 미확인';
+    execOther.intro = '수량이 같거나 비교 수량을 확인하지 못한 보고입니다. 보유비율 변동 여부는 별도로 확인하세요.';
+  }
+  const snapshotDir = path.join(ROOT, 'data', 'blog-disclosures');
+  await mkdir(snapshotDir, {recursive:true});
+  await writeFile(path.join(snapshotDir, `${ymd}.json`), JSON.stringify([...items.map(row=>({...row, category:'5%보고'})), ...execItems.map(row=>({...row,category:'임원·주요주주'}))].filter(row=>receiptDate(row)===ymd).map(row=>({...row,date:ymd}))), 'utf8');
 
   for (const theme of execThemes) {
     theme.svgFile = `dart-executive-${ymd}-${theme.slug}.svg`;
@@ -1079,6 +1090,7 @@ ${pageNav("blog")}
   const execPostTitle = `${dotted} ${executiveKeyword} | 임원보고공시`;
   const execPostDescription = `${dotted} DART 임원보고공시에서 임원·주요주주의 보유주식수와 보유비율 변동을 정리했습니다.`;
   const execPostUrl = `https://leeandnote.com/blog/executives/${iso}`;
+  const execImageUrl = `https://leeandnote.com/assets/blog/${execThemes[0]?.svgFile || `dart-executive-${ymd}-increase.svg`}`;
   const execLeadNames = (execIncreases.length ? execIncreases : execItems).slice(0, 3).map((r) => r.name).join(", ");
   const execSummary = `<div class="summaryBox">오늘 접수된 임원보고공시는 총 <strong>${execItems.length.toLocaleString("ko-KR")}건</strong>입니다.${execLeadNames ? ` 주요 확인 종목은 <strong>${esc(execLeadNames)}</strong> 등입니다.` : ""} 비율 변화가 작게 보이는 공시는 실제 보유주식수 변동을 함께 확인하는 편이 좋습니다.</div>`;
   const execThemeSections = execThemes.length
@@ -1090,11 +1102,11 @@ ${pageNav("blog")}
     { question: "어떤 자료를 기준으로 정리했나요?", answer: "금융감독원 DART 전자공시의 당일 임원·주요주주 보고와 공개 가격 데이터를 기준으로 정리했습니다." },
   ];
   const executiveSchema = articleStructuredData({
-    title: execPostTitle, description: execPostDescription, canonical: execPostUrl, image: imageUrl,
+    title: execPostTitle, description: execPostDescription, canonical: execPostUrl, image: execImageUrl,
     section: "임원보고공시", rows: ["종목명", "보고자", "보유비율", "보유주식수", "지분변동주식수", "보고사유"], facts: executiveFacts,
   });
 
-  await writeFile(path.join(execPostDir, "index.html"), `${htmlHead({ title: execPostTitle, description: execPostDescription, canonical: execPostUrl, image: imageUrl, structuredData: executiveSchema })}
+  await writeFile(path.join(execPostDir, "index.html"), `${htmlHead({ title: execPostTitle, description: execPostDescription, canonical: execPostUrl, image: execImageUrl, structuredData: executiveSchema })}
 <body class="blogBody">
 ${blogCss()}
 ${pageNav("blog")}

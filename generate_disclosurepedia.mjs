@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { loadCompanyNews, newsSection } from "./company_news.mjs";
+import {blogDisclosureRows} from './blog_discovery.mjs';
 
 const ROOT = process.cwd();
 const SITE = path.join(ROOT, "site");
@@ -27,7 +28,7 @@ function money(value) {
   return n >= 100000000 ? `${Math.round(n / 100000000).toLocaleString("ko-KR")}억원` : `${Math.round(n).toLocaleString("ko-KR")}원`;
 }
 function pct(value) { const n = Number(value); return Number.isFinite(n) ? `${n.toLocaleString("ko-KR", { maximumFractionDigits: 2 })}%` : ""; }
-const existingSlugs=new Map(fs.existsSync(OUT)?fs.readdirSync(OUT,{withFileTypes:true}).filter(e=>e.isDirectory()&&/^\d{6}-/.test(e.name)).map(e=>[e.name.slice(0,6),e.name]):[]);
+const existingSlugs=new Map(fs.existsSync(OUT)?fs.readdirSync(OUT,{withFileTypes:true}).filter(e=>e.isDirectory()&&/^[0-9A-Z]{6}-/.test(e.name)).map(e=>[e.name.slice(0,6),e.name]):[]);
 function slug(code, name) { return existingSlugs.get(code)||`${code}-${String(name || "company").replace(/[^0-9A-Za-z가-힣]+/g, "-").replace(/^-|-$/g, "").toLowerCase()}`; }
 function category(row) {
   if (row.category) return row.category;
@@ -44,7 +45,7 @@ const rows = [];
 for (const row of latest.rows || []) {
   const code = String(row["종목코드"] || row.stockCode || "").trim();
   const name = String(row["종목명"] || row.corpName || "").trim();
-  if (!/^\d{6}$/.test(code) || !name) continue;
+  if (!/^[0-9A-Z]{6}$/.test(code) || !name) continue;
   rows.push({
     code, name, market: row["시장"] || row.market || "", date: digits(row["접수일"] || row.receiptDate),
     receiptNo: row["접수번호"] || row.receiptNo || "", reportName: row["보고서명"] || row.reportName || "주식등의대량보유상황보고서",
@@ -55,7 +56,7 @@ for (const row of latest.rows || []) {
 }
 for (const row of signals.rows || []) {
   const code = String(row["종목코드"] || "").trim(); const name = String(row["종목명"] || "").trim();
-  if (!/^\d{6}$/.test(code) || !name) continue;
+  if (!/^[0-9A-Z]{6}$/.test(code) || !name) continue;
   const type = String(row["공시유형"] || "");
   const cat = type === "단일판매·공급계약" ? "대형수주" : type === "투자판단관련주요경영사항" ? "투자판단" : "실적";
   const summary = cat === "대형수주"
@@ -64,8 +65,12 @@ for (const row of signals.rows || []) {
   rows.push({ code, name, market: row["시장"] || "", date: digits(row["접수일"]), receiptNo: row["접수번호"] || "", reportName: row["보고서명"] || type, type, reporter: "", summary, url: row.DART_URL || "", category: cat });
 }
 
+const blogRows=blogDisclosureRows(SITE);
+const blogCodes=new Set(blogRows.map(row=>row.code));
 const companies = new Map();
-for (const row of rows) {
+const uniqueRows=new Map();
+for(const row of [...rows,...blogRows])uniqueRows.set([row.receiptNo,row.code,row.reporter].join('|'),row);
+for (const row of uniqueRows.values()) {
   const item = companies.get(row.code) || { code: row.code, name: row.name, market: row.market, rows: [] };
   item.name ||= row.name; item.market ||= row.market; item.rows.push(row); companies.set(row.code, item);
 }
@@ -75,7 +80,7 @@ const ranked = [...companies.values()]
 const priority = PRIORITY_CODES.map((code) => ranked.find((company) => company.code === code)).filter(Boolean);
 const prioritySet = new Set(priority.map((company) => company.code));
 const selected = [...priority, ...ranked.filter((company) => company.rows.length >= MIN_DISCLOSURES && !prioritySet.has(company.code))].slice(0, MAX_COMPANIES);
-for(const company of ranked)if(existingSlugs.has(company.code)&&!selected.some(c=>c.code===company.code))selected.push(company);
+for(const company of ranked)if((existingSlugs.has(company.code)||blogCodes.has(company.code))&&!selected.some(c=>c.code===company.code))selected.push(company);
 
 const commonStyle = `
 body[data-page-kind="disclosurepedia"] main{padding-top:14px}.pediaHero{padding:4px 0 12px}.pediaHero .eyebrow{margin-bottom:5px}.pediaHero h1{font-size:24px;line-height:1.25}.pediaHero p{margin-top:5px;color:var(--muted);font-size:13px;line-height:1.55}.pediaStats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:4px 0 14px}.pediaStat{padding:13px 15px;border:1px solid var(--line);border-radius:8px;background:#fff;box-shadow:0 5px 14px rgba(15,23,42,.035)}.pediaStat b{display:block;color:var(--ink);font-size:21px}.pediaStat span{color:var(--muted);font-size:11px;font-weight:700}.pediaPanel{margin:0 0 14px;border:1px solid var(--line);border-radius:8px;background:#fff;box-shadow:0 10px 24px rgba(15,23,42,.05);overflow:hidden}.pediaPanel>h2{padding:15px 17px;border-top:3px solid var(--orange);border-bottom:1px solid #e8ecf2;font-size:17px}.pediaGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;padding:14px}.pediaCompany{display:block;min-height:104px;padding:13px;border:1px solid #e0e6ee;border-radius:8px;background:#fff;text-decoration:none}.pediaCompany:hover{border-color:#ff9d79;background:#fffaf7}.pediaCompany strong{color:var(--ink);font-size:16px}.pediaCompany small{color:#718096;font-size:11px;font-weight:700}.pediaCompany p{margin:9px 0 0;color:#566276;font-size:12px;line-height:1.5}.pediaTable{width:100%;border-collapse:collapse;table-layout:fixed}.pediaTable th{height:44px;padding:8px 12px;background:#1e2530;color:#fff;font-size:12px;text-align:left}.pediaTable td{height:58px;padding:9px 12px;border-bottom:1px solid #e7ecf2;font-size:12px;vertical-align:middle}.pediaTable td:first-child{width:112px;white-space:nowrap}.pediaTable td:last-child{width:90px}.pediaPill{display:inline-flex;margin-right:6px;padding:3px 7px;border:1px solid #ffb899;border-radius:999px;background:#fffaf7;color:#273142;font-size:10px;font-weight:800}.pediaDart{color:#7b8493;font-size:11px;font-weight:700;text-decoration:none}.pediaDart:hover{color:var(--orange)}.pediaSummary{overflow:hidden;color:#596579;line-height:1.45;text-overflow:ellipsis}.pediaLinks{display:flex;flex-wrap:wrap;gap:8px;padding:14px 17px}.pediaLinks a{padding:8px 11px;border:1px solid #dce3ec;border-radius:7px;background:#fbfcfe;font-size:12px;font-weight:800;text-decoration:none}.pediaFoot{margin:18px 2px 0;color:#8792a2;font-size:11px;line-height:1.6}@media(max-width:1100px){.pediaGrid{grid-template-columns:repeat(3,minmax(0,1fr))}}@media(max-width:760px){.pediaGrid{grid-template-columns:1fr}.pediaStats{grid-template-columns:repeat(2,1fr)}.pediaTable th:nth-child(3),.pediaTable td:nth-child(3){display:none}.pediaTable td{padding:9px 8px}.pediaHero h1{font-size:22px}}
@@ -108,8 +113,12 @@ const hub = shell({ title:"공시피디아 | 종목별 DART 전자공시 아카�
 fs.writeFileSync(path.join(OUT,"index.html"), hub, "utf8");
 
 const sitemapUrls = [];
+// Bound concurrency as coverage grows beyond the featured companies.
+let newsIndex=0;
+await Promise.all(Array.from({length:4},async()=>{
+  while(newsIndex<selected.length){const company=selected[newsIndex++];company.news=await loadCompanyNews(company.name);}
+}));
 for (const company of selected) {
-  company.news = await loadCompanyNews(company.name);
   const pageSlug = slug(company.code, company.name); const dir = path.join(OUT,pageSlug); fs.mkdirSync(dir,{recursive:true});
   const counts = company.rows.reduce((map,row)=>(map.set(category(row),(map.get(category(row))||0)+1),map),new Map());
   const count = (key) => counts.get(key) || 0; const latestRow = company.rows[0];

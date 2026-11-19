@@ -18,6 +18,7 @@ on:
       - "term_pages.mjs"
       - "search_graph.mjs"
       - "canonical_routes.mjs"
+      - "blog_discovery.mjs"
       - "search_sitemaps.mjs"
       - "notify_indexnow.mjs"
       - "search_foundation.mjs"

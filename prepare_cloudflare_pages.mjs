@@ -141,6 +141,8 @@ console.log(`BLOG_EDITORIAL_PAGES=${await applyBlogEditorial(distDir)}`);
 createTermPages(distDir);
 applySearchFoundation(distDir);
 console.log('SEARCH_LINKS='+JSON.stringify(connectSearchPages(distDir)));
+const {createMonthlyArchives} = await import('./blog_discovery.mjs');
+console.log('BLOG_MONTHS='+JSON.stringify(createMonthlyArchives(distDir)));
 const { normalizeSearchRoutes } = await import('./canonical_routes.mjs');
 normalizeSearchRoutes(distDir);
 console.log('SEARCH_SITEMAPS='+JSON.stringify(await buildSearchSitemaps(distDir)));

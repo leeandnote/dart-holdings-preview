@@ -4,13 +4,39 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { parseHTML, DOMParser } from 'linkedom';
-import { exclusiveThemes, ownershipHeadline, factualReview, reportCounts } from './daily_content.mjs';
+import { exclusiveThemes, ownershipHeadline, factualReview, reportCounts, receiptDate, executiveDirection } from './daily_content.mjs';
+import {blogDisclosureRows,createMonthlyArchives} from './blog_discovery.mjs';
 import { normalizeRoute, normalizeSearchRoutes } from './canonical_routes.mjs';
 import { connectSearchPages } from './search_graph.mjs';
 import { buildSearchSitemaps,contentHash,historyEntry } from './search_sitemaps.mjs';
 import { createTermPages,terms,termUrl } from './term_pages.mjs';
 import { indexNowPayload } from './notify_indexnow.mjs';
 const origin='https://leeandnote.com';
+test('executive direction uses shares and receipt date overrides collection date',()=>{
+  assert.equal(executiveDirection({shareDelta:-848532,delta:0.16}),'decrease');
+  assert.equal(executiveDirection({shareDelta:3900,delta:0}),'increase');
+  assert.equal(executiveDirection({shareDelta:0,delta:-3.15}),'unchanged');
+  assert.equal(executiveDirection({shareDelta:null,delta:1}),'unverified');
+  assert.equal(receiptDate({receiptNo:'20261118000362',reportDate:'20261119'}),'20261118');
+  assert.equal(receiptDate({receiptNo:'invalid',reportDate:'20261119'}),'');
+});
+test('monthly archives include every actual article and link from hubs',()=>{
+  const dir=fs.mkdtempSync(path.join(os.tmpdir(),'blog-discovery-'));
+  const put=(p,html)=>{const file=path.join(dir,p);fs.mkdirSync(path.dirname(file),{recursive:true});fs.writeFileSync(file,html);};
+  try {
+    put('blog/index.html',page('/blog/','<h1>블로그</h1><section class="insightGrid"></section>'));
+    for(const date of ['2026-09-08','2026-10-15','2026-11-19'])put('blog/executives/'+date+'/index.html',page('/blog/executives/'+date+'/','<article><h1>'+date+' 공시</h1></article>'));
+    assert.deepEqual(createMonthlyArchives(dir),{months:3,articles:3});
+    assert.match(fs.readFileSync(path.join(dir,'blog/archive/2026-10/index.html'),'utf8'),/\/blog\/executives\/2026-10-15\//);
+    createMonthlyArchives(dir);
+    const {document}=parseHTML(fs.readFileSync(path.join(dir,'blog/index.html'),'utf8'));
+    assert.equal(document.querySelectorAll('#monthly-archives').length,1);
+    assert.equal(document.querySelectorAll('#monthly-archives a').length,3);
+    const row={code:'084440',name:'유비온',receiptNo:'20261119000097',date:'20261119',reporter:'장봉진',category:'임원·주요주주',url:'https://dart.fss.or.kr/dsaf001/main.do?rcpNo=20261119000097'};
+    put('data/blog-disclosures/20261119.json',JSON.stringify([row,row,{...row,code:'0030R0',name:'대신밸류리츠'},{...row,receiptNo:'20261118000362'}]));
+    assert.equal(blogDisclosureRows(dir).length,2);
+  } finally {fs.rmSync(dir,{recursive:true,force:true});}
+});
 test('canonical routes normalize aliases without changing external URLs',()=>{
   for(const value of ['/about.html','about.html','/about/']) assert.equal(normalizeRoute(value,origin+'/blog/5percent/2026-11-19/'),'/about');
   assert.equal(normalizeRoute('/blog/5percent/2026-11-19?x=1#table'),'/blog/5percent/2026-11-19/?x=1#table');

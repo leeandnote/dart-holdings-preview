@@ -10,7 +10,7 @@ export function htmlFiles(root) {
 export function connectSearchPages(dist) {
   const companies=new Map(),backlinks=new Map();
   for(const file of htmlFiles(path.join(dist,'disclosurepedia'))){
-    const code=path.basename(path.dirname(file)).match(/^(\d{6})-/)?.[1];
+    const code=path.basename(path.dirname(file)).match(/^([0-9A-Z]{6})-/)?.[1];
     if(!code)continue;
     const {document}=parseHTML(fs.readFileSync(file,'utf8'));
     companies.set(code,{file,url:new URL(document.querySelector('link[rel="canonical"]').href).pathname});
@@ -22,7 +22,7 @@ export function connectSearchPages(dist) {
     if(!article.querySelector('.articleBreadcrumb'))article.insertAdjacentHTML('afterbegin','<nav class="articleBreadcrumb" aria-label="현재 위치"><a href="/">홈</a> › <a href="/blog/">공시 블로그</a> › <span aria-current="page">공시 해설</span></nav>');
     const linked=new Set();
     for(const cell of article.querySelectorAll('td.stock')){
-      const code=cell.querySelector('small')?.textContent.match(/\b\d{6}\b/)?.[0];
+      const code=cell.querySelector('small')?.textContent.trim().match(/^([0-9A-Z]{6})(?:\s|·|$)/)?.[1];
       const company=companies.get(code),name=cell.querySelector('strong');
       if(!name)continue;
       if(!company){
