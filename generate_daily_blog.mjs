@@ -1,6 +1,6 @@
 import { mkdir, writeFile, readFile, readdir, rm } from "node:fs/promises";
 import path from "node:path";
-import { exclusiveThemes, ownershipHeadline, factualReview } from './daily_content.mjs';
+import { exclusiveThemes, ownershipHeadline, factualReview, reportCounts } from './daily_content.mjs';
 
 const ROOT = path.resolve("site");
 const CONVEX_URL = process.env.CONVEX_URL || "https://quiet-cardinal-118.convex.cloud";
@@ -722,7 +722,6 @@ function themeSection(theme, index) {
       <h2>${index}. ${esc(theme.heading)}</h2>
       <p>${esc(theme.intro)}</p>
       ${articleDataTable({ title: "", badge: theme.badge, rows: theme.rows })}
-      <p class="articleTableNote outside">지분변동주식수는 직전·이번 보고서의 보유수량 차이입니다. 수량을 확인할 수 없는 항목은 -로 표시합니다.</p>
       ${factualReview(theme.rows).map(text=>`<p>${esc(text)}</p>`).join('')}`;
 }
 
@@ -730,19 +729,15 @@ function pointItems(rows) {
   return rows.slice(0, 2).map((row) => `<li><strong>${esc(row.name)}:</strong> ${esc(row.reporter)} 제출 공시. 보유비율 ${esc(row.rateText)} (${esc(row.deltaText)}), 보고사유는 ${esc(row.reason)}입니다.</li>`).join("");
 }
 
-function introSummary({ items, newEntries, increases, decreases, flow, insiders }) {
+function introSummary({ items, newEntries, increases, decreases }) {
   const topEntry = newEntries[0];
   const topIncrease = increases[0];
   const topDecrease = decreases[0];
-  const topFlow = flow[0];
-  const insiderCount = insiders.length;
   const parts = [];
-  parts.push(`오늘 접수된 5%보고공시는 총 <strong>${items.length.toLocaleString("ko-KR")}건</strong>입니다.`);
-  if (topEntry) parts.push(`신규 5% 진입에서는 <strong>${esc(topEntry.name)}</strong>의 변화가 먼저 눈에 띕니다.`);
-  if (topIncrease) parts.push(`지분율 확대 쪽은 <strong>${esc(topIncrease.name)}</strong>이 ${esc(topIncrease.deltaText)}로 가장 큰 폭을 보였습니다.`);
-  if (topDecrease) parts.push(`반대로 하락 공시는 <strong>${esc(topDecrease.name)}</strong>이 ${esc(topDecrease.deltaText)}로 상위에 올랐습니다.`);
-  if (topFlow) parts.push(`금액 기준으로는 <strong>${esc(topFlow.name)}</strong> 공시가 상대적으로 컸습니다.`);
-  if (insiderCount) parts.push(`오너·특수관계자 성격의 보고도 <strong>${insiderCount.toLocaleString("ko-KR")}건</strong> 확인돼 지배구조와 주요주주 흐름을 함께 볼 필요가 있습니다.`);
+  parts.push(`오늘 접수된 5%보고공시는 <strong>${reportCounts(items).reports}건·${reportCounts(items).companies}종목</strong>입니다.`);
+  if (topEntry) parts.push(`신규 5% 보고는 <strong>${reportCounts(newEntries).reports}건·${reportCounts(newEntries).companies}종목</strong>입니다. ${esc(topEntry.name)}의 ${esc(topEntry.reporter)} 보고사유는 ${esc(topEntry.reason)}입니다.`);
+  if (topIncrease) parts.push(`가장 큰 보유비율 증가폭은 <strong>${esc(topIncrease.name)}</strong> 보고의 ${esc(topIncrease.deltaText)}입니다.`);
+  if (topDecrease) parts.push(`가장 큰 보유비율 감소폭은 <strong>${esc(topDecrease.name)}</strong> 보고의 ${esc(topDecrease.deltaText)}입니다.`);
   return `<div class="summaryBox">${parts.join(" ")}</div>`;
 }
 
@@ -766,14 +761,14 @@ async function main() {
     .sort((a, b) => Math.abs(b.value) - Math.abs(a.value));
   const insiders = items.filter((row) => /오너|특수관계|최대주주|대표|임원|개인/i.test(`${row.reporter} ${row.reporterType}`)).sort((a, b) => Math.abs(b.value) - Math.abs(a.value));
 
-  const primaryRows = newEntries.length ? newEntries : increases;
+  const primaryRows = newEntries;
   const themes = exclusiveThemes([
     {
       slug: "new-entry",
       tag: newEntries.length ? "신규5%진입" : "주요5%보고",
       badge: newEntries.length ? "신규 5% 진입" : "주요 5%보고",
-      heading: "신규 5% 진입 및 지분 확대 종목",
-      intro: "새롭게 5% 보고 대상에 포함됐거나 기존 보유비율을 확대한 종목을 먼저 확인합니다.",
+      heading: "신규 5% 보고",
+      intro: "직전 5% 미만에서 이번 보고 5% 이상으로 확인된 보고입니다. 신규 상장이나 계약 변경에 따른 보고도 포함되므로 신규 매수와 구분해야 합니다.",
       rows: primaryRows,
       mode: "entry",
     },
@@ -849,7 +844,7 @@ async function main() {
       rows: insiders,
       mode: "flow",
     },
-  ].filter((theme) => theme.rows.length), items);
+  ].filter((theme) => ['new-entry','increase','decrease'].includes(theme.slug) && theme.rows.length), items);
 
   const assetDir = path.join(ROOT, "assets", "blog");
   await mkdir(assetDir, { recursive: true });
@@ -877,12 +872,12 @@ async function main() {
   const postUrl = `https://leeandnote.com/blog/5percent/${iso}`;
   const imageUrl = `https://leeandnote.com/assets/blog/${themes[0]?.svgFile || `dart-5percent-${ymd}-new-entry.svg`}`;
 
-  const leadNames = primaryRows.slice(0, 3).map((r) => r.name).join(", ");
+  const leadNames = [...new Set(primaryRows.map((r) => r.name))].slice(0, 3).join(", ");
   const themeSections = themes.map((theme, index) => themeSection(theme, index + 1)).join("\n");
   const dailySummary = introSummary({ items, newEntries, increases, decreases, flow, insiders });
   const ownershipFacts = [
     { question: `${dotted} 5%보고공시는 몇 건인가요?`, answer: `${dotted} 접수 기준 총 ${items.length.toLocaleString("ko-KR")}건입니다.` },
-    { question: "새로 5% 보고 대상에 포함된 종목은 몇 개인가요?", answer: `직전 보유비율 5% 미만에서 이번 보고 5% 이상으로 확인된 종목은 ${newEntries.length.toLocaleString("ko-KR")}개입니다.` },
+    { question: "새로 5% 보고 대상에 포함된 종목은 몇 개인가요?", answer: `직전 보유비율 5% 미만에서 이번 보고 5% 이상으로 확인된 공시는 ${reportCounts(newEntries).reports}건, ${reportCounts(newEntries).companies}종목입니다. 같은 종목이라도 제출인이나 접수번호가 다른 보고는 별도로 집계합니다.` },
     { question: "어떤 자료를 기준으로 정리했나요?", answer: "금융감독원 DART 전자공시의 당일 5%보고공시와 공개 가격 데이터를 기준으로 정리했습니다." },
   ];
   const ownershipSchema = articleStructuredData({
@@ -913,7 +908,8 @@ ${pageNav("blog")}
       <p class="articleMeta">요약 기준: ${iso} 접수 공시 · 총 ${items.length.toLocaleString("ko-KR")}건 · <a href="/editorial-policy.html">LEE&amp;NOTE 편집·검수 기준</a></p>
       ${dailySummary}
       ${factQa(ownershipFacts)}
-      <p>${newEntries.length ? `오늘 신규 5% 보고 대상으로 확인된 주요 종목은 <strong>${esc(leadNames)}</strong> 등입니다.` : `오늘은 신규 진입보다 기존 주요주주의 지분 변동 공시가 중심이었습니다.`} 아래에서는 <span class="softKey">신규 진입</span>, <span class="softKey">지분율 증가와 하락</span>, <span class="softKey">지분변동금액</span>, <span class="softKey">오너·특수관계자 흐름</span>을 나눠 살펴봅니다.</p>
+      <p>${newEntries.length ? `오늘 신규 5% 보고 대상으로 확인된 주요 종목은 <strong>${esc(leadNames)}</strong> 등입니다.` : `오늘은 기존 주요주주의 지분 변동 공시를 정리했습니다.`} 신규 보고, 보유비율 증가·하락, 비율 유지·수치 확인 대상으로 구분합니다.</p>
+      <p class="articleTableNote">지분변동주식수는 직전·이번 보유수량 차이이며 확인되지 않은 수량은 -로 표시합니다. 표시 비율이 같아도 반올림 또는 수량·계약 변경에 따른 보고가 있을 수 있습니다. 동일 종목의 별도 보고는 제출인과 원문으로 구분합니다.</p>
       ${themeSections}
       <div class="blogCta">
         <div>

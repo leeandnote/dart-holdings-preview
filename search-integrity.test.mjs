@@ -4,12 +4,55 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { parseHTML, DOMParser } from 'linkedom';
-import { exclusiveThemes, ownershipHeadline, factualReview } from './daily_content.mjs';
+import { exclusiveThemes, ownershipHeadline, factualReview, reportCounts } from './daily_content.mjs';
+import { normalizeRoute, normalizeSearchRoutes } from './canonical_routes.mjs';
 import { connectSearchPages } from './search_graph.mjs';
 import { buildSearchSitemaps,contentHash,historyEntry } from './search_sitemaps.mjs';
 import { createTermPages,terms,termUrl } from './term_pages.mjs';
 import { indexNowPayload } from './notify_indexnow.mjs';
 const origin='https://leeandnote.com';
+test('canonical routes normalize aliases without changing external URLs',()=>{
+  for(const value of ['/about.html','about.html','/about/']) assert.equal(normalizeRoute(value,origin+'/blog/5percent/2026-11-19/'),'/about');
+  assert.equal(normalizeRoute('/blog/5percent/2026-11-19?x=1#table'),'/blog/5percent/2026-11-19/?x=1#table');
+  assert.equal(normalizeRoute('https://elsewhere.com/about.html'),'https://elsewhere.com/about.html');
+  assert.equal(normalizeRoute('/assets/blog/image.svg'),'/assets/blog/image.svg');
+});
+test('report counts distinguish five disclosures from three companies',()=>{
+  const rows=['a','a','a','b','c'].map((code,i)=>({code,receiptNo:String(i),reporter:'reporter'}));
+  assert.deepEqual(reportCounts(rows),{reports:5,companies:3});
+  assert.equal(exclusiveThemes([], [...rows,rows[0]]).flatMap(t=>t.rows).length,5);
+});
+test('missing companies link only to validated DART receipt URLs',()=>{
+  const dir=fs.mkdtempSync(path.join(os.tmpdir(),'dart-fallback-'));
+  try {
+    fs.mkdirSync(path.join(dir,'blog'),{recursive:true});
+    const row=url=>`<tr><td class="stock"><strong>미수록</strong><small>999999</small></td><td><a class="subLink" href="${url}">원문</a></td></tr>`;
+    const file=path.join(dir,'blog','index.html');
+    fs.writeFileSync(file,page('/blog/example/','<article><h1>공시</h1><table>'+row('https://dart.fss.or.kr/dsaf001/main.do?rcpNo=20261119000333')+row('https://untrusted.example/report')+'</table></article>'));
+    connectSearchPages(dir);
+    const {document}=parseHTML(fs.readFileSync(file,'utf8'));
+    assert.equal(document.querySelectorAll('td.stock a').length,1);
+    assert.match(document.querySelector('td.stock a').href,/rcpNo=20261119000333$/);
+  } finally { fs.rmSync(dir,{recursive:true,force:true}); }
+});
+test('canonical, social metadata, schema and links agree; redirects are idempotent',()=>{
+  const dir=fs.mkdtempSync(path.join(os.tmpdir(),'canonical-routes-'));
+  try {
+    const file=path.join(dir,'index.html');
+    fs.writeFileSync(file,`<html><head><link rel="canonical" href="${origin}/blog/5percent/2026-11-19"><meta property="og:url" content="${origin}/blog/5percent/2026-11-19"><script type="application/ld+json">{"url":"${origin}/blog/5percent/2026-11-19","name":"about"}</script></head><body><a href="contact.html">Contact</a></body></html>`);
+    normalizeSearchRoutes(dir);
+    const first=fs.readFileSync(file,'utf8'), redirects=fs.readFileSync(path.join(dir,'_redirects'),'utf8');
+    const {document}=parseHTML(first);
+    assert.equal(document.querySelector('link').href,origin+'/blog/5percent/2026-11-19/');
+    assert.equal(document.querySelector('meta').getAttribute('content'),origin+'/blog/5percent/2026-11-19/');
+    assert.equal(JSON.parse(document.querySelector('script').textContent).name,'about');
+    assert.equal(document.querySelector('a').href,'/contact');
+    assert.match(redirects,/\/blog\/5percent\/2026-11-19 \/blog\/5percent\/2026-11-19\/ 301/);
+    normalizeSearchRoutes(dir);
+    assert.equal(fs.readFileSync(file,'utf8'),first);
+    assert.equal(fs.readFileSync(path.join(dir,'_redirects'),'utf8').trim(),redirects.trim());
+  } finally { fs.rmSync(dir,{recursive:true,force:true}); }
+});
 const page=(url,body)=>`<!doctype html><html><head><title>공시</title><meta name="description" content="공시 해설"><link rel="canonical" href="${origin+url}"></head><body><main>${body}</main></body></html>`;
 test('exclusive categories preserve every disclosure once; headlines follow stocks',()=>{
   const a={receiptNo:'1',code:'005930',name:'가나다',reporter:'JP Morgan',delta:1,rateText:'5 → 6',deltaText:'+1%p',reason:'변동'},b={...a,receiptNo:'2',name:'다라마',delta:3};

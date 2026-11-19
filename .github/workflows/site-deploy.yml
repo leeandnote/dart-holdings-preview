@@ -17,6 +17,7 @@ on:
       - "daily_content.mjs"
       - "term_pages.mjs"
       - "search_graph.mjs"
+      - "canonical_routes.mjs"
       - "search_sitemaps.mjs"
       - "notify_indexnow.mjs"
       - "search_foundation.mjs"

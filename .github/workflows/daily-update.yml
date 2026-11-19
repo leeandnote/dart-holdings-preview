@@ -58,98 +58,12 @@ jobs:
           $latest = Get-Content "site/data/latest.json" -Raw -Encoding UTF8 | ConvertFrom-Json
           Write-Host "Latest cache generatedAt: $($latest.generatedAt); rows: $($latest.rows.Count)"
 
-      - name: Prepare SEO files
-        shell: pwsh
-        run: |
-          $siteUrl = "${{ vars.SITE_URL }}"
-          if (-not $siteUrl) {
-            $siteUrl = "https://leeandnote.com/"
-          }
-          if (-not $siteUrl.EndsWith("/")) {
-            $siteUrl = "$siteUrl/"
-          }
-          $today = Get-Date -Format "yyyy-MM-dd"
-          @(
-            "User-agent: *",
-            "Allow: /",
-            "",
-            "User-agent: Googlebot",
-            "Allow: /",
-            "",
-            "User-agent: Mediapartners-Google",
-            "Allow: /",
-            "",
-            "User-agent: Google-Display-Ads-Bot",
-            "Allow: /",
-            "",
-            "User-agent: OAI-SearchBot",
-            "Allow: /",
-            "",
-            "User-agent: GPTBot",
-            "Allow: /",
-            "",
-            "User-agent: ClaudeBot",
-            "Allow: /",
-            "",
-            "User-agent: Claude-User",
-            "Allow: /",
-            "",
-            "User-agent: PerplexityBot",
-            "Allow: /",
-            "",
-            "User-agent: Perplexity-User",
-            "Allow: /",
-            "",
-            "Sitemap: ${siteUrl}sitemap.xml"
-          ) | Set-Content -Path "site/robots.txt" -Encoding UTF8
-
-          @(
-            "<?xml version=""1.0"" encoding=""UTF-8""?>",
-            "<urlset xmlns=""http://www.sitemaps.org/schemas/sitemap/0.9"">",
-            "  <url>",
-            "    <loc>${siteUrl}</loc>",
-            "    <lastmod>${today}</lastmod>",
-            "    <priority>1.0</priority>",
-            "  </url>",
-            "  <url>",
-            "    <loc>${siteUrl}blog.html</loc>",
-            "    <lastmod>${today}</lastmod>",
-            "    <priority>0.7</priority>",
-            "  </url>",
-            "  <url>",
-            "    <loc>${siteUrl}prices.html</loc>",
-            "    <lastmod>${today}</lastmod>",
-            "    <priority>0.5</priority>",
-            "  </url>",
-            "  <url>",
-            "    <loc>${siteUrl}disclaimer.html</loc>",
-            "    <lastmod>${today}</lastmod>",
-            "    <priority>0.4</priority>",
-            "  </url>",
-            "  <url>",
-            "    <loc>${siteUrl}privacy.html</loc>",
-            "    <lastmod>${today}</lastmod>",
-            "    <priority>0.3</priority>",
-            "  </url>",
-            "  <url>",
-            "    <loc>${siteUrl}terms.html</loc>",
-            "    <lastmod>${today}</lastmod>",
-            "    <priority>0.3</priority>",
-            "  </url>",
-            "  <url>",
-            "    <loc>${siteUrl}contact.html</loc>",
-            "    <lastmod>${today}</lastmod>",
-            "    <priority>0.3</priority>",
-            "  </url>",
-            "</urlset>"
-          ) | Set-Content -Path "site/sitemap.xml" -Encoding UTF8
-
       - name: Commit updated cache
         shell: pwsh
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add site/data site/robots.txt site/sitemap.xml
+          git add site/data
           git diff --cached --quiet
           if ($LASTEXITCODE -ne 0) {
             git commit -m "Update DART holdings cache"

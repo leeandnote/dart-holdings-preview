@@ -24,7 +24,15 @@ export function connectSearchPages(dist) {
     for(const cell of article.querySelectorAll('td.stock')){
       const code=cell.querySelector('small')?.textContent.match(/\b\d{6}\b/)?.[0];
       const company=companies.get(code),name=cell.querySelector('strong');
-      if(!company||!name)continue;
+      if(!name)continue;
+      if(!company){
+        const original=cell.closest('tr')?.querySelector('a.subLink')?.getAttribute('href');
+        if(original && /^https:\/\/dart\.fss\.or\.kr\/dsaf001\/main\.do\?rcpNo=\d+$/.test(original) && !name.querySelector('a')){
+          const a=document.createElement('a');a.href=original;a.textContent=name.textContent;
+          a.setAttribute('aria-label',`${name.textContent} DART 공시 원문`);name.replaceChildren(a);
+        }
+        continue;
+      }
       if(!name.querySelector('a')){
         const a=document.createElement('a');a.href=company.url;a.textContent=name.textContent;name.replaceChildren(a);
       }
