@@ -1,11 +1,13 @@
 name: Publish reviewed weekly calendar image
 on:
+  schedule:
+    - cron: '0 13 * * 6'
   workflow_dispatch:
     inputs:
       week:
         description: Reviewed issue start date
         required: true
-        default: '2026-11-09'
+        default: ''
         type: string
       retry_instagram:
         description: Retry only a confirmed Instagram authentication rejection
@@ -51,7 +53,9 @@ jobs:
       - name: Publish approved image
         env:
           WEEK: ${{ inputs.week }}
-        run: node publish_weekly_calendar.mjs "$WEEK"
+        run: |
+          if [ -z "$WEEK" ]; then WEEK=$(TZ=Asia/Seoul date -d 'next Monday' +%F); fi
+          node publish_weekly_calendar.mjs "$WEEK"
       - uses: actions/upload-artifact@v4
         if: always()
         with:

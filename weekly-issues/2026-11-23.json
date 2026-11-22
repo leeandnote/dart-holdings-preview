@@ -1,0 +1,23 @@
+{
+  "week": "2026-11-23",
+  "reviewedAt": "2026-11-22",
+  "highlights": ["11/25 미국 GDP·PCE", "11/26 한국은행 금리결정·미국 휴장", "11/29 RSNA 북미영상의학회 개막"],
+  "sources": {
+    "JPX": "https://www.jpx.co.jp/english/corporate/about-jpx/calendar/index.html",
+    "BEA": "https://www.bea.gov/news/schedule/",
+    "BOK": "https://www.bok.or.kr/portal/singl/crncyPolicyDrcMtg/listYear.do?menuNo=200755&mtgSe=A&pYear=2026",
+    "NYSE": "https://www.nyse.com/trade/hours-calendars",
+    "일본 통계국": "https://www.stat.go.jp/info/t-news/pdf/2611.pdf",
+    "RSNA": "https://www.rsna.org/annual-meeting"
+  },
+  "events": [
+    {"date":"2026-11-23","country":"jp","title":"일본 증시 휴장","detail":"근로감사의 날 · 현물시장 기준","source":"JPX"},
+    {"date":"2026-11-25","country":"us","title":"미국 GDP 2차 추정","detail":"22:30 KST · 3분기","source":"BEA"},
+    {"date":"2026-11-25","country":"us","title":"미국 PCE 물가","detail":"22:30 KST · 10월 개인소득·소비","source":"BEA"},
+    {"date":"2026-11-26","country":"kr","title":"한국은행 금리결정","detail":"통화정책방향 결정회의 · 시각 미확인","source":"BOK"},
+    {"date":"2026-11-26","country":"us","title":"미국 증시 휴장","detail":"추수감사절 · 미국 현지 날짜","source":"NYSE"},
+    {"date":"2026-11-27","country":"jp","title":"도쿄 CPI 잠정치","detail":"11월 물가 · 발표 시각 미확인","source":"일본 통계국"},
+    {"date":"2026-11-27","country":"us","title":"미국 증시 조기 폐장","detail":"13:00 EST · 한국 11/28 03:00","source":"NYSE"},
+    {"date":"2026-11-29","country":"us","title":"RSNA 북미영상의학회","detail":"11/29~12/3 현지 · 의료AI·영상진단","source":"RSNA"}
+  ]
+}

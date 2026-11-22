@@ -1,14 +1,15 @@
 import {readFile,mkdir,writeFile} from 'node:fs/promises';
 import crypto from 'node:crypto';
+import {loadWeeklyIssue} from './weekly_issue.mjs';
 import {loadTelegramConfig,uploadXImage,createXPost,threadsFetch,waitForThreadsContainer,publishThreadsContainer,loadInstagramConfig,instagramFetch,waitForInstagramContainer} from './send_daily_social_cards.mjs';
 
 const week=process.argv[2];
-if(week!=='2026-11-09') throw Error('Only the reviewed 2026-11-09 issue is approved by this publisher.');
+const issue=await loadWeeklyIssue(week);
 const file=`site/assets/weekly/${week}.png`;
 const image=await readFile(file);
 if(image.subarray(1,4).toString()!=='PNG')throw Error('Invalid PNG');
-const caption='[리앤노트] 다음 주 증시 일정 | 11/9~11/15\n\n11/10 미국 CPI·근원 CPI\n11/12 KOSPI 200 옵션 만기\n11/13 미국 PPI\n\n비만학회와 SC26 등 업종별 행사도 함께 정리했습니다.\n\n상세 일정·공식 출처\nhttps://leeandnote.com/calendar\n\n시간은 KST, 해외 행사는 현지 날짜 기준입니다. 일정은 변경될 수 있습니다.\n\n#리앤노트 #주간증시일정 #증시캘린더';
-const shortCaption='[리앤노트] 다음 주 증시 일정 | 11/9~11/15\n11/10 미국 CPI · 11/12 옵션 만기 · 11/13 미국 PPI\n비만학회·SC26도 함께 확인하세요.\n시간 KST / 해외 행사 현지 날짜 / 일정 변경 가능\n#리앤노트 #주간증시일정';
+const {caption,shortCaption}=issue;
+if(image.readUInt32BE(16)!==1080||image.readUInt32BE(20)!==1920)throw Error('Expected 1080x1920 PNG');
 if(process.argv.includes('--dry-run')){
   console.log(JSON.stringify({week,width:image.readUInt32BE(16),height:image.readUInt32BE(20),caption,shortCaption}));
   process.exit(0);
@@ -80,12 +81,18 @@ for(const channel of ['telegram','x','threads','instagram']){
       const mediaId=await uploadXImage(file);id=await createXPost({text:shortCaption,mediaId});
       state.channels[channel].url=`https://x.com/i/status/${id}`;
     }else if(channel==='threads'){
+      const accountResponse=await fetch('https://graph.threads.net/v1.0/me?fields=id,username',{headers:{Authorization:`Bearer ${process.env.THREADS_ACCESS_TOKEN}`}});
+      const account=await accountResponse.json();
+      if(!accountResponse.ok||account.username!=='leeandnote')throw Error('Threads account verification failed before publishing');
       const container=await threadsFetch('/me/threads',{media_type:'IMAGE',image_url:url,text:caption});
       state.channels[channel].container=container;await save();
       await waitForThreadsContainer(container);id=await publishThreadsContainer(container);
     }else{
       const config=await loadInstagramConfig();
-      const userId=verifiedInstagramId||config.userId;
+      const accountResponse=await fetch('https://graph.instagram.com/v24.0/me?fields=id,user_id,username',{headers:{Authorization:`Bearer ${config.accessToken}`}});
+      const account=await accountResponse.json();
+      if(!accountResponse.ok||account.username!=='leeandnote'||!account.user_id)throw Error('Instagram account verification failed before publishing');
+      const userId=String(account.user_id);
       const container=await instagramFetch(`/${userId}/media`,{image_url:igUrl,caption});
       state.channels[channel].container=container;await save();
       await waitForInstagramContainer(container);
