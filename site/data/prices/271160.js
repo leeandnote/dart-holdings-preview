@@ -1,1 +1,1 @@
-window.__PRICE_CHUNKS__ = window.__PRICE_CHUNKS__ || {}; window.__PRICE_CHUNKS__['271160'] = [{"date":"2026-11-20","open":10130,"high":11300,"low":5960,"close":6050,"volume":53881867}];
+window.__PRICE_CHUNKS__ = window.__PRICE_CHUNKS__ || {}; window.__PRICE_CHUNKS__['271160'] = [{"date":"2026-11-20","open":10130,"high":11300,"low":5960,"close":6050,"volume":54847105},{"date":"2026-11-23","open":5760,"high":6110,"low":4710,"close":5070,"volume":7043454}];
