@@ -1,5 +1,6 @@
 import { mkdir, writeFile, readFile, readdir, rm } from "node:fs/promises";
 import path from "node:path";
+import { parseHTML } from 'linkedom';
 import { exclusiveThemes, ownershipHeadline, factualReview, reportCounts, receiptDate, executiveDirection } from './daily_content.mjs';
 
 const ROOT = path.resolve("site");
@@ -868,7 +869,9 @@ async function main() {
 
   const ownershipKeyword = ownershipHeadline(items, newEntries);
   const postTitle = `${dotted} ${ownershipKeyword} | 5%보고공시`;
-  const postDescription = `${dotted} DART 5%보고공시에서 신규 진입, 지분율 증감, 주요 제출인 흐름을 정리했습니다.`;
+  const reportNames = [...new Set(items.map(r => r.name).filter(Boolean))].slice(0, 3).join('·');
+  const reporterNames = [...new Set(items.map(r => r.reporter).filter(Boolean))].slice(0, 2).join('·');
+  const postDescription = `${dotted} ${reportNames}의 5% 지분보고 ${items.length}건. ${reporterNames} 등 제출인의 보유비율 변동과 보고 사유를 DART 원문으로 확인합니다.`;
   const postUrl = `https://leeandnote.com/blog/5percent/${iso}`;
   const imageUrl = `https://leeandnote.com/assets/blog/${themes[0]?.svgFile || `dart-5percent-${ymd}-new-entry.svg`}`;
 
@@ -1381,9 +1384,13 @@ ${pageNav("blog")}
   const sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map(([loc, priority, changefreq]) => `  <url>\n    <loc>${loc}</loc>\n    <lastmod>${iso}</lastmod>\n    <changefreq>${changefreq}</changefreq>\n    <priority>${priority}</priority>\n  </url>`).join("\n")}\n</urlset>\n`;
   await writeFile(path.join(ROOT, "sitemap.xml"), sitemap, "utf8");
   const dateDirPattern = /^\d{4}-\d{2}-\d{2}$/;
+  const publishedTitles = new Map();
   async function hasPublishedRows(dir, kind) {
     try {
       const html = await readFile(path.join(dir, "index.html"), "utf8");
+      const { document } = parseHTML(html);
+      const heading = document.querySelector('article h1')?.textContent.trim();
+      if (heading) publishedTitles.set(`${kind}/${path.basename(dir)}`, heading);
       const zeroCountPattern = kind === "executives" ? /총\s*0건/ : /총\s*0건/;
       return !zeroCountPattern.test(html);
     } catch {
@@ -1426,9 +1433,9 @@ function addIsoDays(isoDate, days) {
     const dottedItem = dottedDate(date);
     const href = isMajor ? `/blog/major-events/${date}/` : isContract ? `/blog/contracts/${date}/` : isExecutive ? `/blog/executives/${date}/` : `/blog/5percent/${date}/`;
     const label = isMajor ? "투자판단" : isContract ? "대형수주" : isExecutive ? "임원보고" : "5%보고";
-    const title = date === iso
+    const title = publishedTitles.get(`${kind}/${date}`) || (date === iso
       ? (isMajor ? majorPostTitle : isContract ? contractPostTitle : isExecutive ? execPostTitle : postTitle)
-      : isMajor ? `${dottedItem} 투자판단 관련 주요경영사항 정리` : isContract ? `${dottedItem} - 대형수주보고 요약 노트` : isExecutive ? `${dottedItem} - 임원보고공시 요약 노트` : `${dottedItem} - 5%보고공시 요약 노트`;
+      : `${dottedItem} ${label} 공시`);
     const desc = isMajor
       ? "DART 투자판단 관련 주요경영사항에서 임상, 기술이전, 제휴와 주요 사업 사건을 정리했습니다."
       : isContract
@@ -1442,7 +1449,7 @@ function addIsoDays(isoDate, days) {
       <div class="insightThumb"><div class="orbThumb${thumbClass}"><span class="stars"></span><span class="orbit"></span><span class="label">${thumbLabel}<small>${dottedItem} DART NOTE</small></span></div></div>
       <div class="insightContent">
         <small>${label} · ${dottedItem}</small>
-        <h2>${title}</h2>
+        <h2>${esc(title)}</h2>
         <p>${desc}</p>
       </div>
     </a>`;

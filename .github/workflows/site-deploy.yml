@@ -16,6 +16,9 @@ on:
       - "glossary_detail.mjs"
       - "blog_editorial.mjs"
       - "search_guides.mjs"
+      - "institution_topics.mjs"
+      - "capital_guides.mjs"
+      - "issue_quality.mjs"
       - "disclosure_questions.mjs"
       - "daily_content.mjs"
       - "term_pages.mjs"
@@ -116,6 +119,7 @@ jobs:
           node --test search-questions.test.mjs
           node --test search-integrity.test.mjs
           node --test search_feed.test.mjs channel_menu.test.mjs
+          node --test search-expansion.test.mjs
           node verify-search-pages.mjs
           pnpm dlx wrangler pages deploy public_dist --project-name leeandnote --branch main
 
