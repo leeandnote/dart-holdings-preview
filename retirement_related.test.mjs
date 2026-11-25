@@ -8,6 +8,12 @@ import {retireLinks,isRetiredUrl} from './retire_disclosurepedia.mjs';
 import {buildSearchSitemaps} from './search_sitemaps.mjs';
 import {selectRelated,attachRelated} from './related_articles.mjs';
 import {applyInstitutionGate} from './institution_gate.mjs';
+import retiredWorker from './site/_worker.js';
+test('retired worker returns 410 without redirects and does not intercept other pages',async()=>{
+ const response=await retiredWorker.fetch(new Request('https://leeandnote.com/disclosurepedia/005930-test/'),{});
+ assert.equal(response.status,410);assert.equal(response.headers.get('Cache-Control'),'no-store');assert.equal(response.headers.get('Location'),null);
+ const expected=new Response('asset');assert.equal(await retiredWorker.fetch(new Request('https://leeandnote.com/blog/'),{ASSETS:{fetch:()=>expected}}),expected);
+});
 test('institution indexability requires ten distinct official receipts',()=>{
  const page=count=>parseHTML(`<html><head><link rel="canonical" href="https://leeandnote.com/blog/issues/truston-asset-holdings/"></head><body><article><table>${Array.from({length:count},(_,i)=>`<tr><td><a href="https://dart.fss.or.kr/dsaf001/main.do?rcpNo=2026111900${String(i).padStart(4,'0')}">원문</a></td></tr>`).join('')}</table></article></body></html>`).document;
  const small=page(9);assert.equal(applyInstitutionGate(small).indexable,false);assert.equal(small.querySelector('meta[name="robots"]').getAttribute('content'),'noindex, follow');
