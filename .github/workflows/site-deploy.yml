@@ -8,6 +8,7 @@ on:
     paths:
       - "site/**"
       - "prepare_cloudflare_pages.mjs"
+      - "channel_menu.mjs"
       - "site_metadata.mjs"
       - "home_search.mjs"
       - "glossary_detail.mjs"

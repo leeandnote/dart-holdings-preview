@@ -8,6 +8,7 @@ import { applySearchFoundation } from './search_foundation.mjs';
 import { createTermPages } from './term_pages.mjs';
 import { connectSearchPages } from './search_graph.mjs';
 import { buildSearchSitemaps } from './search_sitemaps.mjs';
+import { applyChannelMenus } from './channel_menu.mjs';
 
 const root = path.dirname(fileURLToPath(import.meta.url));
 const publicDaysArg = process.argv.find((arg) => arg.startsWith("--days="));
@@ -145,6 +146,7 @@ const {createMonthlyArchives} = await import('./blog_discovery.mjs');
 console.log('BLOG_MONTHS='+JSON.stringify(createMonthlyArchives(distDir)));
 const { normalizeSearchRoutes } = await import('./canonical_routes.mjs');
 normalizeSearchRoutes(distDir);
+console.log('CHANNEL_MENU_PAGES='+applyChannelMenus(distDir));
 console.log('SEARCH_SITEMAPS='+JSON.stringify(await buildSearchSitemaps(distDir)));
 const files = walk(distDir);
 const tooLarge = files
