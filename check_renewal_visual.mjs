@@ -31,6 +31,10 @@ try {
    await page.locator('[data-rn=social]').click();
    if(!await page.locator('#rn-social').evaluate(e=>e.open))throw new Error('Social sheet failed');
    await page.keyboard.press('Escape');
+   for(const [route,id] of [['contracts','contractSearch'],['major-events','majorEventSearch']]){
+    await page.goto(`http://127.0.0.1:${process.env.PORT||4178}/${route}?q=${encodeURIComponent('삼성전자')}`);
+    await page.waitForFunction(id=>document.getElementById(id)?.value==='삼성전자',id);
+   }
   }
   await page.close();
  }

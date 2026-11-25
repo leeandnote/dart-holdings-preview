@@ -7,7 +7,7 @@ const majorEventColumns = [
   { key: "price", label: "최근일 종가" },
 ];
 const majorEventState = {
-  rows: [], search: "", market: "all", type: "all", from: "", to: "",
+  rows: [], search: new URLSearchParams(location.search).get("q")?.trim() || "", market: "all", type: "all", from: "", to: "",
   sort: "date", page: 1, pageSize: 10,
   visibleColumns: new Set(majorEventColumns.map((column) => column.key)),
 };
@@ -454,6 +454,7 @@ async function initializeMajorEvents() {
   const first = majorEventState.rows.at(-1)?.date;
   const last = majorEventState.rows[0]?.date;
   majorEventEl("majorEventPeriod").textContent = first && last ? `수록기간 ${majorEventDisplayDate(first)} ~ ${majorEventDisplayDate(last)} · ${majorEventState.rows.length.toLocaleString("ko-KR")}건` : "수집된 공시가 없습니다.";
+  majorEventEl("majorEventSearch").value = majorEventState.search;
   majorEventEl("majorEventSearch").addEventListener("input", (event) => { majorEventState.search = event.target.value; majorEventState.page = 1; renderMajorEvents(); });
   majorEventEl("majorEventMarket").addEventListener("change", (event) => { majorEventState.market = event.target.value; majorEventState.page = 1; renderMajorEvents(); });
   majorEventEl("majorEventType").addEventListener("change", (event) => { majorEventState.type = event.target.value; majorEventState.page = 1; renderMajorEvents(); });

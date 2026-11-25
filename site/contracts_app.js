@@ -1,6 +1,6 @@
 const contractState = {
   rows: [],
-  search: "",
+  search: new URLSearchParams(location.search).get("q")?.trim() || "",
   market: "all",
   sort: "date",
   correction: "all",
@@ -226,6 +226,7 @@ async function loadContracts() {
 
 function bindContracts() {
   setupContractColumns();
+  if ($("contractSearch")) $("contractSearch").value = contractState.search;
   $("contractSearch")?.addEventListener("input", (event) => {
     contractState.search = event.target.value.trim();
     contractState.page = 1;
