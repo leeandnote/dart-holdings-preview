@@ -65,5 +65,13 @@ body.rn-article .rn-article-cta p{font-size:15px;line-height:1.8;margin:12px 0 2
 body.rn-article .rn-article-cta a{display:inline-flex;padding:12px 20px;background:var(--rn-brand);color:var(--rn-ink);text-decoration:none;font-size:15px;font-weight:600;border-radius:4px}
 @media(min-width:1440px){body.rn-has-toc .blogShell{max-width:1040px;padding:48px 40px 64px}body.rn-has-toc article{display:grid;grid-template-columns:minmax(0,720px) 200px;column-gap:40px}body.rn-has-toc article>*{grid-column:1;min-width:0}body.rn-article .rn-toc{display:block;grid-column:2;grid-row:1 / span 3;position:sticky;align-self:start;top:24px;font-size:14px;line-height:1.6}body.rn-article .rn-toc a{display:block;margin:12px 0;color:var(--rn-sub);text-decoration:none}body.rn-article .rn-toc a:hover{color:var(--rn-brand-text)}}
 .rn-scroll-cta{display:none}
+body.rn-article .rn-related{margin:64px 0 0;padding-top:32px;border-top:1px solid var(--rn-line)}
+body.rn-article .rn-related h2{font-size:21px;letter-spacing:0;margin:0 0 16px}
+body.rn-article .rn-related ul{list-style:none;padding:0;margin:0}
+body.rn-article .rn-related li{border-bottom:1px solid var(--rn-line);padding:18px 0}
+body.rn-article .rn-related a{font-size:17px;line-height:1.6;font-weight:500;text-decoration:none;color:var(--rn-text)}
+body.rn-article .rn-adjacent{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px;margin-top:32px}
+body.rn-article .rn-adjacent a{font-size:14px;line-height:1.7;color:var(--rn-text);text-decoration:none;overflow-wrap:anywhere}
+body.rn-article .rn-adjacent small{display:block;font-size:13px;color:var(--rn-sub);margin-bottom:8px}
 @media(min-width:1024px){.rn-scroll-cta:not([hidden]){position:fixed;z-index:70;bottom:16px;left:24px;display:flex;align-items:center;gap:20px;max-width:calc(100vw - 140px);background:var(--rn-cream);border:1px solid var(--rn-line);padding:8px 16px;font-size:14px;line-height:1.6}.rn-scroll-cta a{color:var(--rn-brand-text);font-weight:600;text-decoration:none}}
 @media(max-width:767px){body.rn-article .blogShell{padding:32px 20px 48px}body.rn-article .rn-section-name{font-size:36px;margin-bottom:32px}body.rn-article .blogHero h1{font-size:26px}body.rn-article .articleBody h2{font-size:21px;margin-top:48px}body.rn-article .articleBody h3{font-size:18px}body.rn-article .articleBody p,body.rn-article .articleBody li,body.rn-article .blogHero .lead{font-size:16px}body.rn-article .rn-table-scroll th,body.rn-article .rn-table-scroll td{font-size:14px}body.rn-article .articleBody .summaryBox{font-size:16px;padding:20px}}

@@ -1,7 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { spawnSync } from "node:child_process";
 import { applySiteMetadata } from "./site_metadata.mjs";
 import { applyBlogEditorial } from "./blog_editorial.mjs";
 import { applySearchFoundation } from './search_foundation.mjs';
@@ -11,6 +10,9 @@ import { buildSearchSitemaps } from './search_sitemaps.mjs';
 import { applyChannelMenus } from './channel_menu.mjs';
 import { buildSearchFeed } from './search_feed.mjs';
 import { applyRenewalLayouts } from './renewal_layout.mjs';
+import { retireDisclosurepedia } from './retire_disclosurepedia.mjs';
+import { connectRelatedArticles } from './related_articles.mjs';
+import { applyInstitutionGates } from './institution_gate.mjs';
 
 const root = path.dirname(fileURLToPath(import.meta.url));
 const publicDaysArg = process.argv.find((arg) => arg.startsWith("--days="));
@@ -18,9 +20,6 @@ const publicDays = Number(publicDaysArg?.split("=")[1] || 90);
 const siteDir = path.join(root, "site");
 const distDir = path.join(root, "public_dist");
 const deployDir = path.join(root, "deploy");
-
-const disclosurepedia = spawnSync(process.execPath, [path.join(root, "generate_disclosurepedia.mjs")], { cwd: root, stdio: "inherit" });
-if (disclosurepedia.status !== 0) throw new Error("Disclosurepedia generation failed.");
 
 function firstValue(obj, names) {
   for (const name of names) {
@@ -69,7 +68,10 @@ function makeCleanRoute(fileName, routeName) {
 if (!fs.existsSync(siteDir)) throw new Error(`site folder not found: ${siteDir}`);
 removeDirSafe(distDir);
 fs.mkdirSync(deployDir, { recursive: true });
-fs.cpSync(siteDir, distDir, { recursive: true });
+fs.cpSync(siteDir, distDir, { recursive: true, filter:source=>{
+  const relative=path.relative(siteDir,source).split(path.sep).join('/');
+  return relative!=='disclosurepedia'&&!relative.startsWith('disclosurepedia/')&&relative!=='sitemap-disclosurepedia.xml';
+} });
 // Market-ranking drafts stay local until the provider integration is reviewed.
 for (const draft of ['market-rankings.html','market-rankings.css','market-rankings.mjs','market-rankings-model.mjs','data/market-rankings.json']) {
   fs.rmSync(path.join(distDir, draft), { force: true });
@@ -143,12 +145,15 @@ applySiteMetadata(distDir);
 console.log(`BLOG_EDITORIAL_PAGES=${await applyBlogEditorial(distDir)}`);
 createTermPages(distDir);
 applySearchFoundation(distDir);
-console.log('SEARCH_LINKS='+JSON.stringify(connectSearchPages(distDir)));
+console.log('SEARCH_LINKS='+JSON.stringify(connectSearchPages(distDir,{companiesEnabled:false})));
 const {createMonthlyArchives} = await import('./blog_discovery.mjs');
 console.log('BLOG_MONTHS='+JSON.stringify(createMonthlyArchives(distDir)));
 const { normalizeSearchRoutes } = await import('./canonical_routes.mjs');
 normalizeSearchRoutes(distDir);
 console.log('CHANNEL_MENU_PAGES='+applyChannelMenus(distDir));
+console.log('RETIRED_CATEGORY='+JSON.stringify(retireDisclosurepedia(distDir)));
+console.log('INSTITUTION_GATES='+JSON.stringify(applyInstitutionGates(distDir)));
+console.log('RELATED_ARTICLES='+connectRelatedArticles(distDir));
 console.log('SEARCH_SITEMAPS='+JSON.stringify(await buildSearchSitemaps(distDir)));
 console.log('RSS_ITEMS='+buildSearchFeed(distDir));
 console.log('RENEWAL_LAYOUT_PAGES='+applyRenewalLayouts(distDir));

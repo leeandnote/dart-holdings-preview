@@ -11,6 +11,9 @@ on:
       - "channel_menu.mjs"
       - "renewal_layout.mjs"
       - "renewal_article.mjs"
+      - "related_articles.mjs"
+      - "institution_gate.mjs"
+      - "retire_disclosurepedia.mjs"
       - "search_feed.mjs"
       - "draft_daily_question.mjs"
       - "site_metadata.mjs"
@@ -122,6 +125,7 @@ jobs:
           node --test search-integrity.test.mjs
           node --test search_feed.test.mjs channel_menu.test.mjs
           node --test search-expansion.test.mjs
+          node --test renewal_layout.test.mjs renewal_article.test.mjs retirement_related.test.mjs
           node verify-search-pages.mjs
           pnpm dlx wrangler pages deploy public_dist --project-name leeandnote --branch main
 

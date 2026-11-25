@@ -48,7 +48,7 @@ export function applyArticleDesign(document) {
     const breadcrumb=document.createElement('nav');
     breadcrumb.className='rn-breadcrumb';breadcrumb.setAttribute('aria-label','이동 경로');
     breadcrumb.innerHTML=`<a href="/">홈</a><span>›</span><a href="/blog/">인사이트</a><span>›</span><a href="/blog/${escape(group)}/">${categories[group]||'공시 해설'}</a>`;
-    const section=document.createElement('div');section.className='rn-section-name';section.textContent=daily?'DAILY NOTE':'INSIGHT';
+    const section=document.createElement('div');section.className='rn-section-name';section.textContent=article.hasAttribute('data-rn-institution')?'INVESTOR':daily?'DAILY NOTE':'INSIGHT';
     titleArea.prepend(breadcrumb);titleArea.prepend(section);
     const meta=document.createElement('div');meta.className='rn-author';
     const dates=nodes(document).find(n=>n['@type']==='Article');

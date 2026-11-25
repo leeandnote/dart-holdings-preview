@@ -7,9 +7,9 @@ export function htmlFiles(root) {
   if(!fs.existsSync(root))return [];
   return fs.readdirSync(root,{withFileTypes:true}).flatMap(e=>e.isDirectory()?htmlFiles(path.join(root,e.name)):e.name.endsWith('.html')?[path.join(root,e.name)]:[]);
 }
-export function connectSearchPages(dist) {
+export function connectSearchPages(dist,{companiesEnabled=true}={}) {
   const companies=new Map(),backlinks=new Map();
-  for(const file of htmlFiles(path.join(dist,'disclosurepedia'))){
+  for(const file of companiesEnabled?htmlFiles(path.join(dist,'disclosurepedia')):[]){
     const code=path.basename(path.dirname(file)).match(/^([0-9A-Z]{6})-/)?.[1];
     if(!code)continue;
     const {document}=parseHTML(fs.readFileSync(file,'utf8'));
@@ -25,6 +25,11 @@ export function connectSearchPages(dist) {
       const code=cell.querySelector('small')?.textContent.trim().match(/^([0-9A-Z]{6})(?:\s|·|$)/)?.[1];
       const company=companies.get(code),name=cell.querySelector('strong');
       if(!name)continue;
+      if(!companiesEnabled){
+        const group=canonical.match(/\/blog\/(5percent|executives|contracts|major-events)\//)?.[1]||'5percent';
+        const a=document.createElement('a');a.href=`/${group}?q=${encodeURIComponent(name.textContent.trim())}`;a.textContent=name.textContent;
+        name.replaceChildren(a);continue;
+      }
       if(!company){
         const original=cell.closest('tr')?.querySelector('a.subLink')?.getAttribute('href');
         if(original && /^https:\/\/dart\.fss\.or\.kr\/dsaf001\/main\.do\?rcpNo=\d+$/.test(original) && !name.querySelector('a')){

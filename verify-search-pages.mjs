@@ -16,7 +16,9 @@ for(const slug of slugs){
   }
   assert.ok(fs.readFileSync(path.join(root,'sitemap-blog.xml'),'utf8').includes(`https://leeandnote.com/blog/issues/${slug}/`));
 }
-for(const file of ['index.html','blog/index.html','disclosurepedia/index.html']){
+for(const file of ['index.html','blog/index.html']){
   assert.match(fs.readFileSync(path.join(root,file),'utf8'),/class="questionReading"/);
 }
+assert.ok(!fs.existsSync(path.join(root,'disclosurepedia')),'Retired category must not be deployed');
+assert.doesNotMatch(fs.readFileSync(path.join(root,'sitemap.xml'),'utf8'),/disclosurepedia/);
 console.log('Search pages: canonical, H1, indexability, JSON-LD, links, sitemap and discovery paths passed.');

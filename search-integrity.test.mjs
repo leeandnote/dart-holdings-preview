@@ -125,7 +125,8 @@ test('terms, reciprocal links, breadcrumbs and split sitemaps remain stable',asy
     for(const term of terms){const {document}=parseHTML(fs.readFileSync(path.join(dir,termUrl(term),'index.html'),'utf8'));assert.equal(document.querySelectorAll('h1').length,1);assert.equal(JSON.parse(document.querySelector('script[type="application/ld+json"]').textContent)['@graph'][0]['@type'],'DefinedTerm');}
     await buildSearchSitemaps(dir,{previous:{}});
     const previous=JSON.parse(fs.readFileSync(path.join(dir,'data/search-history.json'),'utf8')).entries;
-    const xml=new DOMParser().parseFromString(fs.readFileSync(path.join(dir,'sitemap.xml'),'utf8'),'text/xml');assert.equal(xml.querySelectorAll('sitemap').length,4);
+    const xml=new DOMParser().parseFromString(fs.readFileSync(path.join(dir,'sitemap.xml'),'utf8'),'text/xml');assert.equal(xml.querySelectorAll('sitemap').length,3);
+    assert.ok(!fs.readFileSync(path.join(dir,'sitemap.xml'),'utf8').includes('disclosurepedia'));
     assert.ok(!fs.readFileSync(path.join(dir,'sitemap-blog.xml'),'utf8').includes('lastmod'));
     put('sitemap.xml',sitemap);
     const result=await buildSearchSitemaps(dir,{previous});assert.equal(result.changed,0);

@@ -32,3 +32,14 @@ Next sequence: finish Phase 1 details; Phase 2 article layout and content audit;
 Validation: 10 unit tests pass; all 309 source HTML pages retain protected SEO tags. Six page types at 375/1280/1440px pass no-overflow/logo/header checks; screenshots in artifacts/renewal-phase2. Updated local preview runs on port 4180 because port 4178 retains the previous version.
 
 Remaining Phase 2 work: related/previous/next articles, verified bibliography aggregation, stock search links, full institutional gates (intentional noindex changes), chart components, and production-build integration verification. No production deployment yet. Other renewal phases remain pending.
+
+## Release checkpoint: related content and category retirement
+
+- Related articles and chronological previous/next links use real existing article URLs. Daily related lists include an available explanatory article and require at least two candidates.
+- Production build excludes disclosurepedia without deleting the source checkout. Its former URLs return 404 via the existing top-level 404 page; no home redirects are introduced.
+- Removed retired links/text/schema references from generated HTML and the retired sitemap group. Actual old URLs from live search history enter the deletion notification manifest once per history transition (867 in the first local build).
+- Institution pages with fewer than ten distinct official receipts are noindex and excluded from related recommendations/sitemaps. These are intentional SEO exceptions required by the specification.
+- Table stock names link to the relevant data category's search query while retaining DART source links.
+- Full build passed using live editorial/search history, and 32 targeted tests passed. Retirement link scan found no references in output HTML/XML/redirects.
+
+This checkpoint is not completion of the entire renewal specification. Remaining: full home/list redesign, reusable chart catalog and daily/weekly chart content, verified long-form rights-offering manuscript, outlined logo assets, unified search, and expanded data-page prerendering. No new unsupported article claims were published as a shortcut.
