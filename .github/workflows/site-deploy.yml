@@ -14,6 +14,7 @@ on:
       - "related_articles.mjs"
       - "institution_gate.mjs"
       - "retire_disclosurepedia.mjs"
+      - "retirement_related.test.mjs"
       - "search_feed.mjs"
       - "draft_daily_question.mjs"
       - "site_metadata.mjs"

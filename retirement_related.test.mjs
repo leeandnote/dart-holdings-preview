@@ -8,7 +8,7 @@ import {retireLinks,isRetiredUrl} from './retire_disclosurepedia.mjs';
 import {buildSearchSitemaps} from './search_sitemaps.mjs';
 import {selectRelated,attachRelated} from './related_articles.mjs';
 import {applyInstitutionGate} from './institution_gate.mjs';
-import retiredWorker from './site/_worker.js';
+const {default:retiredWorker}=await import('data:text/javascript;base64,'+fs.readFileSync(new URL('./site/_worker.js',import.meta.url)).toString('base64'));
 test('retired worker returns 410 without redirects and does not intercept other pages',async()=>{
  const response=await retiredWorker.fetch(new Request('https://leeandnote.com/disclosurepedia/005930-test/'),{});
  assert.equal(response.status,410);assert.equal(response.headers.get('Cache-Control'),'no-store');assert.equal(response.headers.get('Location'),null);
