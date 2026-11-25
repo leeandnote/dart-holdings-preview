@@ -1,6 +1,7 @@
 {
   "private": true,
   "scripts": {
+    "content:audit": "node content_audit.mjs",
     "convex:dev": "convex dev",
     "convex:deploy": "convex deploy",
     "shortform:package": "node shortform/generate_package.mjs",

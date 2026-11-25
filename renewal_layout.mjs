@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { parseHTML } from 'linkedom';
+import { applyArticleDesign, auditHtml } from './renewal_article.mjs';
 
 const icon = name => `<img src="/assets/icons/${name}.svg" alt="" width="22" height="22">`;
 const links = [['5%보고','/5percent'],['임원보고','/executives'],['대형수주','/contracts'],['투자판단','/major-events'],['주요 일정','/calendar'],['인사이트','/blog/']];
@@ -20,6 +21,7 @@ export function applyRenewalLayout(html) {
   document.querySelectorAll('header.topbar,#channel-menu,.channelMenu,footer.minimalFooter,footer.siteFooter').forEach(n=>n.remove());
   document.querySelectorAll('link[href="/channel-menu.css"],script[src="/channel-menu.js"]').forEach(n=>n.remove());
   document.body.classList.add('rn-site');
+  applyArticleDesign(document);
   const top = document.createElement('div');
   top.innerHTML = `<aside class="rn-announcement" id="rn-announcement"><a href="https://t.me/leeandnote" target="_blank" rel="noopener noreferrer">요즘 공시가 궁금할 때, 리앤노트 텔레그램 알림 받기 →</a>${button('dismiss-banner','알림 배너 닫기','x')}</aside><header id="rn-header"><div class="rn-nav-inner"><a class="rn-logo" href="/" aria-label="리앤노트 홈"><img src="/assets/brand/wordmark-light.png" width="724" height="201" alt="LEE&NOTE"></a><nav id="rn-navigation" aria-label="주요 카테고리">${links.map(([name,url])=>`<a href="${url}">${name}</a>`).join('')}</nav><div class="rn-header-tools">${button('search','공시 검색','search')}<button type="button" data-rn="menu" aria-label="메뉴" aria-controls="rn-navigation" aria-expanded="false">${icon('menu')}</button></div></div></header>`;
   document.body.prepend(...top.childNodes);
@@ -38,6 +40,7 @@ export function applyRenewalLayouts(dir) {
     if(entry.isDirectory()) count+=applyRenewalLayouts(file);
     else if(entry.name.endsWith('.html')) {
       const before=fs.readFileSync(file,'utf8'), after=applyRenewalLayout(before);
+      const audit=auditHtml(before);if(audit)console.log('CONTENT_GATES='+JSON.stringify(audit));
       if(JSON.stringify(seoSnapshot(before))!==JSON.stringify(seoSnapshot(after))) throw new Error(`SEO changed: ${file}`);
       fs.writeFileSync(file,after); count++;
     }

@@ -10,6 +10,7 @@ on:
       - "prepare_cloudflare_pages.mjs"
       - "channel_menu.mjs"
       - "renewal_layout.mjs"
+      - "renewal_article.mjs"
       - "search_feed.mjs"
       - "draft_daily_question.mjs"
       - "site_metadata.mjs"

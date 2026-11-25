@@ -22,6 +22,7 @@
       case 'search': document.querySelector('#rn-search').showModal(); break;
       case 'social': document.querySelector('#rn-social').showModal(); break;
       case 'close': button.closest('dialog').close(); break;
+      case 'dismiss-cta': button.closest('.rn-scroll-cta').remove(); break;
     }
   });
   document.querySelectorAll('.rn-dialog').forEach(dialog => dialog.addEventListener('click', e => {
@@ -31,6 +32,8 @@
   }));
   let last=scrollY;
   addEventListener('scroll',()=>{
+    const cta=document.querySelector('.rn-scroll-cta'),body=document.querySelector('[data-rn-article] .articleBody');
+    if(cta&&body){const r=body.getBoundingClientRect();cta.hidden=(innerHeight-r.top)/r.height<0.7;}
     const bar=document.querySelector('.rn-mobile-bar');
     if(Math.abs(scrollY-last)<12) return;
     bar.classList.toggle('rn-bar-hidden',scrollY>last && scrollY>180 && !bar.contains(document.activeElement));

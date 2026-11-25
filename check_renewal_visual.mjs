@@ -2,16 +2,17 @@ import fs from 'node:fs';
 import {server} from './preview_renewal.mjs';
 const {chromium}=await import(process.env.PLAYWRIGHT_MODULE||'playwright');
 const browser=await chromium.launch({channel:'msedge',headless:true});
-fs.mkdirSync('artifacts/renewal-phase1',{recursive:true});
+const outputDir=process.env.RENEWAL_ARTIFACTS||'artifacts/renewal-phase1';
+fs.mkdirSync(outputDir,{recursive:true});
 const results=[];
 try {
- for(const width of [1280,375]) {
+ for(const width of [1440,1280,375]) {
   const page=await browser.newPage({viewport:{width,height:900}});
   await page.route('**/*',route=>route.request().url().startsWith('http://127.0.0.1:')?route.continue():route.abort());
-  for(const [label,url] of [['home','/'],['article','/blog/issues/rights-offering-disclosure-guide/'],['data','/5percent'],['blog','/blog/']]) {
+  for(const [label,url] of [['home','/'],['article','/blog/issues/rights-offering-disclosure-guide/'],['daily','/blog/5percent/2026-11-19/'],['long','/blog/5percent/2026-08-25/'],['data','/5percent'],['blog','/blog/']]) {
    for(const mode of ['before','after']) {
-    await page.goto(`http://127.0.0.1:4178${url}${mode==='before'?'?before=1':''}`);
-    await page.screenshot({path:`artifacts/renewal-phase1/${label}-${width}-${mode}.png`,fullPage:true});
+    await page.goto(`http://127.0.0.1:${process.env.PORT||4178}${url}${mode==='before'?'?before=1':''}`);
+    await page.screenshot({path:`${outputDir}/${label}-${width}-${mode}.png`,fullPage:true});
     if(mode==='after') {
      const check=await page.evaluate(()=>({overflow:document.documentElement.scrollWidth>innerWidth,logo:document.querySelector('.rn-logo img').naturalWidth>0,header:document.querySelectorAll('#rn-header').length}));
      results.push({label,width,...check});
@@ -33,6 +34,6 @@ try {
   }
   await page.close();
  }
- fs.writeFileSync('artifacts/renewal-phase1/results.json',JSON.stringify(results,null,2));
+ fs.writeFileSync(`${outputDir}/results.json`,JSON.stringify(results,null,2));
  console.log(JSON.stringify(results));
 } finally {await browser.close();server.close();}
