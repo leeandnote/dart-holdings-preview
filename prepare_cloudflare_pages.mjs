@@ -9,6 +9,7 @@ import { createTermPages } from './term_pages.mjs';
 import { connectSearchPages } from './search_graph.mjs';
 import { buildSearchSitemaps } from './search_sitemaps.mjs';
 import { applyChannelMenus } from './channel_menu.mjs';
+import { buildSearchFeed } from './search_feed.mjs';
 
 const root = path.dirname(fileURLToPath(import.meta.url));
 const publicDaysArg = process.argv.find((arg) => arg.startsWith("--days="));
@@ -148,6 +149,7 @@ const { normalizeSearchRoutes } = await import('./canonical_routes.mjs');
 normalizeSearchRoutes(distDir);
 console.log('CHANNEL_MENU_PAGES='+applyChannelMenus(distDir));
 console.log('SEARCH_SITEMAPS='+JSON.stringify(await buildSearchSitemaps(distDir)));
+console.log('RSS_ITEMS='+buildSearchFeed(distDir));
 const files = walk(distDir);
 const tooLarge = files
   .map((file) => ({ file, size: fs.statSync(file).size }))

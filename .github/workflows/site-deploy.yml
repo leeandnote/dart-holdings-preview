@@ -9,6 +9,8 @@ on:
       - "site/**"
       - "prepare_cloudflare_pages.mjs"
       - "channel_menu.mjs"
+      - "search_feed.mjs"
+      - "draft_daily_question.mjs"
       - "site_metadata.mjs"
       - "home_search.mjs"
       - "glossary_detail.mjs"
@@ -97,11 +99,23 @@ jobs:
       - name: Build site output
         run: node prepare_cloudflare_pages.mjs --days=120
 
+      - name: Prepare private editorial draft
+        run: node draft_daily_question.mjs
+
+      - name: Save draft for human review
+        uses: actions/upload-artifact@v4
+        with:
+          name: editorial-draft
+          path: editorial-drafts/*.md
+          if-no-files-found: ignore
+          retention-days: 30
+
       - name: Deploy to Cloudflare Pages
         # Validate search entry points before public deployment.
         run: |
           node --test search-questions.test.mjs
           node --test search-integrity.test.mjs
+          node --test search_feed.test.mjs channel_menu.test.mjs
           node verify-search-pages.mjs
           pnpm dlx wrangler pages deploy public_dist --project-name leeandnote --branch main
 

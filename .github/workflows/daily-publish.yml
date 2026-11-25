@@ -190,6 +190,19 @@ jobs:
         if: ${{ success() && inputs.social_only != true }}
         run: node notify_indexnow.mjs
 
+      - name: Prepare private editorial draft
+        if: ${{ success() && inputs.social_only != true }}
+        run: node draft_daily_question.mjs
+
+      - name: Save draft for human review
+        if: ${{ success() && inputs.social_only != true }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: editorial-draft
+          path: editorial-drafts/*.md
+          if-no-files-found: ignore
+          retention-days: 30
+
       - name: Render social card previews
         if: ${{ success() && inputs.social_only != true }}
         shell: pwsh
