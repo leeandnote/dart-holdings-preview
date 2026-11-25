@@ -41,6 +41,7 @@ export function applyArticleDesign(document) {
   const h1=article.querySelector('h1');
   if(daily&&h1)h1.textContent=h1.textContent.replace(/^\d{4}[.-]\d{2}[.-]\d{2}\s*[-–]?\s*/,'').replace(/\s*\|\s*(?:5%보고공시|임원.*|대형수주.*|투자판단.*)$/,'');
   article.querySelectorAll('.insightTabs').forEach(n=>n.remove());
+  article.querySelectorAll('.articleBreadcrumb').forEach(n=>n.remove());
   const oldByline=article.querySelector('#editorial-byline');
   oldByline?.querySelectorAll('span').forEach(n=>{if(n.textContent.includes('이전 기록 미확인'))n.remove();});
   const titleArea=h1?.parentElement;
