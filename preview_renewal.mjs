@@ -6,9 +6,9 @@ import {parseHTML} from 'linkedom';
 import {articleCatalog,attachRelated} from './related_articles.mjs';
 import {retireLinks} from './retire_disclosurepedia.mjs';
 
-const root=path.resolve('site');
+const root=path.resolve(process.env.PREVIEW_ROOT||'site');
 const catalog=articleCatalog(root);
-const types={'.html':'text/html; charset=utf-8','.css':'text/css','.js':'text/javascript','.png':'image/png','.svg':'image/svg+xml','.ttf':'font/ttf','.json':'application/json'};
+const types={'.html':'text/html; charset=utf-8','.css':'text/css','.js':'text/javascript','.mjs':'text/javascript','.png':'image/png','.svg':'image/svg+xml','.ttf':'font/ttf','.json':'application/json'};
 export const server=http.createServer((req,res)=>{
   const url=new URL(req.url,'http://localhost');
   if(/^\/disclosurepedia(?:\/|$)/.test(url.pathname)){res.writeHead(404,{'Content-Type':'text/html; charset=utf-8'}).end(fs.readFileSync(path.join(root,'404.html')));return;}

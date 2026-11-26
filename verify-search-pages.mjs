@@ -17,7 +17,9 @@ for(const slug of slugs){
   assert.ok(fs.readFileSync(path.join(root,'sitemap-blog.xml'),'utf8').includes(`https://leeandnote.com/blog/issues/${slug}/`));
 }
 for(const file of ['index.html','blog/index.html']){
-  assert.match(fs.readFileSync(path.join(root,file),'utf8'),/class="questionReading"/);
+  const html=fs.readFileSync(path.join(root,file),'utf8');
+  assert.match(html,/class="rn-editor-grid"/);
+  assert.match(html,/href="\/blog\/issues\/[^"#]+"/);
 }
 assert.ok(!fs.existsSync(path.join(root,'disclosurepedia')),'Retired category must not be deployed');
 assert.doesNotMatch(fs.readFileSync(path.join(root,'sitemap.xml'),'utf8'),/disclosurepedia/);
