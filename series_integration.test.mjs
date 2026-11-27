@@ -6,8 +6,14 @@ import path from 'node:path';
 import {parseHTML} from 'linkedom';
 import {buildSeries} from './series_pages.mjs';
 import {assertPrivateNotes,noteHash,publishNotes} from './note_series.mjs';
-import {articlePath,validatePublishedHtml} from './preserve_published_articles.mjs';
+import {articlePath,validatePublishedHtml,preservePublishedArticles} from './preserve_published_articles.mjs';
 import {encryptNotes,decryptNotes} from './private_notes.mjs';
+test('preservation includes linked public noindex articles outside sitemap',async()=>{
+ const dir=fs.mkdtempSync(path.join(os.tmpdir(),'preserve-linked-')),original=globalThis.fetch;
+ const origin='https://leeandnote.com',first='/blog/issues/first/',second='/blog/issues/second/';
+ globalThis.fetch=async url=>new Response(url.endsWith('.xml')?`<urlset><url><loc>${origin+first}</loc></url></urlset>`:`<html><head><link rel="canonical" href="${url}"></head><body><article><div class="articleBody"><a href="${url===origin+first?second:first}">related</a></div></article></body></html>`);
+ try{assert.equal(await preservePublishedArticles(dir),2);assert.ok(fs.existsSync(path.join(dir,second,'index.html')));}finally{globalThis.fetch=original;fs.rmSync(dir,{recursive:true,force:true});}
+});
 
 test('series hides empty tabs, renders covers/OG, landing schemas and stable legacy URLs',()=>{
  const dir=fs.mkdtempSync(path.join(os.tmpdir(),'series-ui-'));try{

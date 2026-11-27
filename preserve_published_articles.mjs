@@ -20,14 +20,26 @@ export async function preservePublishedArticles(root='site'){
   const xml=await response.text(),doc=new DOMParser().parseFromString(xml,'text/xml');
   const urls=[...new Set([...doc.querySelectorAll('url > loc')].map(n=>n.textContent).filter(u=>articlePath(u)))];
   if(!urls.length)throw new Error('Published article inventory empty');
+  const seen=new Set(urls);
   let restored=0;
   for(const url of urls){
     const file=path.join(root,articlePath(url),'index.html');
-    if(fs.existsSync(file))continue;
-    const res=await fetch(url,{redirect:'error',signal:AbortSignal.timeout(30000)});
-    if(!res.ok)throw new Error(`Cannot preserve published article ${url}`);
-    const html=validatePublishedHtml(await res.text(),url);
-    fs.mkdirSync(path.dirname(file),{recursive:true});fs.writeFileSync(file,html);restored++;
+    let html;
+    if(fs.existsSync(file))html=fs.readFileSync(file,'utf8');
+    else {
+      const res=await fetch(url,{redirect:'error',signal:AbortSignal.timeout(30000)});
+      if(!res.ok)throw new Error(`Cannot preserve published article ${url}`);
+      html=validatePublishedHtml(await res.text(),url);
+      fs.mkdirSync(path.dirname(file),{recursive:true});fs.writeFileSync(file,html);restored++;
+    }
+    // Published noindex articles are absent from sitemaps but can remain linked.
+    const {document}=parseHTML(html);
+    for(const a of document.querySelectorAll('a[href]')){
+      let linked;try{linked=new URL(a.getAttribute('href'),url);linked.hash='';}catch{continue;}
+      if(!articlePath(linked.href)||seen.has(linked.href))continue;
+      seen.add(linked.href);urls.push(linked.href);
+      if(urls.length>2000)throw new Error('Published article inventory exceeds safety limit');
+    }
   }
   console.log(`PUBLISHED_ARTICLES_PRESERVED=${urls.length}; RESTORED_MISSING=${restored}`);
   return urls.length;

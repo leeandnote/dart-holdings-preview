@@ -6,7 +6,7 @@ on:
       published_only:
         description: "Publish reviewed series notes while preserving existing daily articles; do not recollect disclosures."
         type: boolean
-        default: false
+        default: true
   schedule:
     - cron: '0 22 * * *'
   push:
@@ -117,7 +117,7 @@ jobs:
         run: node private_notes.mjs
 
       - name: Rebuild recent daily blog pages
-        if: github.event_name != 'schedule' && inputs.published_only != true
+        if: github.event_name == 'workflow_dispatch' && inputs.published_only != true
         shell: pwsh
         run: |
           $kstToday = [DateTimeOffset]::UtcNow.ToOffset([TimeSpan]::FromHours(9)).Date
@@ -129,15 +129,15 @@ jobs:
           }
 
       - name: Refresh recent blog archive
-        if: github.event_name != 'schedule' && inputs.published_only != true
+        if: github.event_name == 'workflow_dispatch' && inputs.published_only != true
         run: node generate_blog_archive.mjs --days=30
 
       - name: Refresh search-led issue analysis
-        if: github.event_name != 'schedule' && inputs.published_only != true
+        if: github.event_name == 'workflow_dispatch' && inputs.published_only != true
         run: node generate_issue_analysis.mjs
 
       - name: Preserve published articles for morning series release
-        if: github.event_name == 'schedule' || inputs.published_only == true
+        if: github.event_name != 'workflow_dispatch' || inputs.published_only == true
         run: node preserve_published_articles.mjs
 
       - name: Check private editorial queue
