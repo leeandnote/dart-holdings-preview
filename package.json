@@ -13,9 +13,13 @@
     "shortform:video": "node shortform/render_video.mjs"
   },
   "devDependencies": {
+    "@resvg/resvg-js": "^2.6.2",
     "convex": "^1.25.4",
     "fflate": "^0.8.2",
+    "libsodium-wrappers": "^0.8.4",
     "linkedom": "^0.18.15",
-    "typescript": "^5.5.4"
+    "marked": "^18.3.0",
+    "typescript": "^5.5.4",
+    "yaml": "^2.9.1"
   }
 }

@@ -53,6 +53,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     env:
+      NOTES_ARCHIVE_KEY: ${{ secrets.NOTES_ARCHIVE_KEY }}
       DART_API_KEY: ${{ secrets.DART_API_KEY }}
       NAVER_CLIENT_ID: ${{ secrets.NAVER_CLIENT_ID }}
       NAVER_CLIENT_SECRET: ${{ secrets.NAVER_CLIENT_SECRET }}

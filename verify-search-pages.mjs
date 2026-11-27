@@ -25,7 +25,7 @@ for(const slug of slugs){
 }
 for(const file of ['index.html','blog/index.html']){
   const html=fs.readFileSync(path.join(root,file),'utf8');
-  assert.match(html,/class="rn-editor-grid"/);
+  assert.match(html,file==='index.html'?/rn-series-browser/:/rn-editor-grid/);
   assert.match(html,/href="\/blog\/issues\/[^"#]+"/);
 }
 assert.ok(!fs.existsSync(path.join(root,'disclosurepedia')),'Retired category must not be deployed');

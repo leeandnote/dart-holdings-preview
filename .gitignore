@@ -10,3 +10,6 @@ x_config.local.ps1
 meta_config.local.ps1
 node_modules/
 public_dist/
+.private/
+content/notes/
+artifacts/series-qa/

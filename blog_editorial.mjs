@@ -35,7 +35,8 @@ export const termGroups={
 };
 const groupFor=url=>url.includes('/contracts/')?'contracts':/clinical|bio|pipeline/.test(url)?'clinical':url.includes('/major-events/')?'events':'ownership';
 export function enhanceArticle(html,url,previous,now,canDateNew=false){
-  if(!/<article(?:\s|>)/i.test(html)||html.includes('id="editorial-byline"'))return {html,entry:previous};
+  if(previous?.noteHash)return {html,entry:previous};
+  if(!/<article(?:\s|>)/i.test(html)||html.includes('id="editorial-byline"')||/data-rn-article(?:\s|=|>)/.test(html))return {html,entry:previous};
   const basis=url.match(/\/(\d{4}-\d{2}-\d{2})\/?$/)?.[1];
   // Generator refresh labels are not evidence of an actual publication or modification date.
   const semantic=(html.match(/<article[\s\S]*?<\/article>/i)?.[0]||'').replace(/<span class="postDate">[\s\S]*?<\/span>/g,'');

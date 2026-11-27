@@ -2,6 +2,13 @@ name: Deploy Lee&Note site
 
 on:
   workflow_dispatch:
+    inputs:
+      published_only:
+        description: "Publish reviewed series notes while preserving existing daily articles; do not recollect disclosures."
+        type: boolean
+        default: false
+  schedule:
+    - cron: '0 22 * * *'
   push:
     branches:
       - main
@@ -34,6 +41,13 @@ on:
       - "insight_thumbnails.mjs"
       - "renewal_editor.mjs"
       - "daily_context.mjs"
+      - "content/notes.enc.json"
+      - "private_notes.mjs"
+      - "note_series.mjs"
+      - "series_pages.mjs"
+      - "series_covers.mjs"
+      - "check_note_queue.mjs"
+      - "preserve_published_articles.mjs"
       - "issue_quality.mjs"
       - "disclosure_questions.mjs"
       - "daily_content.mjs"
@@ -58,7 +72,7 @@ permissions:
 
 concurrency:
   group: leeandnote-site-deploy
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   deploy:
@@ -70,6 +84,7 @@ jobs:
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       WRANGLER_CONFIG_TOML_B64: ${{ secrets.WRANGLER_CONFIG_TOML_B64 }}
+      NOTES_ARCHIVE_KEY: ${{ secrets.NOTES_ARCHIVE_KEY }}
 
     steps:
       - name: Check out repository
@@ -98,7 +113,11 @@ jobs:
             [IO.File]::WriteAllBytes($configPath, [Convert]::FromBase64String($env:WRANGLER_CONFIG_TOML_B64))
           }
 
+      - name: Restore private series manuscripts
+        run: node private_notes.mjs
+
       - name: Rebuild recent daily blog pages
+        if: github.event_name != 'schedule' && inputs.published_only != true
         shell: pwsh
         run: |
           $kstToday = [DateTimeOffset]::UtcNow.ToOffset([TimeSpan]::FromHours(9)).Date
@@ -110,10 +129,24 @@ jobs:
           }
 
       - name: Refresh recent blog archive
+        if: github.event_name != 'schedule' && inputs.published_only != true
         run: node generate_blog_archive.mjs --days=30
 
       - name: Refresh search-led issue analysis
+        if: github.event_name != 'schedule' && inputs.published_only != true
         run: node generate_issue_analysis.mjs
+
+      - name: Preserve published articles for morning series release
+        if: github.event_name == 'schedule' || inputs.published_only == true
+        run: node preserve_published_articles.mjs
+
+      - name: Check private editorial queue
+        if: always()
+        continue-on-error: true
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_OPERATOR_CHAT_ID: ${{ secrets.TELEGRAM_OPERATOR_CHAT_ID }}
+        run: node check_note_queue.mjs --notify
 
       - name: Build site output
         run: node prepare_cloudflare_pages.mjs --days=120
@@ -142,6 +175,7 @@ jobs:
           node --test renewal_qa.test.mjs
           node --test daily_context.test.mjs
           node --test renewal_data.test.mjs
+          node --test note_series.test.mjs series_integration.test.mjs
           node verify-search-pages.mjs
           pnpm dlx wrangler pages deploy public_dist --project-name leeandnote --branch main
 

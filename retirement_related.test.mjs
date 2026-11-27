@@ -41,8 +41,13 @@ test('related selection prioritizes actual common stocks, excludes self and incl
  const current={url:'/blog/5percent/2026-11-19/',group:'5percent',stocks:['005930'],date:'2026-11-19'};
  const catalog=[current,...['18','17','16'].map(d=>({...current,url:`/blog/5percent/2026-11-${d}/`,date:`2026-11-${d}`,title:d})),{url:'/blog/issues/guide/',group:'issues',stocks:[],date:'',title:'공시 읽기'}];
  const selected=selectRelated(current,catalog);assert.equal(selected.length,3);assert.ok(selected.some(p=>p.group==='issues'));assert.ok(!selected.includes(current));
- const {document}=parseHTML(`<html><head><link rel="canonical" href="https://leeandnote.com${current.url}"></head><body><article><h1>제목</h1></article></body></html>`);
+ const {document}=parseHTML(`<html><head><link rel="canonical" href="https://leeandnote.com${current.url}"></head><body><article><h1>제목</h1><div class="articleBody">본문</div></article></body></html>`);
  attachRelated(document,catalog);attachRelated(document,catalog);assert.equal(document.querySelectorAll('#rn-related').length,1);
  assert.equal(document.querySelectorAll('.rn-adjacent').length,1);
  assert.deepEqual(selectRelated(current,[current,catalog[1]]),[]);
+});
+test('home cards never receive article related links',()=>{
+ const {document}=parseHTML('<html><head><link rel="canonical" href="https://leeandnote.com/"></head><body><article><h2>공시 데이터</h2></article></body></html>');
+ attachRelated(document,[{url:'/blog/issues/one/',title:'one',stocks:[],group:'issues',date:''},{url:'/blog/issues/two/',title:'two',stocks:[],group:'issues',date:''}]);
+ assert.equal(document.querySelector('#rn-related'),null);
 });

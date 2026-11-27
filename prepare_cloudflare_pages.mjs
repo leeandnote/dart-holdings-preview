@@ -20,6 +20,8 @@ const publicDays = Number(publicDaysArg?.split("=")[1] || 90);
 const siteDir = path.join(root, "site");
 const distDir = path.join(root, "public_dist");
 const deployDir = path.join(root, "deploy");
+const {restorePrivateNotes}=await import('./private_notes.mjs');
+restorePrivateNotes();
 
 function firstValue(obj, names) {
   for (const name of names) {
@@ -144,6 +146,9 @@ if (fs.existsSync(latestJsonPath)) {
 applySiteMetadata(distDir);
 console.log(`BLOG_EDITORIAL_PAGES=${await applyBlogEditorial(distDir)}`);
 createTermPages(distDir);
+const {publishNotes}=await import('./note_series.mjs');
+const publishedNotes=publishNotes(distDir);
+console.log('SERIES_NOTES_PUBLISHED='+publishedNotes.length);
 applySearchFoundation(distDir);
 console.log('SEARCH_LINKS='+JSON.stringify(connectSearchPages(distDir,{companiesEnabled:false})));
 const {createMonthlyArchives} = await import('./blog_discovery.mjs');
@@ -170,10 +175,14 @@ console.log('EDITOR_ARCHIVE='+buildEditorArchive(distDir));
 console.log('UNIFIED_SEARCH='+JSON.stringify(buildUnifiedSearch(distDir,signalRecords(distDir))));
 const {buildDiscovery} = await import('./renewal_discovery.mjs');
 console.log('RENEWAL_DISCOVERY='+JSON.stringify(buildDiscovery(distDir)));
+const {buildSeries}=await import('./series_pages.mjs');
+console.log('NOTE_SERIES='+JSON.stringify(buildSeries(distDir,{published:publishedNotes})));
 console.log('PRERENDERED_DATA='+prerenderDataPages(distDir));
 console.log('SEARCH_SITEMAPS='+JSON.stringify(await buildSearchSitemaps(distDir)));
 console.log('RSS_ITEMS='+buildSearchFeed(distDir));
 console.log('RENEWAL_LAYOUT_PAGES='+applyRenewalLayouts(distDir));
+const {assertPrivateNotes}=await import('./note_series.mjs');
+console.log('PRIVATE_NOTES_VERIFIED='+assertPrivateNotes(distDir));
 const files = walk(distDir);
 const tooLarge = files
   .map((file) => ({ file, size: fs.statSync(file).size }))

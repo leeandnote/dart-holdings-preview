@@ -38,15 +38,20 @@ export async function buildSearchSitemaps(dist,{remote=true,previous,now=new Dat
   const allowed=new Set([...source.querySelectorAll('url > loc')].map(e=>canonicalKey(e.textContent)));
   for(const t of terms)allowed.add(canonicalKey(origin+termUrl(t)));
   const entries={},groups={pages:[],blog:[],terms:[]},changed=[];
+  const editorialPath=path.join(dist,'data/blog-editorial.json');
+  const editorialHistory=fs.existsSync(editorialPath)?JSON.parse(fs.readFileSync(editorialPath,'utf8')).entries:{};
   for(const file of htmlFiles(dist)){
     const html=fs.readFileSync(file,'utf8'),{document}=parseHTML(html);
     const raw=document.querySelector('link[rel="canonical"]')?.href;
     if(!raw||new URL(raw,origin).origin!==origin)continue;
     const url=canonicalKey(raw);
     if(isRetiredUrl(url))continue;
-    const publicContent=/^\/(?:blog|stock-terms)\//.test(new URL(url).pathname);
+    const publicContent=/^\/(?:blog|stock-terms|series)\//.test(new URL(url).pathname);
     if((!allowed.has(url)&&!publicContent)||entries[url]||/noindex/i.test(document.querySelector('meta[name="robots"]')?.content||''))continue;
-    const entry=historyEntry(contentHash(html),previous[url],now);entries[url]=entry;
+    const entry=historyEntry(contentHash(html),previous[url],now);
+    const editorial=editorialHistory?.[url];
+    if(editorial?.noteHash&&!previous[url])entry.modifiedAt=editorial.modifiedAt||editorial.publishedAt;
+    entries[url]=entry;
     if(previous[url]?.hash!==entry.hash)changed.push(new URL(url).href);
     const pathname=new URL(url).pathname;
     const group=pathname.startsWith('/blog/')?'blog':pathname.startsWith('/stock-terms')?'terms':'pages';

@@ -1,0 +1,14 @@
+import fs from 'node:fs';
+import sodium from 'libsodium-wrappers';
+await sodium.ready;
+const token=process.env.GITHUB_TOKEN;if(!token)throw new Error('GITHUB_TOKEN required');
+const base='https://api.github.com/repos/leeandnote/dart-holdings-preview/actions/secrets';
+const headers={Authorization:`Bearer ${token}`,Accept:'application/vnd.github+json','Content-Type':'application/json'};
+const existing=await fetch(base+'/NOTES_ARCHIVE_KEY',{headers});
+if(existing.status!==404)throw new Error(existing.ok?'NOTES_ARCHIVE_KEY already exists; refusing to overwrite':'Cannot verify secret absence');
+const res=await fetch(base+'/public-key',{headers});if(!res.ok)throw new Error('Cannot retrieve repository encryption key');
+const publicKey=await res.json(),secret=fs.readFileSync('.private/notes-archive-key','utf8').trim();
+const encrypted=sodium.crypto_box_seal(sodium.from_string(secret),sodium.from_base64(publicKey.key,sodium.base64_variants.ORIGINAL));
+const stored=await fetch(base+'/NOTES_ARCHIVE_KEY',{method:'PUT',headers,body:JSON.stringify({encrypted_value:sodium.to_base64(encrypted,sodium.base64_variants.ORIGINAL),key_id:publicKey.key_id})});
+if(!stored.ok)throw new Error('Could not store NOTES_ARCHIVE_KEY');
+console.log('NOTES_ARCHIVE_KEY stored securely; value not displayed.');

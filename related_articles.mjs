@@ -32,7 +32,7 @@ export function selectRelated(current,catalog) {
 }
 export function attachRelated(document,catalog) {
   const article=document.querySelector('article');
-  if(!article||document.querySelector('#rn-related'))return;
+  if(!article?.querySelector('.articleBody')||document.querySelector('#rn-related'))return;
   const canonical=document.querySelector('link[rel="canonical"]')?.getAttribute('href');
   if(!canonical)return;
   const url=new URL(canonical,'https://leeandnote.com').pathname.replace(/\/?$/,'/');
