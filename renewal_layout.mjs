@@ -6,7 +6,8 @@ import { applyArticleDesign, auditHtml } from './renewal_article.mjs';
 const icon = name => `<img src="/assets/icons/${name}.svg" alt="" width="22" height="22">`;
 const links = [['5%보고','/5percent'],['임원보고','/executives'],['대형수주','/contracts'],['투자판단','/major-events'],['주요 일정','/calendar'],['인사이트','/blog/']];
 const socials = [['TG','텔레그램','https://t.me/leeandnote'],['IG','인스타그램','https://www.instagram.com/leeandnote/'],['@','스레드','https://www.threads.com/@leeandnote'],['YT','유튜브','https://www.youtube.com/@%EB%A6%AC%EC%95%A4%EB%85%B8%ED%8A%B8'],['N','블로그','https://blog.naver.com/leeandnote']];
-const socialLinks = () => socials.map(([mark,name,url]) => `<a href="${url}" target="_blank" rel="noopener noreferrer" title="${name} (새 창)" aria-label="${name} (새 창)"${mark==='TG'?' class="rn-telegram"':''}><span>${mark==='TG'?icon('send'):mark}</span><small>${name}</small></a>`).join('');
+const socialIcons = {TG:'send',IG:'instagram','@':'threads',YT:'youtube',N:'blog'};
+const socialLinks = () => socials.map(([mark,name,url]) => `<a href="${url}" target="_blank" rel="noopener noreferrer" title="${name} (새 창)" aria-label="${name} (새 창)"${mark==='TG'?' class="rn-telegram"':''}><span>${icon(socialIcons[mark])}</span><small>${name}</small></a>`).join('');
 const button = (action,name,image) => `<button type="button" data-rn="${action}" aria-label="${name}" title="${name}">${icon(image)}</button>`;
 
 export function seoSnapshot(html) {

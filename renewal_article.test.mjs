@@ -20,7 +20,12 @@ test('long prose enables anchored TOC; identical plain columns collapse with lab
 test('matching real FAQ becomes accessible details without changing SEO',()=>{
  const html=fs.readFileSync('site/blog/issues/rights-offering-disclosure-guide/index.html','utf8');
  const output=applyRenewalLayout(html);assert.deepEqual(seoSnapshot(html),seoSnapshot(output));
- const d=parseHTML(output).document;assert.equal(d.querySelectorAll('.rn-faq').length,3);assert.ok(d.querySelector('.rn-author'));
+ const d=parseHTML(output).document;assert.equal(d.querySelectorAll('.rn-faq').length,5);assert.ok(d.querySelector('.rn-author'));
  assert.equal(applyRenewalLayout(output),output);
 });
 test('audit records no invented author profile',()=>assert.equal(measureArticle(fixture('본문')).gates.authorProfile,false));
+test('metadata is consolidated and short guide contents become one disclosure',()=>{
+ const d=fixture('본문','<nav class="guideContents"><h2>이 글에서 확인할 내용</h2><ol><li>A</li></ol></nav><p>작성·편집: 리앤노트 · 자료 수집·정정 기준</p>');
+ const old=d.createElement('div');old.id='editorial-byline';old.textContent='작성·운영';d.querySelector('.blogHero').append(old);
+ applyArticleDesign(d);assert.equal(d.querySelector('#editorial-byline'),null);assert.equal(d.querySelectorAll('.rn-author').length,1);assert.equal(d.querySelectorAll('.rn-compact-toc').length,1);assert.equal(d.querySelector('.guideContents'),null);assert.doesNotMatch(d.querySelector('.articleBody').textContent,/작성·편집:/);
+});

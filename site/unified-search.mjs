@@ -11,6 +11,8 @@ if(typeof document!=='undefined'){
     list.replaceChildren();more.hidden=true;
     if(!loaded)return;
     const results=matchRecords(records,input.value,kind);
+    document.querySelector('#search-empty-character')?.remove();
+    if(input.value.trim()&&!results.length){const img=document.createElement('img');img.id='search-empty-character';img.src='/assets/brand/leeandnote-full.png';img.alt='생각하는 리앤노트';img.width=120;img.height=160;status.after(img);}
     status.textContent=input.value.trim()?`${results.length.toLocaleString('ko')}건 · 수집된 공개 공시와 인사이트 기준`:'검색어를 입력해 주세요.';
     for(const r of results.slice(0,limit)){
       const li=document.createElement('li'),a=document.createElement('a'),meta=document.createElement('small'),p=document.createElement('p');

@@ -12,15 +12,16 @@ export function measureArticle(document) {
   const body=article?.querySelector('.articleBody');
   if(!body) return null;
   const prose=body.cloneNode(true);
-  prose.querySelectorAll('table,script,style,nav,.rn-author,.rn-toc,.rn-article-cta').forEach(n=>n.remove());
+  prose.querySelectorAll('table,figure,script,style,nav,.rn-author,.rn-toc,.rn-compact-toc,.rn-references,.rn-article-cta').forEach(n=>n.remove());
   const bodyChars=clean(prose.textContent).length;
-  const headings=[...body.querySelectorAll('h2')];
-  const faq=[...body.querySelectorAll('.issueFaq h3')];
+  const headings=[...body.querySelectorAll('h2')].filter(n=>!n.closest('nav'));
+  const faq=[...body.querySelectorAll('.issueFaq h3,.issueFaq .rn-faq summary')];
   const sources=new Set([...body.querySelectorAll('a[href^="https://"]')].map(n=>n.getAttribute('href')));
   return {
     url:document.querySelector('link[rel="canonical"]')?.getAttribute('href')||'',
     bodyChars,h2Count:headings.length,questionHeadingRatio:headings.length?headings.filter(h=>/[?？]$/.test(h.textContent.trim())).length/headings.length:0,
-    figures:body.querySelectorAll('figure,img,svg').length,
+    figures:body.querySelectorAll('figure').length+[...body.querySelectorAll('img,svg')].filter(n=>!n.closest('figure')).length,
+    references:body.querySelectorAll('.rn-references li a[href^="https://"]').length,
     missingAlt:body.querySelectorAll('img:not([alt])').length,
     sourceLinks:sources.size,faqQuestions:faq.length,
     internalLinks:[...body.querySelectorAll('a[href]')].filter(a=>a.getAttribute('href').startsWith('/')).length,
@@ -54,11 +55,20 @@ export function applyArticleDesign(document) {
     const meta=document.createElement('div');meta.className='rn-author';
     const dates=nodes(document).find(n=>n['@type']==='Article');
     const basis=url.match(/\/(\d{4}-\d{2}-\d{2})(?:\/|$)/)?.[1];
-    const dateText=basis?`공시 기준 ${basis}`:dates?.dateModified?`업데이트 ${String(dates.dateModified).slice(0,10)}`:'';
+    const published=dates?.datePublished,modified=dates?.dateModified;
+    const dateText=[basis?`공시 기준 ${basis}`:'',published?`작성 ${String(published).slice(0,10)}`:'',modified&&published&&Date.parse(modified)>Date.parse(published)?`업데이트 ${String(modified).slice(0,10)}`:''].filter(Boolean).join(' · ');
     meta.innerHTML=`<img src="/assets/brand/leeandnote-avatar.png" width="56" height="56" alt="리앤노트 캐릭터"><div><strong>리앤노트 편집팀</strong><p>${escape(dateText)}${dateText?' · ':''}${Math.max(1,Math.ceil(audit.bodyChars/500))}분 읽기 · <a href="/editorial-policy">편집 기준</a></p></div>`;
     h1.after(meta);
-    if(oldByline){oldByline.classList.add('rn-original-dates');const first=oldByline.querySelector('span');if(first?.textContent.includes('작성·운영'))first.remove();}
+    oldByline?.remove();
+    titleArea.querySelectorAll('.postMeta,.postDate').forEach(n=>n.remove());
   }
+  body.querySelectorAll('p').forEach(p=>{if(/^작성·편집:/.test(clean(p.textContent)))p.remove();});
+  body.querySelectorAll('.guideContents').forEach(old=>{
+    if(audit.gates.stickyToc){old.remove();return;}
+    const details=document.createElement('details'),summary=document.createElement('summary');
+    details.className='rn-compact-toc';summary.textContent='이 글에서 확인할 내용';details.append(summary);
+    const list=old.querySelector('ol');if(list)details.append(list);old.replaceWith(details);
+  });
   if(!audit.gates.summary)body.querySelectorAll('.summaryBox').forEach(n=>{
     const p=document.createElement('p');p.className='rn-intro';p.innerHTML=n.innerHTML;n.replaceWith(p);
   });
@@ -70,6 +80,9 @@ export function applyArticleDesign(document) {
       const a=document.createElement('a');a.href='#'+h.id;a.textContent=h.textContent;toc.append(a);
     });
     article.append(toc);document.body.classList.add('rn-has-toc');
+    const compact=document.createElement('details');compact.className='rn-compact-toc rn-mobile-toc';
+    compact.innerHTML='<summary>이 글의 목차</summary>'+[...toc.querySelectorAll('a')].map(a=>a.outerHTML).join('');
+    body.prepend(compact);
   }
   // Convert only matching visible FAQ content. Schema remains byte-for-byte unchanged.
   const schema=nodes(document).find(n=>n['@type']==='FAQPage');
@@ -108,6 +121,7 @@ export function applyArticleDesign(document) {
     }
   });
   const cta=document.createElement('section');cta.className='rn-article-cta';cta.innerHTML='<h2>다음 공시도 놓치지 않도록</h2><p>리앤노트 텔레그램에서 실시간 공시를 확인하세요.</p><a href="https://t.me/leeandnote" target="_blank" rel="noopener noreferrer">텔레그램 알림 받기 →</a>';
+  const editor=document.createElement('section');editor.className='rn-editor-credit';editor.innerHTML='<h2><a href="/editor/fox/">리앤노트 편집팀</a></h2><p>DART 원문과 공식 자료를 바탕으로 공시를 정리합니다.</p><a href="/editor/fox/">편집팀의 해설 전체 보기 →</a>';article.append(editor);
   article.append(cta);
   const floating=document.createElement('aside');floating.className='rn-scroll-cta';floating.hidden=true;
   floating.innerHTML='<span>새 공시를 텔레그램에서 확인하세요.</span><a href="https://t.me/leeandnote" target="_blank" rel="noopener noreferrer">알림 받기 →</a><button type="button" data-rn="dismiss-cta" aria-label="알림 안내 닫기"><img src="/assets/icons/x.svg" width="20" height="20" alt=""></button>';

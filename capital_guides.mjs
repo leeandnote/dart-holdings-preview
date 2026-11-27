@@ -1,4 +1,5 @@
 const source = '<p>공식 확인 경로: <a href="https://opendart.fss.or.kr/disclosureinfo/mainMatter/main.do">금융감독원 주요사항보고서 주요정보조회</a> · <a href="https://dart.fss.or.kr/dsab007/detailSearchMain.do">DART 상세검색</a> · <a href="https://kind.krx.co.kr/">한국거래소 KIND</a></p>';
+import {rightsOfferingGuide} from './rights_offering_guide.mjs';
 const guides = [
   {
     slug: 'rights-offering-disclosure-guide', title: '유상증자 공시 읽는 법: 희석·자금 사용·발행가액 확인',
@@ -27,8 +28,8 @@ const guides = [
 ];
 
 export function capitalGuides() {
-  return guides.map(g => ({...g, score: 78,
-    column: g.sections.map(([h, p]) => `<h2>${h}</h2><p>${p}</p>`).join('') + source + '<p>이 페이지는 일반적인 공시 읽기 안내입니다. 이 유형의 전체 최근 공시를 수집하고 있다고 주장하지 않으며, 실제 기업 사례는 DART에서 회사명과 보고서명을 함께 검색해 확인하세요.</p><p><a href="/blog/issues/how-to-read-dart-disclosures/">공시 읽는 순서</a> · <a href="/stock-terms">공시 용어</a></p>',
+  return guides.map(g=>g.slug===rightsOfferingGuide.slug?rightsOfferingGuide:g).map(g => ({...g, score: 78,
+    column: g.column || g.sections.map(([h, p]) => `<h2>${h}</h2><p>${p}</p>`).join('') + source + '<p>이 페이지는 일반적인 공시 읽기 안내입니다. 이 유형의 전체 최근 공시를 수집하고 있다고 주장하지 않으며, 실제 기업 사례는 DART에서 회사명과 보고서명을 함께 검색해 확인하세요.</p><p><a href="/blog/issues/how-to-read-dart-disclosures/">공시 읽는 순서</a> · <a href="/stock-terms">공시 용어</a></p>',
     faq: '<h2>자주 묻는 질문</h2>' + g.faq.map(([q, a]) => `<h3>${q}</h3><p>${a}</p>`).join(''),
     rows: [], headers: [], row: () => ''}));
 }

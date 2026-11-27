@@ -8,8 +8,9 @@ import {signalRecords} from './renewal_data.mjs';
 
 const groups=[['5percent','5% 지분보고'],['executives','임원·주요주주'],['contracts','수주·공급계약'],['major-events','투자판단']];
 const link=p=>`<a href="${e(p.url)}">${e(p.title)}</a>`;
-const dailyList=items=>`<ul class="rn-daily-list">${items.map(p=>`<li><time>${e(p.date)}</time><span>${link(p)}</span><small>${e(groups.find(([key])=>key===p.group)?.[1]||'공시')}</small></li>`).join('')}</ul>`;
-const picks=items=>`<div class="rn-editor-grid">${items.map((p,i)=>`<article><div class="rn-editor-label"><span>INSIGHT</span><b>${String(i+1).padStart(2,'0')}</b></div><h3>${link(p)}</h3></article>`).join('')}</div>`;
+export const dailyTitle=title=>title.replace(/^\d{4}[.-]\d{2}[.-]\d{2}\s*[-–]?\s*/,'').replace(/\s*\|\s*(?:5%보고공시|임원.*|대형수주.*|투자판단.*)$/,'');
+const dailyList=items=>`<ul class="rn-daily-list">${items.map(p=>`<li><time>${e(p.date)}</time><span>${link({...p,title:dailyTitle(p.title)})}</span><small>${e(groups.find(([key])=>key===p.group)?.[1]||'공시')}</small></li>`).join('')}</ul>`;
+const picks=items=>`<div class="rn-editor-grid">${items.map(p=>`<article><a class="rn-insight-image" href="${e(p.url)}" tabindex="-1" aria-hidden="true"><img src="/assets/insights/${e(p.url.split('/').filter(Boolean).at(-1))}.png" width="1200" height="630" alt="" loading="lazy"></a><div class="rn-card-copy"><small>공시 해설${p.published?' · '+e(p.published):''}</small><h3>${link(p)}</h3><p>${e(p.description)}</p></div></article>`).join('')}</div>`;
 const tabs=`<nav class="rn-category-tabs" aria-label="인사이트 분류"><a href="/blog/" aria-current="page">전체</a><a href="/blog/issues/">해설·이슈</a>${groups.map(([key,label])=>`<a href="/blog/${key}/">${label}</a>`).join('')}</nav>`;
 const form=`<form class="rn-unified-form" action="/search/" role="search"><label for="home-query">종목 · 코드 · 보고자 · 공시 해설</label><div><input id="home-query" name="q" type="search" required maxlength="120" placeholder="궁금한 종목이나 기관을 검색하세요"><button aria-label="검색"><img src="/assets/icons/search.svg" alt="" width="24" height="24"></button></div></form>`;
 
@@ -32,9 +33,15 @@ export function buildDiscovery(dir){
     const {document}=parseHTML(fs.readFileSync(home,'utf8')),signals=signalRecords(dir);
     const latestSignal=signals[0]?.date;
     const cards=document.querySelectorAll('.rn-category-grid article');
+    const character=document.createElement('img');character.src='/assets/brand/leeandnote-full.png';character.alt='리앤노트';character.width=140;character.height=190;document.querySelector('.rn-subscription')?.append(character);
+    const updateCard=(card,data,basis)=>{
+      card.querySelector('strong').textContent=`${data.length}건`;
+      const p=card.querySelector('p');p.innerHTML=`<small>${e(basis.slice(4,6)+'.'+basis.slice(6))} 접수</small><span class="rn-stock-chips">${[...new Set(data.map(r=>r.name))].slice(0,3).map(name=>`<span>${e(name)}</span>`).join('')||'수집 내역 없음'}</span>`;
+    };
+    if(latest)for(const i of [0,1])updateCard(cards[i],latestRows.filter(r=>r.category===(i===0?'5%보고':'임원·주요주주')),latest);
     for(const [i,category] of [[2,'contracts'],[3,'major-events']]){
       const data=signals.filter(r=>r.category===category&&r.date===latestSignal);
-      if(latestSignal){cards[i].querySelector('strong').textContent=String(data.length);cards[i].querySelector('p').textContent=`${latestSignal.slice(0,4)}.${latestSignal.slice(4,6)}.${latestSignal.slice(6)} 접수 · ${[...new Set(data.map(r=>r.name))].slice(0,3).join(' · ')||'수집 내역 없음'}`;}
+      if(latestSignal)updateCard(cards[i],data,latestSignal);
     }
     fs.writeFileSync(home,document.toString());
   }
@@ -43,6 +50,9 @@ export function buildDiscovery(dir){
     const pageSize=24, pages=Math.max(1,Math.ceil(daily.length/pageSize));
     const pagination=current=>`<nav class="rn-pagination" aria-label="데일리 노트 페이지">${Array.from({length:pages},(_,i)=>`<a href="${i===0?'/blog/':`/blog/page/${i+1}/`}"${current===i+1?' aria-current="page"':''}>${i+1}</a>`).join('')}</nav>`;
     setMain(blog,`<header class="rn-discovery-heading"><p>INSIGHT</p><h1>공시로 읽는 시장 이야기</h1></header>${tabs}<section class="rn-discovery-section"><h2>해설·이슈</h2>${picks(guides)}</section><section class="rn-discovery-section"><h2>데일리 노트</h2>${dailyList(daily.slice(0,pageSize))}${pagination(1)}</section>`);
+    const {document:listing}=parseHTML(fs.readFileSync(blog,'utf8'));
+    const featured=listing.querySelector('.rn-editor-grid article');if(featured)featured.classList.add('rn-featured');
+    fs.writeFileSync(blog,listing.toString());
     for(let page=2;page<=pages;page++){
       const target=path.join(dir,`blog/page/${page}`);fs.mkdirSync(target,{recursive:true});
       const file=path.join(target,'index.html');

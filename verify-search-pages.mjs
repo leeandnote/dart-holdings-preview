@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import assert from 'node:assert/strict';
+import {parseHTML} from 'linkedom';
 const root=path.resolve(process.argv[2]||'public_dist');
 const slugs=['ownership-rate-vs-share-count','contract-value-vs-revenue'];
 for(const slug of slugs){
@@ -8,7 +9,13 @@ for(const slug of slugs){
   assert.equal((html.match(/<h1\b/g)||[]).length,1);
   assert.match(html,new RegExp(`rel="canonical" href="https://leeandnote.com/blog/issues/${slug}/"`));
   assert.doesNotMatch(html,/<meta[^>]*name="robots"[^>]*noindex/i);
-  assert.match(html,/class="guideContents"/);
+  const {document}=parseHTML(html);
+  const contents=document.querySelector('.rn-compact-toc');
+  assert.ok(contents?.querySelector('summary'),'Short guides need one accessible contents disclosure');
+  assert.equal(document.querySelectorAll('.guideContents').length,0);
+  const anchors=[...contents.querySelectorAll('a[href^="#"]')];
+  assert.ok(anchors.length>0,'Contents must link to article headings');
+  for(const anchor of anchors)assert.ok(document.getElementById(anchor.getAttribute('href').slice(1)),'Contents target must exist');
   assert.doesNotMatch(html,/class="issueTableTitle"/);
   for(const match of html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g))JSON.parse(match[1]);
   for(const [,link] of html.matchAll(/href="(\/blog\/issues\/[^"#]+)"/g)){

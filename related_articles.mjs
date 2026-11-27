@@ -14,6 +14,8 @@ export function articleCatalog(dir) {
     unique.set(url,{file,url,group,title:article.querySelector('h1')?.textContent.trim()||document.title,
       stocks:[...article.querySelectorAll('td.stock small')].map(n=>n.textContent.match(/^[0-9A-Z]{6}/)?.[0]).filter(Boolean),
       date:url.match(/\d{4}-\d{2}-\d{2}/)?.[0]||'',
+      description:document.querySelector('meta[name="description"]')?.getAttribute('content')||'',
+      published:[...document.querySelectorAll('script[type="application/ld+json"]')].flatMap(n=>{try{const j=JSON.parse(n.textContent);return Array.isArray(j)?j:j['@graph']||[j];}catch{return [];}}).find(n=>n['@type']==='Article')?.datePublished?.slice(0,10)||'',
     });
   }
   return [...unique.values()];
@@ -34,7 +36,7 @@ export function attachRelated(document,catalog) {
   const canonical=document.querySelector('link[rel="canonical"]')?.getAttribute('href');
   if(!canonical)return;
   const url=new URL(canonical,'https://leeandnote.com').pathname.replace(/\/?$/,'/');
-  const current=catalog.find(p=>p.url===url);if(!current)return;
+  const current=catalog.find(p=>p.url===url)||{url,group:url.split('/')[2],stocks:[],date:''};
   const candidates=selectRelated(current,catalog);
   if(candidates.length){
     const section=document.createElement('section');section.id='rn-related';section.className='rn-related';
@@ -53,6 +55,11 @@ export function attachRelated(document,catalog) {
 }
 export function connectRelatedArticles(dir){
   const catalog=articleCatalog(dir);
-  for(const p of catalog){const {document}=parseHTML(fs.readFileSync(p.file,'utf8'));attachRelated(document,catalog);fs.writeFileSync(p.file,document.toString());}
+  for(const file of htmlFiles(dir)){
+    const {document}=parseHTML(fs.readFileSync(file,'utf8'));
+    if(!document.querySelector('article .articleBody'))continue;
+    attachRelated(document,catalog);
+    fs.writeFileSync(file,document.toString());
+  }
   return catalog.length;
 }

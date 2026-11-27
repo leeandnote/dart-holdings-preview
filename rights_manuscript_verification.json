@@ -1,11 +1,12 @@
 {
-  "reviewDate": "2026-11-26",
-  "publicationStatus": "blocked_pending_full_current_regulation_check",
+  "reviewDate": "2026-11-27",
+  "publicationStatus": "integrated_with_verified_claims_and_explicit_examples",
   "checks": [
     {"claim":"주주배정·제3자배정·일반공모 구분과 주주배정 신주인수권증서 발행", "status":"verified", "source":"https://www.law.go.kr/lsLinkCommonInfo.do?chrClsCd=010202&lsJoLnkSeq=1026822857", "effectiveDate":"2026-11-13", "provision":"제165조의6 제1항·제3항"},
     {"claim":"국내 주식 결제 T+2", "status":"verified_official_glossary", "source":"https://www.fsc.go.kr/in090301/view?dicId=1831"},
     {"claim":"권리락일 전까지 매수해 결제가 끝나야 한다", "status":"correction_required", "correction":"매수 시점과 결제 완료 시점을 구분해야 한다. 기준일에 결제된 보유분인지 최신 일정으로 확인하며 권리락일 이전에 결제까지 완료되어야 한다고 쓰지 않는다."},
-    {"claim":"일반공모 30%, 제3자배정 10% 할인율 상한", "status":"current_version_and_exceptions_pending", "source":"https://www.law.go.kr/LSW/admRulInfoP.do?admRulSeq=2100000264790&chrClsCd=010201", "note":"열람한 본문은 2025-09-23 시행본이다. 2026년 최신 개정본 및 예외를 확인하기 전 확정적 현행 규정으로 발행하지 않는다."},
+    {"claim":"일반공모 30%, 제3자배정 10% 할인율 상한", "status":"verified_with_exceptions", "source":"https://www.law.go.kr/LSW/admRulInfoP.do?admRulSeq=2100000287734", "effectiveDate":"2026-11-13", "provision":"제5-18조 제1항~제5항", "note":"제1항 원칙은 일반공모 30%, 제3자배정 10% 이내. 제2항의 조건부 기준주가 산정, 제4항의 구조조정·회생 등 할인율 예외, 제5항의 코넥스 수요예측 예외가 있으므로 모든 증자에 적용되는 절대 상한으로 쓰지 않는다. 원문 본문 admRulLsInfoR.do에서 확인."},
+    {"claim":"보고 기한 및 사전 통지 예외", "status":"verified_with_scope", "sources":["https://law.go.kr/lsLinkCommonInfo.do?chrClsCd=010202&lsJoLnkSeq=1027002751","https://www.law.go.kr/lsLinkCommonInfo.do?lsJoLnkSeq=1030607851"], "note":"자본시장법 제161조 제1항 제5호 보고 원칙은 lsLinkProc.do 현행 전체 본문에서 확인. 제165조의9 및 상법 제418조 제4항을 확인했고, 모든 공시·통지에 대한 일반화 없이 조건부 특례로 원고에 반영."},
     {"claim":"증자 발표 직후 주가가 내리는 경우가 많다는 주장", "status":"remove_without_empirical_evidence"},
     {"claim":"배정 방식별 희석 부담 순위", "status":"remove", "reason":"희석은 발행 주식수·참여 여부·조건에 따라 달라지므로 배정 방식만으로 일률적인 순위를 매기지 않는다."},
     {"claim":"최근 유상증자 사례 및 비율 분포", "status":"omit_until_verified_dataset", "minimumReports":3},

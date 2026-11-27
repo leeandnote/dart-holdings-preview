@@ -3,15 +3,37 @@ import path from 'node:path';
 import {parseHTML} from 'linkedom';
 import {disclosureRecords,escapeHtml as e} from './renewal_search.mjs';
 
+export function publishedMajorRows(snapshot,today){
+  const rows=(snapshot.rows||[]).filter(r=>r['공시유형']==='투자판단관련주요경영사항');
+  if(!rows.length)throw Error('Published major snapshot is empty');
+  for(const r of rows){
+    let url;try{url=new URL(r.DART_URL);}catch{throw Error('Invalid published DART URL');}
+    if(!/^\d{14}$/.test(r['접수번호'])||r['접수번호'].slice(0,8)!==r['접수일']||url.protocol!=='https:'||url.hostname!=='dart.fss.or.kr'||url.searchParams.get('rcpNo')!==r['접수번호'])throw Error('Invalid published major receipt');
+  }
+  const latest=rows.map(r=>r['접수일']).sort().at(-1),parse=s=>Date.parse(`${s.slice(0,4)}-${s.slice(4,6)}-${s.slice(6)}T00:00:00Z`),age=(parse(today)-parse(latest))/86400000;
+  if(!Number.isFinite(age)||age<0||age>7)throw Error('Published major snapshot is stale');
+  return rows;
+}
+
 export async function refreshMajorSnapshot(dir){
   const file=path.join(dir,'data/disclosure_signals.json');if(!fs.existsSync(file))return 0;
   const end=new Date(Date.now()+9*60*60*1000),start=new Date(end);start.setUTCDate(start.getUTCDate()-120);
   const format=d=>d.toISOString().slice(0,10).replaceAll('-','');
-  const response=await fetch('https://quiet-cardinal-118.convex.cloud/api/query',{method:'POST',headers:{'content-type':'application/json'},signal:AbortSignal.timeout(30000),body:JSON.stringify({path:'dart:listMajorEventDailyReportItemsRange',args:{bgnDe:format(start),endDe:format(end),limit:1000},format:'json'})});
-  if(!response.ok)throw Error(`Major-event snapshot HTTP ${response.status}`);
-  const result=await response.json();if(result.status!=='success'||!Array.isArray(result.value))throw Error('Invalid major-event snapshot');
   const data=JSON.parse(fs.readFileSync(file,'utf8'));
-  const rows=result.value.map(r=>({'접수일':r.receiptDate||r.reportDate,'시장':r.market,'종목명':r.corpName,'종목코드':r.stockCode,'보고서명':r.eventTitle||r.reportName,'주요내용':[r.eventTitle,r.detail,r.metric].filter(Boolean).join(' · '),'접수번호':r.receiptNo,DART_URL:r.url,'공시유형':'투자판단관련주요경영사항'}));
+  let rows;
+  try{
+    const response=await fetch('https://quiet-cardinal-118.convex.cloud/api/query',{method:'POST',headers:{'content-type':'application/json'},signal:AbortSignal.timeout(30000),body:JSON.stringify({path:'dart:listMajorEventDailyReportItemsRange',args:{bgnDe:format(start),endDe:format(end),limit:1000},format:'json'})});
+    if(!response.ok)throw Error(`Major-event snapshot HTTP ${response.status}`);
+    const result=await response.json();if(result.status!=='success'||!Array.isArray(result.value))throw Error('Invalid major-event snapshot');
+    rows=result.value.map(r=>({'접수일':r.receiptDate||r.reportDate,'시장':r.market,'종목명':r.corpName,'종목코드':r.stockCode,'보고서명':r.eventTitle||r.reportName,'주요내용':[r.eventTitle,r.detail,r.metric].filter(Boolean).join(' · '),'접수번호':r.receiptNo,DART_URL:r.url,'공시유형':'투자판단관련주요경영사항'}));
+    delete data.majorSnapshot;
+  }catch{
+    const url='https://leeandnote.com/data/disclosure_signals.json';
+    const response=await fetch(url,{signal:AbortSignal.timeout(30000)});if(!response.ok)throw Error('Published major snapshot unavailable');
+    rows=publishedMajorRows(await response.json(),format(end));
+    data.majorSnapshot={source:'published-fallback',url,latestReceiptDate:rows.map(r=>r['접수일']).sort().at(-1)};
+    console.warn('Major-event API unavailable; retaining verified published snapshot: '+data.majorSnapshot.latestReceiptDate);
+  }
   const merged=new Map((data.rows||[]).map(r=>[r['접수번호'],r]));for(const r of rows)merged.set(r['접수번호'],r);
   data.rows=[...merged.values()];
   fs.writeFileSync(file,JSON.stringify(data));
@@ -40,6 +62,10 @@ export function prerenderDataPages(dir){
       if(!fs.existsSync(file)||!data.length)continue;
       const {document}=parseHTML(fs.readFileSync(file,'utf8')),list=document.getElementById(id);if(!list)continue;
       list.classList.add('rn-ssr-list');
+      if(route==='major-events'){
+        const snapshot=JSON.parse(fs.readFileSync(path.join(dir,'data/disclosure_signals.json'),'utf8')).majorSnapshot;
+        if(snapshot?.source==='published-fallback'){const note=document.createElement('p');note.className='rn-source-status';note.textContent=`실시간 수집 연결 지연으로 기존 게시 자료를 표시합니다. 최근 공시 접수일 ${snapshot.latestReceiptDate.replace(/^(\d{4})(\d{2})(\d{2})$/,'$1.$2.$3')}.`;list.before(note);}
+      }
       list.innerHTML=`<div class="rn-ssr-table"><table><caption>최근 수집 공시 ${data.length}건 · 접수일 기준</caption><thead><tr><th>접수일</th><th>종목</th><th>보고자 · 공시</th><th>확인 내용</th><th>원문</th></tr></thead><tbody>${data.map(r=>`<tr><td>${e(r.date)}</td><th>${e(r.name)}<small>${e(r.code)}</small></th><td>${e(r.reporter||r.reason)}</td><td>${e(r.rateText||r.reason||'원문 확인')}</td><td><a href="${e(r.url)}" target="_blank" rel="noopener noreferrer">DART 원문</a></td></tr>`).join('')}</tbody></table></div>`;
       fs.writeFileSync(file,document.toString());count++;
     }

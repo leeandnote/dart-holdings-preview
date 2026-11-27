@@ -28,7 +28,7 @@ test('explanations have visible FAQs matching schema and no empty data table', (
     assert.equal(document.querySelectorAll('#issue-faq-schema').length, 1);
     assert.equal(document.querySelector('.issueTable'), null);
     const schema = JSON.parse(document.querySelector('#issue-faq-schema').textContent);
-    assert.equal(schema.mainEntity.length, 3);
+    assert.equal(schema.mainEntity.length, guide.slug==='rights-offering-disclosure-guide'?5:3);
     assert.deepEqual(schema.mainEntity.map(q => q.name), [...document.querySelectorAll('.issueFaq h3')].map(h => h.textContent));
   }
 });

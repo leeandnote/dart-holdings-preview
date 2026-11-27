@@ -14,6 +14,8 @@ on:
       - "renewal_search.mjs"
       - "renewal_discovery.mjs"
       - "renewal_charts.mjs"
+      - "renewal_extended_charts.mjs"
+      - "renewal_extended_charts.test.mjs"
       - "renewal_data.mjs"
       - "related_articles.mjs"
       - "institution_gate.mjs"
@@ -28,6 +30,10 @@ on:
       - "search_guides.mjs"
       - "institution_topics.mjs"
       - "capital_guides.mjs"
+      - "rights_offering_guide.mjs"
+      - "insight_thumbnails.mjs"
+      - "renewal_editor.mjs"
+      - "daily_context.mjs"
       - "issue_quality.mjs"
       - "disclosure_questions.mjs"
       - "daily_content.mjs"
@@ -132,6 +138,10 @@ jobs:
           node --test search-expansion.test.mjs
           node --test renewal_layout.test.mjs renewal_article.test.mjs retirement_related.test.mjs
           node --test renewal_search.test.mjs renewal_discovery.test.mjs renewal_charts.test.mjs
+          node --test renewal_extended_charts.test.mjs
+          node --test renewal_qa.test.mjs
+          node --test daily_context.test.mjs
+          node --test renewal_data.test.mjs
           node verify-search-pages.mjs
           pnpm dlx wrangler pages deploy public_dist --project-name leeandnote --branch main
 
