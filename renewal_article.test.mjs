@@ -5,6 +5,18 @@ import {parseHTML} from 'linkedom';
 import {applyArticleDesign,measureArticle} from './renewal_article.mjs';
 import {seoSnapshot,applyRenewalLayout} from './renewal_layout.mjs';
 const fixture=(text,extras='')=>parseHTML(`<html><head><title>Original</title><link rel="canonical" href="https://leeandnote.com/blog/5percent/2026-11-19/"></head><body><article><header class="blogHero"><h1>2026.11.19 삼성전자 | 5%보고공시</h1></header><section class="articleBody"><div class="summaryBox">요약</div><p>${text}</p><h2>A?</h2><h2>B?</h2><h2>C?</h2><h2>D?</h2>${extras}</section></article></body></html>`).document;
+test('preserved old article upgrades once without duplicate byline or CTA',()=>{
+ const d=fixture('본문','<section class="guideContents"><ol><li><a href="#a">A</a></li></ol></section>');
+ d.querySelector('article').setAttribute('data-rn-article','');
+ d.body.insertAdjacentHTML('afterbegin','<header id="rn-header"></header><aside class="rn-scroll-cta"></aside>');
+ d.querySelector('article').insertAdjacentHTML('beforeend','<div class="rn-author">old</div><section class="rn-article-cta">old</section>');
+ const upgraded=applyRenewalLayout(d.toString()),{document}=parseHTML(upgraded);
+ assert.equal(document.querySelectorAll('.rn-author').length,1);
+ assert.equal(document.querySelectorAll('.rn-article-cta').length,1);
+ assert.equal(document.querySelectorAll('.rn-compact-toc').length,1);
+ assert.equal(document.querySelectorAll('.guideContents').length,0);
+ assert.equal(applyRenewalLayout(upgraded),upgraded);
+});
 test('short prose excludes long tables and omits ornamental summary/TOC',()=>{
  const d=fixture('본문',`<table><tbody><tr><td>${'데이터'.repeat(2000)}</td></tr></tbody></table>`);
  const report=applyArticleDesign(d);

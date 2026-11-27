@@ -17,7 +17,11 @@ export function seoSnapshot(html) {
 
 export function applyRenewalLayout(html) {
   const {document} = parseHTML(html);
-  if (!document.body || document.querySelector('#rn-header')) return html;
+  if (!document.body) return html;
+  if (document.querySelector('#rn-header')) {
+    applyArticleDesign(document);
+    return document.toString();
+  }
   // Only replace site chrome: article headers, source footers and structured data remain intact.
   document.querySelectorAll('header.topbar,#channel-menu,.channelMenu,footer.minimalFooter,footer.siteFooter').forEach(n=>n.remove());
   document.querySelectorAll('link[href="/channel-menu.css"],script[src="/channel-menu.js"]').forEach(n=>n.remove());

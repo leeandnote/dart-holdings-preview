@@ -33,9 +33,14 @@ export function measureArticle(document) {
 export function applyArticleDesign(document) {
   const article=document.querySelector('article');
   const body=article?.querySelector('.articleBody');
-  if(!body||article.hasAttribute('data-rn-article'))return null;
+  if(!body||article.getAttribute('data-rn-article')==='2')return null;
+  if(article.hasAttribute('data-rn-article')){
+    article.querySelectorAll('.rn-author,.rn-breadcrumb,.rn-section-name,.rn-toc,.rn-mobile-toc,.rn-article-cta,.rn-editor-credit').forEach(n=>n.remove());
+    document.querySelectorAll('.rn-scroll-cta').forEach(n=>n.remove());
+    document.body.classList.remove('rn-has-toc');
+  }
   const audit=measureArticle(document);
-  article.setAttribute('data-rn-article','');
+  article.setAttribute('data-rn-article','2');
   document.body.classList.add('rn-article');
   const url=audit.url, group=url.match(/\/blog\/([^/]+)\//)?.[1]||'issues';
   const daily=group!=='issues';
