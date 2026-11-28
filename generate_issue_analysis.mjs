@@ -1,5 +1,6 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
+import {cachedConvexQuery} from './convex_read_cache.mjs';
 import { searchGuides, enrichSearchTopics, buybackGuide } from './search_guides.mjs';
 import { questionGuides } from './disclosure_questions.mjs';
 import { institutionTopics } from './institution_topics.mjs';
@@ -15,14 +16,7 @@ const bgnDe = "00000000";
 const iso = `${endDe.slice(0, 4)}-${endDe.slice(4, 6)}-${endDe.slice(6, 8)}`;
 
 async function query(queryPath, limit = 3000) {
-  const response = await fetch(`${CONVEX}/api/query`, {
-    method: "POST", headers: { "content-type": "application/json" },
-    body: JSON.stringify({ path: queryPath, args: { bgnDe, endDe, limit }, format: "json" }),
-    signal: AbortSignal.timeout(30_000),
-  });
-  const payload = await response.json();
-  if (!response.ok || payload.status !== "success") throw new Error(payload.errorMessage || `${queryPath} failed`);
-  return payload.value || [];
+  return await cachedConvexQuery(CONVEX,queryPath,{bgnDe,endDe,limit}) || [];
 }
 
 const esc = (value) => String(value ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;");

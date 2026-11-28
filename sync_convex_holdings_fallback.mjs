@@ -1,4 +1,5 @@
 import fs from "node:fs";
+import {cachedConvexQuery} from './convex_read_cache.mjs';
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -13,14 +14,7 @@ start.setUTCDate(start.getUTCDate() - 120);
 const bgnDe = start.toISOString().slice(0, 10).replaceAll("-", "");
 
 async function query(queryPath, args) {
-  const response = await fetch(`${convexUrl}/api/query`, {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify({ path: queryPath, args, format: "json" }),
-  });
-  const payload = await response.json();
-  if (!response.ok || payload.status !== "success") throw new Error(payload.errorMessage || queryPath);
-  return payload.value;
+  return cachedConvexQuery(convexUrl,queryPath,args);
 }
 
 const numberOrBlank = (value) => Number.isFinite(value) ? value : "";

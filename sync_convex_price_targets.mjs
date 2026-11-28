@@ -1,4 +1,5 @@
 import fs from "node:fs";
+import {cachedConvexQuery} from './convex_read_cache.mjs';
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import vm from "node:vm";
@@ -36,14 +37,8 @@ function normalizeDate(value) {
 }
 
 async function convexQuery(pathName, args) {
-  const res = await fetch(`${convexUrl}/api/query`, {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify({ path: pathName, args, format: "json" }),
-  });
-  const json = await res.json();
-  if (json.status !== "success") throw new Error(`${pathName}: ${JSON.stringify(json)}`);
-  return Array.isArray(json.value) ? json.value : [];
+  const value=await cachedConvexQuery(convexUrl,pathName,args);
+  return Array.isArray(value)?value:[];
 }
 
 function readExisting() {

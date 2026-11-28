@@ -1,5 +1,6 @@
 import { mkdir, writeFile, readFile, readdir, rm } from "node:fs/promises";
 import path from "node:path";
+import {cachedConvexQuery} from './convex_read_cache.mjs';
 import { parseHTML } from 'linkedom';
 import { exclusiveThemes, ownershipHeadline, factualReview, reportCounts, receiptDate, executiveDirection } from './daily_content.mjs';
 
@@ -12,16 +13,7 @@ const iso = `${ymd.slice(0, 4)}-${ymd.slice(4, 6)}-${ymd.slice(6, 8)}`;
 const dotted = `${ymd.slice(0, 4)}.${ymd.slice(4, 6)}.${ymd.slice(6, 8)}`;
 
 async function convexQuery(queryPath, args = {}) {
-  const response = await fetch(`${CONVEX_URL}/api/query`, {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify({ path: queryPath, args, format: "json" }),
-  });
-  const payload = await response.json();
-  if (payload.status !== "success") {
-    throw new Error(payload.errorMessage || `Convex query failed: ${queryPath}`);
-  }
-  return payload.value || [];
+  return await cachedConvexQuery(CONVEX_URL,queryPath,args) || [];
 }
 
 async function dailyRows(queryPath, reportDate, limit = 300) {

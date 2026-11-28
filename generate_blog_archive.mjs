@@ -1,5 +1,6 @@
 import { spawnSync } from "node:child_process";
 import path from "node:path";
+import {cachedConvexQuery} from './convex_read_cache.mjs';
 import { fileURLToPath } from "node:url";
 
 const root = path.dirname(fileURLToPath(import.meta.url));
@@ -14,16 +15,8 @@ function kstDate(offsetDays = 0) {
 }
 
 async function queryDates(queryPath) {
-  const response = await fetch(`${convexUrl}/api/query`, {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify({ path: queryPath, args: {}, format: "json" }),
-    signal: AbortSignal.timeout(30_000),
-  });
-  if (!response.ok) throw new Error(`${queryPath} returned HTTP ${response.status}`);
-  const payload = await response.json();
-  if (payload.status !== "success") throw new Error(payload.errorMessage || `${queryPath} failed`);
-  return Array.isArray(payload.value) ? payload.value : [];
+  const value=await cachedConvexQuery(convexUrl,queryPath,{});
+  return Array.isArray(value)?value:[];
 }
 
 const dates = new Set();

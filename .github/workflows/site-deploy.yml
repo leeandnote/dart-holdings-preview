@@ -24,6 +24,7 @@ on:
       - "renewal_extended_charts.mjs"
       - "renewal_extended_charts.test.mjs"
       - "renewal_data.mjs"
+      - "convex_read_cache.mjs"
       - "related_articles.mjs"
       - "institution_gate.mjs"
       - "retire_disclosurepedia.mjs"
@@ -175,6 +176,7 @@ jobs:
           node --test renewal_qa.test.mjs
           node --test daily_context.test.mjs
           node --test renewal_data.test.mjs
+          node --test convex_read_cache.test.mjs
           node --test note_series.test.mjs series_integration.test.mjs
           node verify-search-pages.mjs
           pnpm dlx wrangler pages deploy public_dist --project-name leeandnote --branch main

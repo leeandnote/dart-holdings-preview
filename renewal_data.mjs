@@ -15,13 +15,14 @@ export function publishedMajorRows(snapshot,today){
   return rows;
 }
 
-export async function refreshMajorSnapshot(dir){
+export async function refreshMajorSnapshot(dir,{allowLive=false}={}){
   const file=path.join(dir,'data/disclosure_signals.json');if(!fs.existsSync(file))return 0;
   const end=new Date(Date.now()+9*60*60*1000),start=new Date(end);start.setUTCDate(start.getUTCDate()-120);
   const format=d=>d.toISOString().slice(0,10).replaceAll('-','');
   const data=JSON.parse(fs.readFileSync(file,'utf8'));
   let rows;
   try{
+    if(!allowLive)throw Error('Site builds reuse published snapshots; live collection is separate');
     const response=await fetch('https://quiet-cardinal-118.convex.cloud/api/query',{method:'POST',headers:{'content-type':'application/json'},signal:AbortSignal.timeout(30000),body:JSON.stringify({path:'dart:listMajorEventDailyReportItemsRange',args:{bgnDe:format(start),endDe:format(end),limit:1000},format:'json'})});
     if(!response.ok)throw Error(`Major-event snapshot HTTP ${response.status}`);
     const result=await response.json();if(result.status!=='success'||!Array.isArray(result.value))throw Error('Invalid major-event snapshot');
@@ -32,7 +33,7 @@ export async function refreshMajorSnapshot(dir){
     const response=await fetch(url,{signal:AbortSignal.timeout(30000)});if(!response.ok)throw Error('Published major snapshot unavailable');
     rows=publishedMajorRows(await response.json(),format(end));
     data.majorSnapshot={source:'published-fallback',url,latestReceiptDate:rows.map(r=>r['접수일']).sort().at(-1)};
-    console.warn('Major-event API unavailable; retaining verified published snapshot: '+data.majorSnapshot.latestReceiptDate);
+    console.log((allowLive?'Major-event API unavailable; retaining verified published snapshot: ':'Site build reuses verified published snapshot: ')+data.majorSnapshot.latestReceiptDate);
   }
   const merged=new Map((data.rows||[]).map(r=>[r['접수번호'],r]));for(const r of rows)merged.set(r['접수번호'],r);
   data.rows=[...merged.values()];
