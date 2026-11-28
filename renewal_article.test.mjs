@@ -17,6 +17,15 @@ test('preserved old article upgrades once without duplicate byline or CTA',()=>{
  assert.equal(document.querySelectorAll('.guideContents').length,0);
  assert.equal(applyRenewalLayout(upgraded),upgraded);
 });
+test('preserved styled articles discard reinserted legacy contents',()=>{
+ const d=fixture('본문','<section class="guideContents"><ol><li>A</li></ol></section>');
+ applyArticleDesign(d);
+ d.querySelector('.articleBody').insertAdjacentHTML('afterbegin','<section class="guideContents">duplicate</section>');
+ applyArticleDesign(d);
+ assert.equal(d.querySelectorAll('.guideContents').length,0);
+ assert.equal(d.querySelectorAll('.rn-compact-toc').length,1);
+});
+
 test('short prose excludes long tables and omits ornamental summary/TOC',()=>{
  const d=fixture('본문',`<table><tbody><tr><td>${'데이터'.repeat(2000)}</td></tr></tbody></table>`);
  const report=applyArticleDesign(d);

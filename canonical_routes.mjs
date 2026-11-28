@@ -12,7 +12,8 @@ export function normalizeRoute(value, base = origin + '/') {
   try { url = new URL(value, clean.has(value.split(/[?#]/)[0].replace(/\.html$/, '')) ? origin + '/' : base); } catch { return value; }
   if (![origin, 'https://www.leeandnote.com'].includes(url.origin)) return value;
   const page = url.pathname.replace(/^\//, '').replace(/\/$/, '').replace(/\.html$/, '');
-  if (clean.has(page)) url.pathname = '/' + page;
+  if (/^\/blog\/issues\/?$/.test(url.pathname)) url.pathname = '/blog/';
+  else if (clean.has(page)) url.pathname = '/' + page;
   else if (/^\/(blog|disclosurepedia|stock-terms)(\/|$)/.test(url.pathname) && !/\.[^/]+$/.test(url.pathname)) {
     url.pathname = url.pathname.replace(/\/$/, '') + '/';
   } else return value;
@@ -25,6 +26,8 @@ export function normalizeSearchRoutes(dist) {
   const existing = fs.existsSync(redirectFile) ? fs.readFileSync(redirectFile, 'utf8') : '';
   const sources = new Set(existing.split(/\r?\n/).map(line => line.trim().split(/\s+/)[0]));
   const add = (from, to) => { if (from !== to && !sources.has(from)) redirects.set(from, to); };
+  add('/blog/issues', '/blog/');
+  add('/blog/issues/', '/blog/');
   for (const page of clean) {
     add('/' + page + '.html', '/' + page);
     add('/' + page + '/', '/' + page);

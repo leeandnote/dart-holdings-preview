@@ -38,6 +38,9 @@ test('monthly archives include every actual article and link from hubs',()=>{
   } finally {fs.rmSync(dir,{recursive:true,force:true});}
 });
 test('canonical routes normalize aliases without changing external URLs',()=>{
+  for(const value of ['/blog/issues','/blog/issues/']) assert.equal(normalizeRoute(value),'/blog/');
+  assert.equal(normalizeRoute('/blog/issues/?x=1#notes'),'/blog/?x=1#notes');
+  assert.equal(normalizeRoute('/blog/issues/rights-offering-disclosure-guide/'),'/blog/issues/rights-offering-disclosure-guide/');
   for(const value of ['/about.html','about.html','/about/']) assert.equal(normalizeRoute(value,origin+'/blog/5percent/2026-11-19/'),'/about');
   assert.equal(normalizeRoute('/blog/5percent/2026-11-19?x=1#table'),'/blog/5percent/2026-11-19/?x=1#table');
   assert.equal(normalizeRoute('https://elsewhere.com/about.html'),'https://elsewhere.com/about.html');
@@ -68,6 +71,9 @@ test('canonical, social metadata, schema and links agree; redirects are idempote
     fs.writeFileSync(file,`<html><head><link rel="canonical" href="${origin}/blog/5percent/2026-11-19"><meta property="og:url" content="${origin}/blog/5percent/2026-11-19"><script type="application/ld+json">{"url":"${origin}/blog/5percent/2026-11-19","name":"about"}</script></head><body><a href="contact.html">Contact</a></body></html>`);
     normalizeSearchRoutes(dir);
     const first=fs.readFileSync(file,'utf8'), redirects=fs.readFileSync(path.join(dir,'_redirects'),'utf8');
+    assert.ok(redirects.split('\n').includes('/blog/issues /blog/ 301'));
+    assert.ok(redirects.split('\n').includes('/blog/issues/ /blog/ 301'));
+    assert.ok(!redirects.includes('/blog/issues/*'));
     const {document}=parseHTML(first);
     assert.equal(document.querySelector('link').href,origin+'/blog/5percent/2026-11-19/');
     assert.equal(document.querySelector('meta').getAttribute('content'),origin+'/blog/5percent/2026-11-19/');

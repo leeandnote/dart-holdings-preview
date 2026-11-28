@@ -33,7 +33,12 @@ export function measureArticle(document) {
 export function applyArticleDesign(document) {
   const article=document.querySelector('article');
   const body=article?.querySelector('.articleBody');
-  if(!body||article.getAttribute('data-rn-article')==='2')return null;
+  if(!body)return null;
+  // Editorial enrichment can reinsert the legacy contents into a styled article.
+  if(article.getAttribute('data-rn-article')==='2'){
+    if(article.querySelector('.rn-compact-toc,.rn-toc'))body.querySelectorAll('.guideContents').forEach(n=>n.remove());
+    return null;
+  }
   if(article.hasAttribute('data-rn-article')){
     article.querySelectorAll('.rn-author,.rn-breadcrumb,.rn-section-name,.rn-toc,.rn-mobile-toc,.rn-article-cta,.rn-editor-credit').forEach(n=>n.remove());
     document.querySelectorAll('.rn-scroll-cta').forEach(n=>n.remove());
